@@ -1,0 +1,114 @@
+[
+  {
+    "id": "f8e55010",
+    "type": "import",
+    "name": null,
+    "code": "import json",
+    "pyh": "import json"
+  },
+  {
+    "id": "cace5bec",
+    "type": "import",
+    "name": null,
+    "code": "from typing import List, Dict, Optional",
+    "pyh": "from typing import List, Dict, Optional"
+  },
+  {
+    "id": "b7ef3d8e",
+    "type": "class",
+    "name": "Task",
+    "code": "class Task:\n    def __init__(self, title: str, description: str = \"\", done: bool = False):\n        self.title = title\n        self.description = description\n        self.done = done\n        self.subtasks: List[\"Task\"] = []\n\n    def add_subtask(self, subtask: \"Task\") -> None:\n        self.subtasks.append(subtask)\n\n    def mark_done(self) -> None:\n        self.done = True\n        for sub in self.subtasks:\n            sub.mark_done()\n\n    def to_dict(self) -> Dict:\n        return {\n            \"title\": self.title,\n            \"description\": self.description,\n            \"done\": self.done,\n            \"subtasks\": [sub.to_dict() for sub in self.subtasks],\n        }\n\n    def __str__(self, level: int = 0) -> str:\n        indent = \"  \" * level\n        status = \"[x]\" if self.done else \"[ ]\"\n        result = f\"{indent}{status} {self.title} - {self.description}\\n\"\n        for sub in self.subtasks:\n            result += sub.__str__(level + 1)\n        return result",
+    "pyh": "class Task:\n    def __init__(self, title: str, description: str='', done: bool=False):\n    self.title = title\n    self.description = description\n    self.done = done\n    self.subtasks: List['Task'] = []\n    def add_subtask(self, subtask: 'Task') -> None:\n    self.subtasks.append(subtask)\n    def mark_done(self) -> None:\n    self.done = True\n    for sub in self.subtasks:\n        sub.mark_done()\n    def to_dict(self) -> Dict:\n    return {'title': self.title, 'description': self.description, 'done': self.done, 'subtasks': [sub.to_dict() for sub in self.subtasks]}\n    def __str__(self, level: int=0) -> str:\n    indent = '  ' * level\n    status = '[x]' if self.done else '[ ]'\n    result = f'{indent}{status} {self.title} - {self.description}\\n'\n    for sub in self.subtasks:\n        result += sub.__str__(level + 1)\n    return result"
+  },
+  {
+    "id": "be15035e",
+    "type": "function",
+    "name": "__init__",
+    "code": "    def __init__(self, title: str, description: str = \"\", done: bool = False):\n        self.title = title\n        self.description = description\n        self.done = done\n        self.subtasks: List[\"Task\"] = []",
+    "pyh": "def __init__(self, title, description, done):\n    set self.title to title\n    set self.description to description\n    set self.done to done\n    self.subtasks: List['Task'] = []"
+  },
+  {
+    "id": "c32d2062",
+    "type": "function",
+    "name": "add_subtask",
+    "code": "    def add_subtask(self, subtask: \"Task\") -> None:\n        self.subtasks.append(subtask)",
+    "pyh": "def add_subtask(self, subtask):\n    call self.subtasks.append with args subtask"
+  },
+  {
+    "id": "be65ceba",
+    "type": "function",
+    "name": "mark_done",
+    "code": "    def mark_done(self) -> None:\n        self.done = True\n        for sub in self.subtasks:\n            sub.mark_done()",
+    "pyh": "def mark_done(self):\n    set self.done to True\n    for each sub in self.subtasks:"
+  },
+  {
+    "id": "3fbb5e90",
+    "type": "function",
+    "name": "to_dict",
+    "code": "    def to_dict(self) -> Dict:\n        return {\n            \"title\": self.title,\n            \"description\": self.description,\n            \"done\": self.done,\n            \"subtasks\": [sub.to_dict() for sub in self.subtasks],\n        }",
+    "pyh": "def to_dict(self):\n    return {'title': self.title, 'description': self.description, 'done': self.done, 'subtasks': [sub.to_dict() for sub in self.subtasks]}"
+  },
+  {
+    "id": "cc7d08bb",
+    "type": "function",
+    "name": "__str__",
+    "code": "    def __str__(self, level: int = 0) -> str:\n        indent = \"  \" * level\n        status = \"[x]\" if self.done else \"[ ]\"\n        result = f\"{indent}{status} {self.title} - {self.description}\\n\"\n        for sub in self.subtasks:\n            result += sub.__str__(level + 1)\n        return result",
+    "pyh": "def __str__(self, level):\n    set indent to '  ' * level\n    set status to '[x]' if self.done else '[ ]'\n    set result to f'{indent}{status} {self.title} - {self.description}\\n'\n    for each sub in self.subtasks:\n    return result"
+  },
+  {
+    "id": "9ee92c8d",
+    "type": "class",
+    "name": "TaskManager",
+    "code": "class TaskManager:\n    def __init__(self):\n        self.tasks: List[Task] = []\n\n    def add_task(self, title: str, description: str = \"\") -> Task:\n        task = Task(title, description)\n        self.tasks.append(task)\n        return task\n\n    def find_task(self, title: str) -> Optional[Task]:\n        def _find(task_list: List[Task]) -> Optional[Task]:\n            for t in task_list:\n                if t.title == title:\n                    return t\n                result = _find(t.subtasks)\n                if result:\n                    return result\n            return None\n\n        return _find(self.tasks)\n\n    def mark_done(self, title: str) -> bool:\n        task = self.find_task(title)\n        if task:\n            task.mark_done()\n            return True\n        return False\n\n    def export_to_json(self, file_name: str) -> None:\n        with open(file_name, \"w\", encoding=\"utf-8\") as f:\n            json.dump([task.to_dict() for task in self.tasks], f, indent=4)\n\n    def __str__(self) -> str:\n        result = \"\"\n        for task in self.tasks:\n            result += task.__str__()\n        return result",
+    "pyh": "class TaskManager:\n    def __init__(self):\n    self.tasks: List[Task] = []\n    def add_task(self, title: str, description: str='') -> Task:\n    task = Task(title, description)\n    self.tasks.append(task)\n    return task\n    def find_task(self, title: str) -> Optional[Task]:\n\n    def _find(task_list: List[Task]) -> Optional[Task]:\n        for t in task_list:\n            if t.title == title:\n                return t\n            result = _find(t.subtasks)\n            if result:\n                return result\n        return None\n    return _find(self.tasks)\n    def mark_done(self, title: str) -> bool:\n    task = self.find_task(title)\n    if task:\n        task.mark_done()\n        return True\n    return False\n    def export_to_json(self, file_name: str) -> None:\n    with open(file_name, 'w', encoding='utf-8') as f:\n        json.dump([task.to_dict() for task in self.tasks], f, indent=4)\n    def __str__(self) -> str:\n    result = ''\n    for task in self.tasks:\n        result += task.__str__()\n    return result"
+  },
+  {
+    "id": "c5e11e66",
+    "type": "function",
+    "name": "__init__",
+    "code": "    def __init__(self):\n        self.tasks: List[Task] = []",
+    "pyh": "def __init__(self):\n    self.tasks: List[Task] = []"
+  },
+  {
+    "id": "b30c0109",
+    "type": "function",
+    "name": "add_task",
+    "code": "    def add_task(self, title: str, description: str = \"\") -> Task:\n        task = Task(title, description)\n        self.tasks.append(task)\n        return task",
+    "pyh": "def add_task(self, title, description):\n    set task to Task(title, description)\n    call self.tasks.append with args task\n    return task"
+  },
+  {
+    "id": "44c6b2c8",
+    "type": "function",
+    "name": "find_task",
+    "code": "    def find_task(self, title: str) -> Optional[Task]:\n        def _find(task_list: List[Task]) -> Optional[Task]:\n            for t in task_list:\n                if t.title == title:\n                    return t\n                result = _find(t.subtasks)\n                if result:\n                    return result\n            return None\n\n        return _find(self.tasks)",
+    "pyh": "def find_task(self, title):\n    def _find(task_list: List[Task]) -> Optional[Task]:\n    for t in task_list:\n        if t.title == title:\n            return t\n        result = _find(t.subtasks)\n        if result:\n            return result\n    return None\n    return _find(self.tasks)"
+  },
+  {
+    "id": "f96ec6c6",
+    "type": "function",
+    "name": "_find",
+    "code": "        def _find(task_list: List[Task]) -> Optional[Task]:\n            for t in task_list:\n                if t.title == title:\n                    return t\n                result = _find(t.subtasks)\n                if result:\n                    return result\n            return None",
+    "pyh": "def _find(task_list):\n    for each t in task_list:\n    return None"
+  },
+  {
+    "id": "c4080c23",
+    "type": "function",
+    "name": "mark_done",
+    "code": "    def mark_done(self, title: str) -> bool:\n        task = self.find_task(title)\n        if task:\n            task.mark_done()\n            return True\n        return False",
+    "pyh": "def mark_done(self, title):\n    set task to self.find_task(title)\n    if task:\n    return False"
+  },
+  {
+    "id": "ac1c7aa8",
+    "type": "function",
+    "name": "export_to_json",
+    "code": "    def export_to_json(self, file_name: str) -> None:\n        with open(file_name, \"w\", encoding=\"utf-8\") as f:\n            json.dump([task.to_dict() for task in self.tasks], f, indent=4)",
+    "pyh": "def export_to_json(self, file_name):\n    with open(file_name, 'w', encoding='utf-8') as f:\n    json.dump([task.to_dict() for task in self.tasks], f, indent=4)"
+  },
+  {
+    "id": "bec1f301",
+    "type": "function",
+    "name": "__str__",
+    "code": "    def __str__(self) -> str:\n        result = \"\"\n        for task in self.tasks:\n            result += task.__str__()\n        return result",
+    "pyh": "def __str__(self):\n    set result to ''\n    for each task in self.tasks:\n    return result"
+  }
+]
