@@ -1,14 +1,30 @@
 # crawl_repo.py
 import os
-import subprocess
 from pathlib import Path
+import ast_chunker
+import pyh_ast_generator
+
+# Directories and file patterns to ignore
+IGNORE_DIRS = {
+    ".git", ".github", ".gitlab", ".idea", ".vscode",
+    "venv", ".venv", "env", ".env",
+    "__pycache__", "build", "dist"
+}
+IGNORE_SUFFIXES = {".egg-info", ".pyc", ".pyo"}
 
 def crawl_repo(repo_root: str, out_root: str = "out"):
     repo_root = Path(repo_root).resolve()
-    out_root = Path(out_root).resolve()
+    out_root = repo_root / "out"
 
-    for dirpath, _, filenames in os.walk(repo_root):
+    for dirpath, dirnames, filenames in os.walk(repo_root):
+        # Filter out ignored directories in-place
+        dirnames[:] = [d for d in dirnames if d not in IGNORE_DIRS]
+
         for filename in filenames:
+            # Skip unwanted suffixes
+            if any(filename.endswith(suffix) for suffix in IGNORE_SUFFIXES):
+                continue
+
             if filename.endswith(".py"):
                 py_file = Path(dirpath) / filename
 
@@ -27,29 +43,28 @@ def crawl_repo(repo_root: str, out_root: str = "out"):
 
                 print(f"\n📄 Processing {py_file}")
 
-                # 1. Run AST chunker
-                chunker_cmd = [
-                    "python3", "ast_chunker.py",
-                    str(py_file),
-                    "-o", str(ast_json)
-                ]
-                result = subprocess.run(chunker_cmd, capture_output=True, text=True)
-                if result.returncode != 0:
-                    print(f"Chunker failed for {py_file}:\n{result.stderr.strip()}")
+                # 1. Run AST chunker (imported directly)
+                try:
+                    chunker = ast_chunker.CodeChunker()
+                    result = chunker.chunk_file(str(py_file))
+                    ast_json.write_text(
+                        __import__("json").dumps(result, indent=2),
+                        encoding="utf-8"
+                    )
+                    print(f"✅ Chunked → {ast_json}")
+                except Exception as e:
+                    print(f"❌ Chunker failed for {py_file}: {e}")
                     continue
-                print(f"Chunked → {ast_json}")
 
-                # 2. Run pyh AST generator
-                generator_cmd = [
-                    "python3", "pyh_ast_generator.py",
-                    str(ast_json),
-                    "-o", str(pyh_json)
-                ]
-                result = subprocess.run(generator_cmd, capture_output=True, text=True)
-                if result.returncode != 0:
-                    print(f"Generator failed for {py_file}:\n{result.stderr.strip()}")
+                # 2. Run pyh AST generator (imported directly)
+                try:
+                    pyh_ast_generator.generate_pyh_with_claude(
+                        str(ast_json), str(pyh_json)
+                    )
+                    print(f"✅ Generated → {pyh_json}")
+                except Exception as e:
+                    print(f"❌ Generator failed for {py_file}: {e}")
                     continue
-                print(f"Generated → {pyh_json}")
 
 
 if __name__ == "__main__":
