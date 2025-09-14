@@ -3,7 +3,7 @@
     "original_file": "test.py",
     "total_chunks": 28,
     "chunking_method": "ast_semantic",
-    "timestamp": "2025-09-13T19:24:19.446555"
+    "timestamp": "2025-09-13T22:14:14.783074"
   },
   "chunks": {
     "main": {
