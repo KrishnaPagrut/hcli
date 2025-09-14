@@ -12,6 +12,9 @@ export interface LineMapping {
   pyLine: number;
   description: string;
   signature?: string;
+  nodeId?: string;
+  nodeType?: string;
+  pyLineRange?: [number, number];
 }
 
 export interface DiffChange {
@@ -47,6 +50,7 @@ export interface EditorState {
   diffs: DiffChange[];
   isEditing: boolean;
   hasUnsavedChanges: boolean;
+  pyhData?: any; // PHY AST data
 }
 
 export interface AppState {

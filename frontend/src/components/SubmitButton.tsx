@@ -3,7 +3,7 @@ import { Send, Loader, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
 import { useStore } from '../hooks/useStore';
 
 const SubmitButton: React.FC = () => {
-  const { repository, applyPhyChanges } = useStore();
+  const { repository, applyPhyChanges, selectFile } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error' | 'warning'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
@@ -22,9 +22,17 @@ const SubmitButton: React.FC = () => {
       setSubmitStatus('success');
       setSubmitMessage('PHY changes applied successfully!');
       
-      // Reload the file to show updated content
-      setTimeout(() => {
-        window.location.reload();
+      // Reload the current file to show updated content instead of refreshing the page
+      setTimeout(async () => {
+        try {
+          await selectFile(repository.selectedFile!);
+          setSubmitStatus('idle');
+          setSubmitMessage('');
+        } catch (error) {
+          console.error('Failed to reload file:', error);
+          setSubmitStatus('warning');
+          setSubmitMessage('Changes applied but failed to reload file. Please refresh manually.');
+        }
       }, 2000);
     } catch (error) {
       setSubmitStatus('error');

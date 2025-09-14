@@ -145,6 +145,7 @@ export const useStore = create<AppStore>((set, get) => ({
           pyContent: pyData.content,
           pyhContent: pyhData?.content || '',
           lineMappings: pyhData?.line_mappings || [],
+          pyhData: pyhData?.phy_data || null,
           hasUnsavedChanges: false,
         },
         isLoading: false,
@@ -368,6 +369,11 @@ export const useStore = create<AppStore>((set, get) => ({
         },
         isLoading: false,
       }));
+      
+      // Auto-crawl the cloned repository
+      console.log('Auto-crawling cloned repository...');
+      await get().crawlRepository(data.repo_path);
+      
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to clone repository',
