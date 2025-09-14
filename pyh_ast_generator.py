@@ -1,3 +1,4 @@
+
 import subprocess
 from pathlib import Path
 
@@ -240,18 +241,27 @@ Now apply the same abstraction process to the following AST JSON:
 Your output must be only the abstracted .phy JSON, nothing else.
 """
 
-    # Call Claude CLI in one-shot mode
+
     result = subprocess.run(
         ["claude", prompt],
         capture_output=True,
         text=True
     )
 
+    output = result.stdout.strip()
+
+    if output.startswith("```json") and output.endswith("```"):
+        output = output[len("```json"): -len("```")].strip()
+    elif output.startswith("'''json") and output.endswith("'''"):
+        output = output[len("'''json"): -len("'''")].strip()
+
+    
     if result.returncode != 0:
         print("❌ Error:", result.stderr.strip())
     else:
-        Path(pyh_file).write_text(result.stdout.strip())
+        Path(pyh_file).write_text(output)   # write cleaned output
         print(f"✅ Generated {pyh_file}")
+
 
 
 import argparse
@@ -259,7 +269,15 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input_file", help="Path to AST JSON file")
-    parser.add_argument("-o", "--output", required=True, help="Path to output .pyh file")
+    parser.add_argument(
+        "-o", "--output",
+        help="Path to output .pyh.json file"
+    )
     args = parser.parse_args()
+
+    # If no output is given, use input name with .pyh.json
+    if args.output is None:
+        base = Path(args.input_file).stem  # removes .json
+        args.output = f"{base}.pyh.json"
 
     generate_pyh_with_claude(args.input_file, args.output)
