@@ -1,0 +1,7 @@
+    class TextUtils
+        method word_count(takes self and text)  (lines 2–4)
+            returns the number of words in a string by splitting and counting
+    class MathUtils
+        method add(takes self, a, and b)  (lines 8–10)
+            returns the sum of two numbers
+    when run as main: create instances of TextUtils and MathUtils, then print word count of 'hello world' and sum of 2 and 3  (lines 13–17)
