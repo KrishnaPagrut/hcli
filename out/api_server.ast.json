@@ -1,0 +1,1974 @@
+{
+  "metadata": {
+    "original_file": "/Users/krishnapagrut/Developer/hcli/api_server.py",
+    "total_chunks": 70,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T08:08:03.484835"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "FastAPI Server for HCLI Backend",
+            "Provides endpoints for crawling repositories, displaying pyh files, and converting pyh to py.",
+            "\"\"\""
+          ],
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import asyncio"
+          ],
+          "line_range": [
+            6,
+            6
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import json"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import os"
+          ],
+          "line_range": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import subprocess"
+          ],
+          "line_range": [
+            9,
+            9
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import tempfile"
+          ],
+          "line_range": [
+            10,
+            10
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            11,
+            11
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from typing import Dict, List, Optional, Any"
+          ],
+          "line_range": [
+            12,
+            12
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import uuid"
+          ],
+          "line_range": [
+            13,
+            13
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from fastapi import FastAPI, HTTPException, UploadFile, File, Form"
+          ],
+          "line_range": [
+            15,
+            15
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from fastapi.responses import JSONResponse, FileResponse"
+          ],
+          "line_range": [
+            16,
+            16
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from fastapi.middleware.cors import CORSMiddleware"
+          ],
+          "line_range": [
+            17,
+            17
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pydantic import BaseModel"
+          ],
+          "line_range": [
+            18,
+            18
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import uvicorn"
+          ],
+          "line_range": [
+            19,
+            19
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import crawl_repo"
+          ],
+          "line_range": [
+            22,
+            22
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import pyh_ast_to_output"
+          ],
+          "line_range": [
+            23,
+            23
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import diff_analyzer"
+          ],
+          "line_range": [
+            24,
+            24
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import apply_changes_demo"
+          ],
+          "line_range": [
+            25,
+            25
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "app = FastAPI(",
+            "title=\"HCLI Backend API\",",
+            "description=\"Backend API for HCLI - Human Code Language Interface\",",
+            "version=\"1.0.0\"",
+            ")"
+          ],
+          "line_range": [
+            28,
+            32
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "app.add_middleware(",
+            "CORSMiddleware,",
+            "allow_origins=[\"http://localhost:3000\"],  # React dev server",
+            "allow_credentials=True,",
+            "allow_methods=[\"*\"],",
+            "allow_headers=[\"*\"],",
+            ")"
+          ],
+          "line_range": [
+            35,
+            41
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_CrawlRequest",
+          "line_range": [
+            45,
+            47
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_CrawlResponse",
+          "line_range": [
+            50,
+            54
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_DisplayPyhRequest",
+          "line_range": [
+            57,
+            58
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_DisplayPyhResponse",
+          "line_range": [
+            61,
+            64
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_PyhToPyRequest",
+          "line_range": [
+            67,
+            71
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_PyhToPyResponse",
+          "line_range": [
+            74,
+            79
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "temp_files: Dict[str, str] = {}"
+          ],
+          "line_range": [
+            83,
+            83
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def root():",
+            "\"\"\"Root endpoint with API information\"\"\"",
+            "return {",
+            "\"message\": \"HCLI Backend API\",",
+            "\"version\": \"1.0.0\",",
+            "\"endpoints\": {",
+            "\"crawl\": \"/crawl - Crawl a repository and generate pyh files\",",
+            "\"display-pyh\": \"/display-pyh - Display pyh file content\",",
+            "\"pyh-to-py\": \"/pyh-to-py - Convert pyh changes to py file updates\"",
+            "}",
+            "}"
+          ],
+          "line_range": [
+            87,
+            97
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def crawl_repository(request: CrawlRequest):",
+            "\"\"\"",
+            "Crawl a repository and generate pyh AST files for all Python files.",
+            "",
+            "Args:",
+            "request: Contains repo_path and optional output_dir",
+            "",
+            "Returns:",
+            "CrawlResponse with success status and processed files list",
+            "\"\"\"",
+            "try:",
+            "repo_path = Path(request.repo_path)",
+            "if not repo_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Repository path not found: {repo_path}\")",
+            "",
+            "output_dir = request.output_dir or \"out\"",
+            "",
+            "# Run the crawl_repo function",
+            "crawl_repo.crawl_repo(str(repo_path), output_dir)",
+            "",
+            "# Find all generated pyh files",
+            "output_path = repo_path / output_dir",
+            "pyh_files = list(output_path.rglob(\"*.pyh.ast.json\"))",
+            "processed_files = [str(f.relative_to(repo_path)) for f in pyh_files]",
+            "",
+            "return CrawlResponse(",
+            "success=True,",
+            "message=f\"Successfully crawled repository. Generated {len(processed_files)} pyh files.\",",
+            "output_dir=str(output_path),",
+            "processed_files=processed_files",
+            ")",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Crawl failed: {str(e)}\")"
+          ],
+          "line_range": [
+            101,
+            134
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def display_pyh_file(request: DisplayPyhRequest):",
+            "\"\"\"",
+            "Display the content of a pyh file in a readable format.",
+            "",
+            "Args:",
+            "request: Contains pyh_file_path",
+            "",
+            "Returns:",
+            "DisplayPyhResponse with formatted content",
+            "\"\"\"",
+            "try:",
+            "pyh_path = Path(request.pyh_file_path)",
+            "if not pyh_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Pyh file not found: {pyh_path}\")",
+            "",
+            "# Use the existing pyh_ast_to_output function to format the content",
+            "content = pyh_ast_to_output.phy_ast_to_output(str(pyh_path))",
+            "",
+            "return DisplayPyhResponse(",
+            "success=True,",
+            "content=content,",
+            "file_path=str(pyh_path)",
+            ")",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Failed to display pyh file: {str(e)}\")"
+          ],
+          "line_range": [
+            138,
+            163
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def convert_pyh_to_py(request: PyhToPyRequest):",
+            "\"\"\"",
+            "Convert pyh changes to Python file updates.",
+            "",
+            "This endpoint:",
+            "1. Creates temporary files for original and modified pyh content",
+            "2. Runs diff_analyzer to generate changes.json",
+            "3. Runs apply_changes_demo to apply changes to the Python file",
+            "",
+            "Args:",
+            "request: Contains pyh file path, original content, modified content, and optional source py file",
+            "",
+            "Returns:",
+            "PyhToPyResponse with success status and applied changes",
+            "\"\"\"",
+            "try:",
+            "# Generate unique session ID for temporary files",
+            "session_id = str(uuid.uuid4())",
+            "",
+            "# Create temporary directory for this session",
+            "temp_dir = Path(tempfile.mkdtemp(prefix=f\"hcli_{session_id}_\"))",
+            "temp_files[session_id] = str(temp_dir)",
+            "",
+            "# Write original and modified pyh content to temporary files",
+            "original_pyh_file = temp_dir / \"original.pyh.ast.json\"",
+            "modified_pyh_file = temp_dir / \"modified.pyh.ast.json\"",
+            "",
+            "original_pyh_file.write_text(request.original_pyh_content, encoding=\"utf-8\")",
+            "modified_pyh_file.write_text(request.modified_pyh_content, encoding=\"utf-8\")",
+            "",
+            "# Determine the source Python file",
+            "source_py_file = request.source_py_file",
+            "if not source_py_file:",
+            "# Try to extract from pyh file metadata",
+            "try:",
+            "pyh_data = json.loads(request.original_pyh_content)",
+            "metadata = pyh_data.get(\"metadata\", {})",
+            "source_py_file = metadata.get(\"source_file\") or metadata.get(\"source_py\")",
+            "",
+            "# Clean up the path if it's a .pyh.ast.json file",
+            "if source_py_file and source_py_file.endswith(\".pyh.ast.json\"):",
+            "source_py_file = source_py_file.replace(\".pyh.ast.json\", \".py\")",
+            "",
+            "except json.JSONDecodeError:",
+            "pass",
+            "",
+            "if not source_py_file:",
+            "raise HTTPException(",
+            "status_code=400,",
+            "detail=\"Source Python file not specified and could not be determined from pyh metadata\"",
+            ")",
+            "",
+            "# Check if source Python file exists",
+            "source_py_path = Path(source_py_file)",
+            "if not source_py_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Source Python file not found: {source_py_path}\")",
+            "",
+            "# Run diff_analyzer",
+            "changes_json_file = temp_dir / \"changes.json\"",
+            "",
+            "# Create a DiffAnalyzer instance and run analysis",
+            "analyzer = diff_analyzer.DiffAnalyzer(",
+            "str(original_pyh_file),",
+            "str(original_pyh_file),  # Using original as both files for now",
+            "str(modified_pyh_file)",
+            ")",
+            "",
+            "changes = analyzer.analyze_changes()",
+            "changes_json = analyzer.to_json(changes)",
+            "",
+            "# Write changes.json",
+            "changes_json_file.write_text(changes_json, encoding=\"utf-8\")",
+            "",
+            "# Update the changes.json with correct source file path",
+            "changes_data = json.loads(changes_json)",
+            "changes_data[\"metadata\"][\"source_file\"] = str(source_py_path)",
+            "changes_json_file.write_text(json.dumps(changes_data, indent=2), encoding=\"utf-8\")",
+            "",
+            "# Run apply_changes_demo",
+            "try:",
+            "# Change to temp directory to run apply_changes_demo",
+            "original_cwd = os.getcwd()",
+            "os.chdir(temp_dir)",
+            "",
+            "# Copy source file to temp directory",
+            "temp_source_file = temp_dir / source_py_path.name",
+            "temp_source_file.write_text(source_py_path.read_text(encoding=\"utf-8\"), encoding=\"utf-8\")",
+            "",
+            "# Run apply_changes_demo",
+            "modified_files = await apply_changes_demo.apply_changes_from_json(source_py_path.stem)",
+            "",
+            "# Restore original working directory",
+            "os.chdir(original_cwd)",
+            "",
+            "# Copy modified file back to original location if it was modified",
+            "if modified_files and temp_source_file.exists():",
+            "source_py_path.write_text(temp_source_file.read_text(encoding=\"utf-8\"), encoding=\"utf-8\")",
+            "",
+            "return PyhToPyResponse(",
+            "success=True,",
+            "message=\"Successfully converted pyh changes to Python file updates\",",
+            "changes_applied=True,",
+            "modified_files=modified_files or [str(source_py_path)],",
+            "changes_json=changes_data",
+            ")",
+            "",
+            "except Exception as apply_error:",
+            "return PyhToPyResponse(",
+            "success=False,",
+            "message=f\"Changes analysis completed but application failed: {str(apply_error)}\",",
+            "changes_applied=False,",
+            "modified_files=[],",
+            "changes_json=changes_data",
+            ")",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Pyh to py conversion failed: {str(e)}\")",
+            "",
+            "finally:",
+            "# Clean up temporary files",
+            "if session_id in temp_files:",
+            "temp_dir = Path(temp_files[session_id])",
+            "if temp_dir.exists():",
+            "import shutil",
+            "shutil.rmtree(temp_dir)",
+            "del temp_files[session_id]"
+          ],
+          "line_range": [
+            167,
+            292
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def health_check():",
+            "\"\"\"Health check endpoint\"\"\"",
+            "return {\"status\": \"healthy\", \"message\": \"HCLI Backend API is running\"}"
+          ],
+          "line_range": [
+            296,
+            298
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def get_files(directory: str = \"test\"):",
+            "\"\"\"Get directory contents for file explorer\"\"\"",
+            "try:",
+            "# Convert to absolute path",
+            "base_path = Path.cwd()",
+            "target_path = base_path / directory",
+            "",
+            "if not target_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Directory {directory} not found\")",
+            "",
+            "if not target_path.is_dir():",
+            "raise HTTPException(status_code=400, detail=f\"{directory} is not a directory\")",
+            "",
+            "def build_file_tree(path: Path, relative_path: str = \"\") -> List[Dict[str, Any]]:",
+            "\"\"\"Recursively build file tree structure\"\"\"",
+            "items = []",
+            "",
+            "try:",
+            "for item in sorted(path.iterdir()):",
+            "item_relative_path = f\"{relative_path}/{item.name}\" if relative_path else item.name",
+            "",
+            "if item.is_dir():",
+            "# Skip hidden directories and common build/cache directories",
+            "if not item.name.startswith('.') and item.name not in ['__pycache__', 'node_modules', 'venv']:",
+            "children = build_file_tree(item, item_relative_path)",
+            "items.append({",
+            "\"name\": item.name,",
+            "\"type\": \"folder\",",
+            "\"path\": item_relative_path,",
+            "\"children\": children",
+            "})",
+            "else:",
+            "# Only include Python files and JSON files for now",
+            "if item.suffix in ['.py', '.json', '.pyh', '.txt']:",
+            "items.append({",
+            "\"name\": item.name,",
+            "\"type\": \"file\",",
+            "\"path\": item_relative_path",
+            "})",
+            "except PermissionError:",
+            "pass  # Skip directories we can't read",
+            "",
+            "return items",
+            "",
+            "file_tree = build_file_tree(target_path)",
+            "return {\"files\": file_tree, \"directory\": directory}",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Error reading directory: {str(e)}\")"
+          ],
+          "line_range": [
+            302,
+            350
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def get_file_content(file_path: str):",
+            "\"\"\"Get the content of a specific file\"\"\"",
+            "try:",
+            "# Convert to absolute path",
+            "base_path = Path.cwd()",
+            "target_path = base_path / \"test\" / file_path",
+            "",
+            "if not target_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"File {file_path} not found\")",
+            "",
+            "if not target_path.is_file():",
+            "raise HTTPException(status_code=400, detail=f\"{file_path} is not a file\")",
+            "",
+            "# Read file content",
+            "try:",
+            "content = target_path.read_text(encoding='utf-8')",
+            "except UnicodeDecodeError:",
+            "# If it's a binary file, return a message",
+            "content = f\"[Binary file: {target_path.name}]\"",
+            "",
+            "return {",
+            "\"file_path\": file_path,",
+            "\"content\": content,",
+            "\"size\": target_path.stat().st_size",
+            "}",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Error reading file: {str(e)}\")"
+          ],
+          "line_range": [
+            354,
+            381
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def get_pyh_output(file_path: str):",
+            "\"\"\"Get the pyh output for a specific file\"\"\"",
+            "try:",
+            "# Convert to absolute path",
+            "base_path = Path.cwd()",
+            "target_path = base_path / \"test\" / file_path",
+            "",
+            "if not target_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"File {file_path} not found\")",
+            "",
+            "if not target_path.is_file():",
+            "raise HTTPException(status_code=400, detail=f\"{file_path} is not a file\")",
+            "",
+            "# Check if it's a .py file",
+            "if not target_path.suffix == '.py':",
+            "raise HTTPException(status_code=400, detail=f\"{file_path} is not a Python file\")",
+            "",
+            "# Look for corresponding .ast.json file",
+            "ast_file_path = target_path.with_suffix('.ast.json')",
+            "if not ast_file_path.exists():",
+            "# Try looking in out/ directory",
+            "out_ast_file = base_path / \"test\" / \"out\" / ast_file_path.name",
+            "if out_ast_file.exists():",
+            "ast_file_path = out_ast_file",
+            "else:",
+            "raise HTTPException(status_code=404, detail=f\"AST file for {file_path} not found\")",
+            "",
+            "# Read and process the AST file",
+            "try:",
+            "with open(ast_file_path, 'r', encoding='utf-8') as f:",
+            "ast_data = json.load(f)",
+            "",
+            "# Use the existing pyh_ast_to_output module to convert AST to readable format",
+            "# First, let's use the render_node function to convert the AST data",
+            "pyh_output_lines = []",
+            "for node in ast_data.get(\"nodes\", []):",
+            "pyh_output_lines.extend(pyh_ast_to_output.render_node(node))",
+            "pyh_output = \"\\n\".join(pyh_output_lines)",
+            "",
+            "return {",
+            "\"file_path\": file_path,",
+            "\"ast_file_path\": str(ast_file_path.relative_to(base_path)),",
+            "\"pyh_output\": pyh_output",
+            "}",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Error processing AST file: {str(e)}\")",
+            "",
+            "except Exception as e:",
+            "raise HTTPException(status_code=500, detail=f\"Error getting pyh output: {str(e)}\")"
+          ],
+          "line_range": [
+            385,
+            434
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def list_temp_files():",
+            "\"\"\"List active temporary file sessions (for debugging)\"\"\"",
+            "return {\"active_sessions\": list(temp_files.keys())}"
+          ],
+          "line_range": [
+            438,
+            440
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def cleanup_temp_files(session_id: str):",
+            "\"\"\"Clean up temporary files for a specific session\"\"\"",
+            "if session_id not in temp_files:",
+            "raise HTTPException(status_code=404, detail=\"Session not found\")",
+            "",
+            "temp_dir = Path(temp_files[session_id])",
+            "if temp_dir.exists():",
+            "import shutil",
+            "shutil.rmtree(temp_dir)",
+            "",
+            "del temp_files[session_id]",
+            "return {\"message\": f\"Cleaned up temporary files for session {session_id}\"}"
+          ],
+          "line_range": [
+            444,
+            455
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if23_block",
+          "line_range": [
+            458,
+            465
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "class_CrawlRequest": {
+      "id": "class_CrawlRequest",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class CrawlRequest:"
+          ],
+          "line_range": [
+            45,
+            45
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "repo_path: str"
+          ],
+          "line_range": [
+            46,
+            46
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "output_dir: Optional[str] = \"out\""
+          ],
+          "line_range": [
+            47,
+            47
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_CrawlResponse": {
+      "id": "class_CrawlResponse",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class CrawlResponse:"
+          ],
+          "line_range": [
+            50,
+            50
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "success: bool"
+          ],
+          "line_range": [
+            51,
+            51
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "message: str"
+          ],
+          "line_range": [
+            52,
+            52
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "output_dir: str"
+          ],
+          "line_range": [
+            53,
+            53
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "processed_files: List[str]"
+          ],
+          "line_range": [
+            54,
+            54
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_DisplayPyhRequest": {
+      "id": "class_DisplayPyhRequest",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class DisplayPyhRequest:"
+          ],
+          "line_range": [
+            57,
+            57
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "pyh_file_path: str"
+          ],
+          "line_range": [
+            58,
+            58
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_DisplayPyhResponse": {
+      "id": "class_DisplayPyhResponse",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class DisplayPyhResponse:"
+          ],
+          "line_range": [
+            61,
+            61
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "success: bool"
+          ],
+          "line_range": [
+            62,
+            62
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "content: str"
+          ],
+          "line_range": [
+            63,
+            63
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "file_path: str"
+          ],
+          "line_range": [
+            64,
+            64
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_PyhToPyRequest": {
+      "id": "class_PyhToPyRequest",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class PyhToPyRequest:"
+          ],
+          "line_range": [
+            67,
+            67
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "pyh_file_path: str"
+          ],
+          "line_range": [
+            68,
+            68
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "original_pyh_content: str"
+          ],
+          "line_range": [
+            69,
+            69
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "modified_pyh_content: str"
+          ],
+          "line_range": [
+            70,
+            70
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "source_py_file: Optional[str] = None"
+          ],
+          "line_range": [
+            71,
+            71
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_PyhToPyResponse": {
+      "id": "class_PyhToPyResponse",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class PyhToPyResponse:"
+          ],
+          "line_range": [
+            74,
+            74
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "success: bool"
+          ],
+          "line_range": [
+            75,
+            75
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "message: str"
+          ],
+          "line_range": [
+            76,
+            76
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes_applied: bool"
+          ],
+          "line_range": [
+            77,
+            77
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "modified_files: List[str]"
+          ],
+          "line_range": [
+            78,
+            78
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes_json: Optional[Dict[str, Any]] = None"
+          ],
+          "line_range": [
+            79,
+            79
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try1_block": {
+      "id": "try1_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not repo_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Repository path not found: {repo_path}\")"
+          ],
+          "line_range": [
+            113,
+            114
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "try2_block": {
+      "id": "try2_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "try2_block"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not pyh_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Pyh file not found: {pyh_path}\")"
+          ],
+          "line_range": [
+            150,
+            151
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "try3_block": {
+      "id": "try3_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        }
+      ],
+      "parent_scope": "try3_block"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not source_py_file:",
+            "# Try to extract from pyh file metadata",
+            "try:",
+            "pyh_data = json.loads(request.original_pyh_content)",
+            "metadata = pyh_data.get(\"metadata\", {})",
+            "source_py_file = metadata.get(\"source_file\") or metadata.get(\"source_py\")",
+            "",
+            "# Clean up the path if it's a .pyh.ast.json file",
+            "if source_py_file and source_py_file.endswith(\".pyh.ast.json\"):",
+            "source_py_file = source_py_file.replace(\".pyh.ast.json\", \".py\")",
+            "",
+            "except json.JSONDecodeError:",
+            "pass"
+          ],
+          "line_range": [
+            199,
+            211
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "try4_block": {
+      "id": "try4_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "if3"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "try4_block"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if source_py_file and source_py_file.endswith(\".pyh.ast.json\"):",
+            "source_py_file = source_py_file.replace(\".pyh.ast.json\", \".py\")"
+          ],
+          "line_range": [
+            207,
+            208
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "try3_block"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not source_py_file:",
+            "raise HTTPException(",
+            "status_code=400,",
+            "detail=\"Source Python file not specified and could not be determined from pyh metadata\"",
+            ")"
+          ],
+          "line_range": [
+            213,
+            217
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        }
+      ],
+      "parent_scope": "try3_block"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not source_py_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Source Python file not found: {source_py_path}\")"
+          ],
+          "line_range": [
+            221,
+            222
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "try5_block": {
+      "id": "try5_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "try3_block"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        }
+      ],
+      "parent_scope": "try5_block"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if modified_files and temp_source_file.exists():",
+            "source_py_path.write_text(temp_source_file.read_text(encoding=\"utf-8\"), encoding=\"utf-8\")"
+          ],
+          "line_range": [
+            262,
+            263
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "if8_block": {
+      "id": "if8_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8"
+        }
+      ],
+      "parent_scope": "try3_block"
+    },
+    "if8": {
+      "id": "if8",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if session_id in temp_files:",
+            "temp_dir = Path(temp_files[session_id])",
+            "if temp_dir.exists():",
+            "import shutil",
+            "shutil.rmtree(temp_dir)",
+            "del temp_files[session_id]"
+          ],
+          "line_range": [
+            287,
+            292
+          ]
+        }
+      ],
+      "parent_scope": "if8_block"
+    },
+    "if9_block": {
+      "id": "if9_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9"
+        }
+      ],
+      "parent_scope": "if8"
+    },
+    "if9": {
+      "id": "if9",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if temp_dir.exists():",
+            "import shutil",
+            "shutil.rmtree(temp_dir)"
+          ],
+          "line_range": [
+            289,
+            291
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "try6_block": {
+      "id": "try6_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "if10_block": {
+      "id": "if10_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10"
+        }
+      ],
+      "parent_scope": "try6_block"
+    },
+    "if10": {
+      "id": "if10",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"Directory {directory} not found\")"
+          ],
+          "line_range": [
+            309,
+            310
+          ]
+        }
+      ],
+      "parent_scope": "if10_block"
+    },
+    "if11_block": {
+      "id": "if11_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11"
+        }
+      ],
+      "parent_scope": "try6_block"
+    },
+    "if11": {
+      "id": "if11",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.is_dir():",
+            "raise HTTPException(status_code=400, detail=f\"{directory} is not a directory\")"
+          ],
+          "line_range": [
+            312,
+            313
+          ]
+        }
+      ],
+      "parent_scope": "if11_block"
+    },
+    "function_build_file_tree": {
+      "id": "function_build_file_tree",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def build_file_tree(path, relative_path) -> ReturnType:"
+          ],
+          "line_range": [
+            315,
+            315
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Recursively build file tree structure\"\"\""
+          ],
+          "line_range": [
+            316,
+            316
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "items = []"
+          ],
+          "line_range": [
+            317,
+            317
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try7_block",
+          "line_range": [
+            319,
+            342
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return items"
+          ],
+          "line_range": [
+            344,
+            344
+          ]
+        }
+      ],
+      "parent_scope": "try6_block"
+    },
+    "try7_block": {
+      "id": "try7_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_build_file_tree"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for item in sorted(path.iterdir()):"
+          ],
+          "line_range": [
+            320,
+            320
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "item_relative_path = f\"{relative_path}/{item.name}\" if relative_path else item.name"
+          ],
+          "line_range": [
+            321,
+            321
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12_block",
+          "line_range": [
+            323,
+            340
+          ]
+        }
+      ],
+      "parent_scope": "try7_block"
+    },
+    "if12_block": {
+      "id": "if12_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if12": {
+      "id": "if12",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if item.is_dir():",
+            "# Skip hidden directories and common build/cache directories",
+            "if not item.name.startswith('.') and item.name not in ['__pycache__', 'node_modules', 'venv']:",
+            "children = build_file_tree(item, item_relative_path)",
+            "items.append({",
+            "\"name\": item.name,",
+            "\"type\": \"folder\",",
+            "\"path\": item_relative_path,",
+            "\"children\": children",
+            "})",
+            "else:",
+            "# Only include Python files and JSON files for now",
+            "if item.suffix in ['.py', '.json', '.pyh', '.txt']:",
+            "items.append({",
+            "\"name\": item.name,",
+            "\"type\": \"file\",",
+            "\"path\": item_relative_path",
+            "})"
+          ],
+          "line_range": [
+            323,
+            332
+          ]
+        }
+      ],
+      "parent_scope": "if12_block"
+    },
+    "if13_block": {
+      "id": "if13_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13"
+        }
+      ],
+      "parent_scope": "if12"
+    },
+    "if13": {
+      "id": "if13",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not item.name.startswith('.') and item.name not in ['__pycache__', 'node_modules', 'venv']:",
+            "children = build_file_tree(item, item_relative_path)",
+            "items.append({",
+            "\"name\": item.name,",
+            "\"type\": \"folder\",",
+            "\"path\": item_relative_path,",
+            "\"children\": children",
+            "})"
+          ],
+          "line_range": [
+            325,
+            332
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "elif1": {
+      "id": "elif1",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if12_block"
+    },
+    "try8_block": {
+      "id": "try8_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "if14_block": {
+      "id": "if14_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14"
+        }
+      ],
+      "parent_scope": "try8_block"
+    },
+    "if14": {
+      "id": "if14",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"File {file_path} not found\")"
+          ],
+          "line_range": [
+            361,
+            362
+          ]
+        }
+      ],
+      "parent_scope": "if14_block"
+    },
+    "if15_block": {
+      "id": "if15_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15"
+        }
+      ],
+      "parent_scope": "try8_block"
+    },
+    "if15": {
+      "id": "if15",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.is_file():",
+            "raise HTTPException(status_code=400, detail=f\"{file_path} is not a file\")"
+          ],
+          "line_range": [
+            364,
+            365
+          ]
+        }
+      ],
+      "parent_scope": "if15_block"
+    },
+    "try9_block": {
+      "id": "try9_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "try8_block"
+    },
+    "try10_block": {
+      "id": "try10_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "if16_block": {
+      "id": "if16_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if16"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if16": {
+      "id": "if16",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.exists():",
+            "raise HTTPException(status_code=404, detail=f\"File {file_path} not found\")"
+          ],
+          "line_range": [
+            392,
+            393
+          ]
+        }
+      ],
+      "parent_scope": "if16_block"
+    },
+    "if17_block": {
+      "id": "if17_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if17"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if17": {
+      "id": "if17",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.is_file():",
+            "raise HTTPException(status_code=400, detail=f\"{file_path} is not a file\")"
+          ],
+          "line_range": [
+            395,
+            396
+          ]
+        }
+      ],
+      "parent_scope": "if17_block"
+    },
+    "if18_block": {
+      "id": "if18_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if18"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if18": {
+      "id": "if18",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not target_path.suffix == '.py':",
+            "raise HTTPException(status_code=400, detail=f\"{file_path} is not a Python file\")"
+          ],
+          "line_range": [
+            399,
+            400
+          ]
+        }
+      ],
+      "parent_scope": "if18_block"
+    },
+    "if19_block": {
+      "id": "if19_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if19"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if19": {
+      "id": "if19",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not ast_file_path.exists():",
+            "# Try looking in out/ directory",
+            "out_ast_file = base_path / \"test\" / \"out\" / ast_file_path.name",
+            "if out_ast_file.exists():",
+            "ast_file_path = out_ast_file",
+            "else:",
+            "raise HTTPException(status_code=404, detail=f\"AST file for {file_path} not found\")"
+          ],
+          "line_range": [
+            404,
+            410
+          ]
+        }
+      ],
+      "parent_scope": "if19_block"
+    },
+    "if20_block": {
+      "id": "if20_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if20"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else20"
+        }
+      ],
+      "parent_scope": "if19"
+    },
+    "if20": {
+      "id": "if20",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if out_ast_file.exists():",
+            "ast_file_path = out_ast_file",
+            "else:",
+            "raise HTTPException(status_code=404, detail=f\"AST file for {file_path} not found\")"
+          ],
+          "line_range": [
+            407,
+            408
+          ]
+        }
+      ],
+      "parent_scope": "if20_block"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "raise HTTPException(status_code=404, detail=f\"AST file for {file_path} not found\")"
+          ],
+          "line_range": [
+            410,
+            410
+          ]
+        }
+      ],
+      "parent_scope": "if20_block"
+    },
+    "try11_block": {
+      "id": "try11_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "try10_block"
+    },
+    "with1_statement": {
+      "id": "with1_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try11_block"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for node in ast_data.get('nodes', []):"
+          ],
+          "line_range": [
+            420,
+            420
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "pyh_output_lines.extend(pyh_ast_to_output.render_node(node))"
+          ],
+          "line_range": [
+            421,
+            421
+          ]
+        }
+      ],
+      "parent_scope": "try11_block"
+    },
+    "if21_block": {
+      "id": "if21_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if21"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if21": {
+      "id": "if21",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if session_id not in temp_files:",
+            "raise HTTPException(status_code=404, detail=\"Session not found\")"
+          ],
+          "line_range": [
+            446,
+            447
+          ]
+        }
+      ],
+      "parent_scope": "if21_block"
+    },
+    "if22_block": {
+      "id": "if22_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if22"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if22": {
+      "id": "if22",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if temp_dir.exists():",
+            "import shutil",
+            "shutil.rmtree(temp_dir)"
+          ],
+          "line_range": [
+            450,
+            452
+          ]
+        }
+      ],
+      "parent_scope": "if22_block"
+    },
+    "if23_block": {
+      "id": "if23_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if23"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if23": {
+      "id": "if23",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "uvicorn.run(",
+            "\"api_server:app\",",
+            "host=\"0.0.0.0\",",
+            "port=8000,",
+            "reload=True,",
+            "log_level=\"info\"",
+            ")"
+          ],
+          "line_range": [
+            458,
+            465
+          ]
+        }
+      ],
+      "parent_scope": "if23_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}
