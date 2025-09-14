@@ -340,7 +340,7 @@ class CodeChunker:
             # Class chunk - only class declaration, everything else should be references
             blocks = [{
                 "type": "code",
-                "content": f"class {node.name}:",
+                "content": [f"class {node.name}:".strip()],
                 "line_range": [node.lineno, node.lineno]
             }]
             
@@ -401,12 +401,37 @@ class CodeChunker:
                 }]
         
         elif isinstance(node, ast.For):
-            # For loop chunk
-            chunk["code_blocks"] = [{
+            # For loop chunk - create chunk references for nested control structures
+            blocks = []
+            
+            # Add the for loop header
+            for_header = f"for {ast.unparse(node.target)} in {ast.unparse(node.iter)}:"
+            blocks.append({
                 "type": "code",
-                "content": self._get_source_segment(node, include_body=True),
-                "line_range": [node.lineno, getattr(node, 'end_lineno', node.lineno)]
-            }]
+                "content": [for_header],
+                "line_range": [node.lineno, node.lineno]
+            })
+            
+            # Process the body and create chunk references for nested structures
+            for stmt in node.body:
+                if isinstance(stmt, (ast.If, ast.For, ast.While, ast.Try, ast.With)):
+                    # Create chunk reference for nested control structure
+                    child_chunk_id = self.node_to_chunk_id.get(stmt)
+                    if child_chunk_id:
+                        blocks.append({
+                            "type": "chunk_ref",
+                            "chunk_id": child_chunk_id,
+                            "line_range": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]
+                        })
+                else:
+                    # Regular statement - include directly
+                    blocks.append({
+                        "type": "code",
+                        "content": self._get_source_segment(stmt),
+                        "line_range": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]
+                    })
+            
+            chunk["code_blocks"] = blocks
         
         elif isinstance(node, ast.While):
             # While loop chunk
@@ -430,7 +455,7 @@ class CodeChunker:
         func_signature = f"def {node.name}({self._get_args_string(node.args)}) -> {self._get_returns_string(node)}:"
         blocks.append({
             "type": "code",
-            "content": func_signature,
+            "content": [func_signature.strip()],
             "line_range": [node.lineno, node.lineno]
         })
         
@@ -458,8 +483,8 @@ class CodeChunker:
             return 0
         return max(getattr(stmt, 'end_lineno', stmt.lineno) for stmt in body)
     
-    def _get_source_segment(self, node: ast.AST, include_body: bool = False, body_only_if: bool = False) -> str:
-        """Extract source code for a given AST node"""
+    def _get_source_segment(self, node: ast.AST, include_body: bool = False, body_only_if: bool = False) -> List[str]:
+        """Extract source code for a given AST node as a list of statements"""
         start_line = node.lineno - 1
         end_line = getattr(node, 'end_lineno', node.lineno) - 1
         
@@ -483,12 +508,15 @@ class CodeChunker:
                 cleaned_lines = []
                 for line in lines:
                     if line.strip():
-                        cleaned_lines.append(line[min_indent:] if len(line) > min_indent else line)
+                        # Remove indentation and strip whitespace
+                        cleaned_line = line[min_indent:] if len(line) > min_indent else line
+                        cleaned_lines.append(cleaned_line.strip())
                     else:
-                        cleaned_lines.append(line)
-                return '\n'.join(cleaned_lines)
+                        # Keep empty lines as empty strings
+                        cleaned_lines.append("")
+                return cleaned_lines
         
-        return '\n'.join(lines)
+        return [line.strip() for line in lines]
     
     def _extract_dependencies(self, node: ast.AST) -> List[str]:
         """Extract variable dependencies from a node"""
@@ -533,7 +561,7 @@ class CodeChunker:
                     "type": "error",
                     "code_blocks": [{
                         "type": "code",
-                        "content": source_code,
+                        "content": [line.strip() for line in source_code.split('\n')],
                         "line_range": [1, len(source_code.split('\n'))]
                     }],
                     # "dependencies": [],

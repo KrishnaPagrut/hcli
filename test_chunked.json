@@ -3,7 +3,7 @@
     "original_file": "test.py",
     "total_chunks": 28,
     "chunking_method": "ast_semantic",
-    "timestamp": "2025-09-13T16:31:17.312666"
+    "timestamp": "2025-09-13T19:24:19.446555"
   },
   "chunks": {
     "main": {
@@ -12,7 +12,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "import json",
+          "content": [
+            "import json"
+          ],
           "line_range": [
             1,
             1
@@ -20,7 +22,9 @@
         },
         {
           "type": "code",
-          "content": "from typing import List, Dict, Optional",
+          "content": [
+            "from typing import List, Dict, Optional"
+          ],
           "line_range": [
             2,
             2
@@ -59,7 +63,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "class Task:",
+          "content": [
+            "class Task:"
+          ],
           "line_range": [
             5,
             5
@@ -114,7 +120,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def __init__(self, title, description, done) -> None:",
+          "content": [
+            "def __init__(self, title, description, done) -> None:"
+          ],
           "line_range": [
             6,
             6
@@ -122,7 +130,9 @@
         },
         {
           "type": "code",
-          "content": "self.title = title",
+          "content": [
+            "self.title = title"
+          ],
           "line_range": [
             7,
             7
@@ -130,7 +140,9 @@
         },
         {
           "type": "code",
-          "content": "self.description = description",
+          "content": [
+            "self.description = description"
+          ],
           "line_range": [
             8,
             8
@@ -138,7 +150,9 @@
         },
         {
           "type": "code",
-          "content": "self.done = done",
+          "content": [
+            "self.done = done"
+          ],
           "line_range": [
             9,
             9
@@ -146,7 +160,9 @@
         },
         {
           "type": "code",
-          "content": "self.subtasks: List[\"Task\"] = []",
+          "content": [
+            "self.subtasks: List[\"Task\"] = []"
+          ],
           "line_range": [
             10,
             10
@@ -161,7 +177,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def add_subtask(self, subtask) -> ReturnType:",
+          "content": [
+            "def add_subtask(self, subtask) -> ReturnType:"
+          ],
           "line_range": [
             12,
             12
@@ -169,7 +187,9 @@
         },
         {
           "type": "code",
-          "content": "self.subtasks.append(subtask)",
+          "content": [
+            "self.subtasks.append(subtask)"
+          ],
           "line_range": [
             13,
             13
@@ -184,7 +204,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def mark_done(self) -> ReturnType:",
+          "content": [
+            "def mark_done(self) -> ReturnType:"
+          ],
           "line_range": [
             15,
             15
@@ -192,7 +214,9 @@
         },
         {
           "type": "code",
-          "content": "self.done = True",
+          "content": [
+            "self.done = True"
+          ],
           "line_range": [
             16,
             16
@@ -215,9 +239,21 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "for sub in self.subtasks:\n    sub.mark_done()",
+          "content": [
+            "for sub in self.subtasks:"
+          ],
           "line_range": [
             17,
+            17
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "sub.mark_done()"
+          ],
+          "line_range": [
+            18,
             18
           ]
         }
@@ -230,7 +266,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def to_dict(self) -> ReturnType:",
+          "content": [
+            "def to_dict(self) -> ReturnType:"
+          ],
           "line_range": [
             20,
             20
@@ -238,7 +276,14 @@
         },
         {
           "type": "code",
-          "content": "return {\n    \"title\": self.title,\n    \"description\": self.description,\n    \"done\": self.done,\n    \"subtasks\": [sub.to_dict() for sub in self.subtasks],\n}",
+          "content": [
+            "return {",
+            "\"title\": self.title,",
+            "\"description\": self.description,",
+            "\"done\": self.done,",
+            "\"subtasks\": [sub.to_dict() for sub in self.subtasks],",
+            "}"
+          ],
           "line_range": [
             21,
             26
@@ -253,7 +298,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def __str__(self, level) -> ReturnType:",
+          "content": [
+            "def __str__(self, level) -> ReturnType:"
+          ],
           "line_range": [
             28,
             28
@@ -261,7 +308,9 @@
         },
         {
           "type": "code",
-          "content": "indent = \"  \" * level",
+          "content": [
+            "indent = \"  \" * level"
+          ],
           "line_range": [
             29,
             29
@@ -269,7 +318,9 @@
         },
         {
           "type": "code",
-          "content": "status = \"[x]\" if self.done else \"[ ]\"",
+          "content": [
+            "status = \"[x]\" if self.done else \"[ ]\""
+          ],
           "line_range": [
             30,
             30
@@ -277,7 +328,9 @@
         },
         {
           "type": "code",
-          "content": "result = f\"{indent}{status} {self.title} - {self.description}\\n\"",
+          "content": [
+            "result = f\"{indent}{status} {self.title} - {self.description}\\n\""
+          ],
           "line_range": [
             31,
             31
@@ -293,7 +346,9 @@
         },
         {
           "type": "code",
-          "content": "return result",
+          "content": [
+            "return result"
+          ],
           "line_range": [
             34,
             34
@@ -308,9 +363,21 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "for sub in self.subtasks:\n    result += sub.__str__(level + 1)",
+          "content": [
+            "for sub in self.subtasks:"
+          ],
           "line_range": [
             32,
+            32
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "result += sub.__str__(level + 1)"
+          ],
+          "line_range": [
+            33,
             33
           ]
         }
@@ -323,7 +390,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "class TaskManager:",
+          "content": [
+            "class TaskManager:"
+          ],
           "line_range": [
             37,
             37
@@ -386,7 +455,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def __init__(self) -> None:",
+          "content": [
+            "def __init__(self) -> None:"
+          ],
           "line_range": [
             38,
             38
@@ -394,7 +465,9 @@
         },
         {
           "type": "code",
-          "content": "self.tasks: List[Task] = []",
+          "content": [
+            "self.tasks: List[Task] = []"
+          ],
           "line_range": [
             39,
             39
@@ -409,7 +482,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def add_task(self, title, description) -> ReturnType:",
+          "content": [
+            "def add_task(self, title, description) -> ReturnType:"
+          ],
           "line_range": [
             41,
             41
@@ -417,7 +492,9 @@
         },
         {
           "type": "code",
-          "content": "task = Task(title, description)",
+          "content": [
+            "task = Task(title, description)"
+          ],
           "line_range": [
             42,
             42
@@ -425,7 +502,9 @@
         },
         {
           "type": "code",
-          "content": "self.tasks.append(task)",
+          "content": [
+            "self.tasks.append(task)"
+          ],
           "line_range": [
             43,
             43
@@ -433,7 +512,9 @@
         },
         {
           "type": "code",
-          "content": "return task",
+          "content": [
+            "return task"
+          ],
           "line_range": [
             44,
             44
@@ -448,7 +529,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def find_task(self, title) -> ReturnType:",
+          "content": [
+            "def find_task(self, title) -> ReturnType:"
+          ],
           "line_range": [
             46,
             46
@@ -464,7 +547,9 @@
         },
         {
           "type": "code",
-          "content": "return _find(self.tasks)",
+          "content": [
+            "return _find(self.tasks)"
+          ],
           "line_range": [
             56,
             56
@@ -479,7 +564,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def _find(task_list) -> ReturnType:",
+          "content": [
+            "def _find(task_list) -> ReturnType:"
+          ],
           "line_range": [
             47,
             47
@@ -495,7 +582,9 @@
         },
         {
           "type": "code",
-          "content": "return None",
+          "content": [
+            "return None"
+          ],
           "line_range": [
             54,
             54
@@ -510,9 +599,37 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "for t in task_list:\n    if t.title == title:\n        return t\n    result = _find(t.subtasks)\n    if result:\n        return result",
+          "content": [
+            "for t in task_list:"
+          ],
           "line_range": [
             48,
+            48
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1_block",
+          "line_range": [
+            49,
+            50
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "result = _find(t.subtasks)"
+          ],
+          "line_range": [
+            51,
+            51
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2_block",
+          "line_range": [
+            52,
             53
           ]
         }
@@ -536,7 +653,10 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "if t.title == title:\n    return t",
+          "content": [
+            "if t.title == title:",
+            "return t"
+          ],
           "line_range": [
             49,
             50
@@ -562,7 +682,10 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "if result:\n    return result",
+          "content": [
+            "if result:",
+            "return result"
+          ],
           "line_range": [
             52,
             53
@@ -577,7 +700,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def mark_done(self, title) -> ReturnType:",
+          "content": [
+            "def mark_done(self, title) -> ReturnType:"
+          ],
           "line_range": [
             58,
             58
@@ -585,7 +710,9 @@
         },
         {
           "type": "code",
-          "content": "task = self.find_task(title)",
+          "content": [
+            "task = self.find_task(title)"
+          ],
           "line_range": [
             59,
             59
@@ -601,7 +728,9 @@
         },
         {
           "type": "code",
-          "content": "return False",
+          "content": [
+            "return False"
+          ],
           "line_range": [
             63,
             63
@@ -627,7 +756,11 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "if task:\n    task.mark_done()\n    return True",
+          "content": [
+            "if task:",
+            "task.mark_done()",
+            "return True"
+          ],
           "line_range": [
             60,
             62
@@ -642,7 +775,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def export_to_json(self, file_name) -> ReturnType:",
+          "content": [
+            "def export_to_json(self, file_name) -> ReturnType:"
+          ],
           "line_range": [
             65,
             65
@@ -671,7 +806,9 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "def __str__(self) -> ReturnType:",
+          "content": [
+            "def __str__(self) -> ReturnType:"
+          ],
           "line_range": [
             69,
             69
@@ -679,7 +816,9 @@
         },
         {
           "type": "code",
-          "content": "result = \"\"",
+          "content": [
+            "result = \"\""
+          ],
           "line_range": [
             70,
             70
@@ -695,7 +834,9 @@
         },
         {
           "type": "code",
-          "content": "return result",
+          "content": [
+            "return result"
+          ],
           "line_range": [
             73,
             73
@@ -710,9 +851,21 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "for task in self.tasks:\n    result += task.__str__()",
+          "content": [
+            "for task in self.tasks:"
+          ],
           "line_range": [
             71,
+            71
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "result += task.__str__()"
+          ],
+          "line_range": [
+            72,
             72
           ]
         }
@@ -736,7 +889,40 @@
       "code_blocks": [
         {
           "type": "code",
-          "content": "if __name__ == \"__main__\":\n    manager = TaskManager()\n\n    # Add main tasks\n    study = manager.add_task(\"Study\", \"Prepare for exams\")\n    workout = manager.add_task(\"Workout\", \"Stay healthy\")\n\n    # Add subtasks under study\n    math = Task(\"Math\", \"Review calculus notes\")\n    study.add_subtask(math)\n    math.add_subtask(Task(\"Practice Problems\", \"Solve 20 questions\"))\n    math.add_subtask(Task(\"Flashcards\", \"Revise formulas\"))\n\n    cs = Task(\"CS Project\", \"Build scheduler app\")\n    study.add_subtask(cs)\n    cs.add_subtask(Task(\"Frontend\", \"React components\"))\n    cs.add_subtask(Task(\"Backend\", \"Flask API\"))\n    cs.add_subtask(Task(\"Testing\", \"Unit tests\"))\n\n    # Add subtasks under workout\n    workout.add_subtask(Task(\"Cardio\", \"Run 5 km\"))\n    workout.add_subtask(Task(\"Strength\", \"Push-ups and squats\"))\n\n    # Mark one task done\n    manager.mark_done(\"Frontend\")\n\n    # Print the task hierarchy\n    print(manager)\n\n    # Export to JSON\n    manager.export_to_json(\"tasks.json\")\n    print(\"Tasks exported to tasks.json \u2705\")",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "manager = TaskManager()",
+            "",
+            "# Add main tasks",
+            "study = manager.add_task(\"Study\", \"Prepare for exams\")",
+            "workout = manager.add_task(\"Workout\", \"Stay healthy\")",
+            "",
+            "# Add subtasks under study",
+            "math = Task(\"Math\", \"Review calculus notes\")",
+            "study.add_subtask(math)",
+            "math.add_subtask(Task(\"Practice Problems\", \"Solve 20 questions\"))",
+            "math.add_subtask(Task(\"Flashcards\", \"Revise formulas\"))",
+            "",
+            "cs = Task(\"CS Project\", \"Build scheduler app\")",
+            "study.add_subtask(cs)",
+            "cs.add_subtask(Task(\"Frontend\", \"React components\"))",
+            "cs.add_subtask(Task(\"Backend\", \"Flask API\"))",
+            "cs.add_subtask(Task(\"Testing\", \"Unit tests\"))",
+            "",
+            "# Add subtasks under workout",
+            "workout.add_subtask(Task(\"Cardio\", \"Run 5 km\"))",
+            "workout.add_subtask(Task(\"Strength\", \"Push-ups and squats\"))",
+            "",
+            "# Mark one task done",
+            "manager.mark_done(\"Frontend\")",
+            "",
+            "# Print the task hierarchy",
+            "print(manager)",
+            "",
+            "# Export to JSON",
+            "manager.export_to_json(\"tasks.json\")",
+            "print(\"Tasks exported to tasks.json \u2705\")"
+          ],
           "line_range": [
             76,
             107
