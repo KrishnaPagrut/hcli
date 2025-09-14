@@ -24,10 +24,10 @@
                 return None if task not found  (lines 54–54)
             call the nested _find function with the manager's tasks list  (lines 56–56)
         method mark_done(takes title)
-            find the task by title  (lines 59–59)
+            find the task by  (lines 59–59)
             if task exists, mark it done and return True, otherwise return False  (lines 60–63)
         method export_to_json(takes file_name)  (lines 65–67)
-            export tasks to JSON file using with statement
+            export tasks to JSON file using with 
         method __str__()
             initialize empty result string  (lines 70–70)
             iterate through all tasks and append their string representations to result  (lines 71–72)
