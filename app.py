@@ -16,9 +16,12 @@ app.add_middleware(
 
 @app.get("/clone")
 def clone_repo_endpoint(url: str = Query(...)):
-    repo_path = clone_repo(url)
-    repo_name = os.path.basename(repo_path)
-    return {"repo": repo_name}
+    try:
+        repo_path = clone_repo(url)
+        repo_name = os.path.basename(repo_path)
+        return {"repo": repo_name}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/files")
 def list_repo_files(repo: str):
