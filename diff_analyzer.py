@@ -246,7 +246,7 @@ class DiffAnalyzer:
                     node_type=mapping.node_type,
                     signature=mapping.signature,
                     description=mapping.description,
-                    line_range=mapping.line_range,
+                    line_range=mapping.line_range if mapping.line_range else (0, 0),
                     change_type=diff_result.change_type.value,
                     affected_output_lines=[diff_result.line_num],
                     original_content=diff_result.original_content,
@@ -275,7 +275,7 @@ class DiffAnalyzer:
             "total_changes": len(changes_dict),
             "changes": changes_dict,
             "metadata": {
-                "source_file": "/Users/krishnapagrut/Developer/hcli/test.ast.json"
+                "source_file": str(self.ast_json_file)
             }
         }
         

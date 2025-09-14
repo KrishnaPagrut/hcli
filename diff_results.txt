@@ -1,40 +1,59 @@
 {
-  "file1": "test_output_strict.txt",
-  "file2": "test_output_user.txt",
-  "ast_file": "/Users/krishnapagrut/Developer/hcli/out/test.pyh.json",
-  "total_changes": 2,
+  "file1": "test01_strict_op.txt",
+  "file2": "test01_user_op.txt",
+  "ast_file": "test01.ast.pyh.json",
+  "total_changes": 3,
   "changes": [
     {
       "node_id": "Task___init__",
       "node_type": "method_definition",
-      "signature": "constructor __init__(title, description, done)",
-      "description": "initialize task with title, description, done status, and empty subtasks list",
+      "signature": "constructor method __init__(takes title, description, done)",
+      "description": "initialize task instance with title, description, and done status attributes",
       "line_range": [
-        6,
-        10
+        2,
+        5
       ],
       "change_type": "changed",
       "affected_output_lines": [
-        3
+        2
       ],
-      "original_content": "        constructor __init__(takes title, description, done)  (lines 6\u201310)",
-      "modified_content": "        constructor __init__(takes title, description, done, timeToComplete)  (lines 6\u201310)"
+      "original_content": "        constructor method __init__(takes title, description, done)  (lines 2\u20135)",
+      "modified_content": "        constructor method __init__(takes title, description, priority, done)  (lines 2\u20135)"
+    },
+    {
+      "node_id": "Task_mark_done",
+      "node_type": "method_definition",
+      "signature": "method mark_done()",
+      "description": "set the task's done status to True",
+      "line_range": [
+        7,
+        8
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        4
+      ],
+      "original_content": "        method mark_done()  (lines 7\u20138)",
+      "modified_content": "            if priority not in {\"low\", \"medium\", \"high\"} raise ValueError"
     },
     {
       "node_id": "Task_to_dict",
       "node_type": "method_definition",
       "signature": "method to_dict()",
-      "description": "return a dictionary representation with title, description, done status, and recursively converted subtasks",
+      "description": "return a dictionary representation containing title, description, and done status",
       "line_range": [
-        20,
-        26
+        10,
+        15
       ],
       "change_type": "changed",
       "affected_output_lines": [
-        11
+        6
       ],
-      "original_content": "            return a dictionary representation with title, description, done status, and recursively converted subtasks",
-      "modified_content": "            return a dictionary representation with title, description, done status, timeToComplete and recursively converted subtasks"
+      "original_content": "        method to_dict()  (lines 10\u201315)",
+      "modified_content": "            set the task's done status to True and print confirmation"
     }
-  ]
+  ],
+  "metadata": {
+    "source_file": "/Users/krishnapagrut/Developer/hcli/test.ast.json"
+  }
 }
