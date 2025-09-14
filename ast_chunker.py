@@ -622,7 +622,7 @@ def main():
     try:
         result = chunker.chunk_file(file_path)
         
-        output_file = file_path.replace('.py', '_chunked.json')
+        output_file = file_path.replace('.py', '.ast.json')
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2)
         

@@ -1,0 +1,222 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports",
+          "type": "import_statements",
+          "description": "import json and typing modules for List, Dict, Optional",
+          "line_range": [1, 2]
+        },
+        {
+          "id": "class_Task",
+          "type": "class_definition",
+          "signature": "class Task",
+          "children": [
+            {
+              "id": "Task___init__",
+              "type": "method_definition",
+              "signature": "method __init__(takes title, description, done)",
+              "description": "initialize task with title, description, done status, and empty subtasks list",
+              "line_range": [6, 10]
+            },
+            {
+              "id": "Task_add_subtask",
+              "type": "method_definition",
+              "signature": "method add_subtask(takes subtask)",
+              "description": "append subtask to the subtasks list",
+              "line_range": [12, 13]
+            },
+            {
+              "id": "Task_mark_done",
+              "type": "method_definition",
+              "signature": "method mark_done()",
+              "children": [
+                {
+                  "id": "mark_self_done",
+                  "type": "assignment",
+                  "description": "set self.done to True",
+                  "line_range": [16, 16]
+                },
+                {
+                  "id": "mark_subtasks_done",
+                  "type": "for_loop",
+                  "description": "iterate through all subtasks and mark each one done",
+                  "line_range": [17, 18]
+                }
+              ]
+            },
+            {
+              "id": "Task_to_dict",
+              "type": "method_definition",
+              "signature": "method to_dict()",
+              "description": "return dictionary representation with title, description, done status, and recursively converted subtasks",
+              "line_range": [20, 26]
+            },
+            {
+              "id": "Task___str__",
+              "type": "method_definition",
+              "signature": "method __str__(takes level)",
+              "children": [
+                {
+                  "id": "format_preparation",
+                  "type": "assignments",
+                  "description": "create indentation based on level, determine status symbol, and format main task line",
+                  "line_range": [29, 31]
+                },
+                {
+                  "id": "append_subtasks",
+                  "type": "for_loop",
+                  "description": "iterate through subtasks and append their string representation with increased indentation",
+                  "line_range": [32, 33]
+                },
+                {
+                  "id": "return_result",
+                  "type": "return_statement",
+                  "description": "return the formatted string",
+                  "line_range": [34, 34]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "class_TaskManager",
+          "type": "class_definition",
+          "signature": "class TaskManager",
+          "children": [
+            {
+              "id": "TaskManager___init__",
+              "type": "method_definition",
+              "signature": "method __init__()",
+              "description": "initialize with empty tasks list",
+              "line_range": [38, 39]
+            },
+            {
+              "id": "TaskManager_add_task",
+              "type": "method_definition",
+              "signature": "method add_task(takes title, description)",
+              "description": "create new Task with title and description, add to tasks list, and return the task",
+              "line_range": [41, 44]
+            },
+            {
+              "id": "TaskManager_find_task",
+              "type": "method_definition",
+              "signature": "method find_task(takes title)",
+              "children": [
+                {
+                  "id": "function__find",
+                  "type": "function_definition",
+                  "signature": "nested function _find(takes task_list)",
+                  "children": [
+                    {
+                      "id": "search_loop",
+                      "type": "for_loop",
+                      "children": [
+                        {
+                          "id": "title_match_check",
+                          "type": "if_statement",
+                          "description": "if task title matches, return the task",
+                          "line_range": [49, 50]
+                        },
+                        {
+                          "id": "recursive_search",
+                          "type": "assignment",
+                          "description": "recursively search in subtasks",
+                          "line_range": [51, 51]
+                        },
+                        {
+                          "id": "result_check",
+                          "type": "if_statement",
+                          "description": "if recursive result found, return it",
+                          "line_range": [52, 53]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "not_found",
+                      "type": "return_statement",
+                      "description": "return None if not found",
+                      "line_range": [54, 54]
+                    }
+                  ]
+                },
+                {
+                  "id": "call_find",
+                  "type": "return_statement",
+                  "description": "call _find with self.tasks and return result",
+                  "line_range": [56, 56]
+                }
+              ]
+            },
+            {
+              "id": "TaskManager_mark_done",
+              "type": "method_definition",
+              "signature": "method mark_done(takes title)",
+              "children": [
+                {
+                  "id": "find_task",
+                  "type": "assignment",
+                  "description": "find task by title",
+                  "line_range": [59, 59]
+                },
+                {
+                  "id": "mark_if_found",
+                  "type": "if_statement",
+                  "description": "if task exists, mark it done and return True",
+                  "line_range": [60, 62]
+                },
+                {
+                  "id": "return_false",
+                  "type": "return_statement",
+                  "description": "return False if task not found",
+                  "line_range": [63, 63]
+                }
+              ]
+            },
+            {
+              "id": "TaskManager_export_to_json",
+              "type": "method_definition",
+              "signature": "method export_to_json(takes file_name)",
+              "description": "export tasks to JSON file using with statement",
+              "line_range": [65, 67]
+            },
+            {
+              "id": "TaskManager___str__",
+              "type": "method_definition",
+              "signature": "method __str__()",
+              "children": [
+                {
+                  "id": "init_result",
+                  "type": "assignment",
+                  "description": "initialize empty result string",
+                  "line_range": [70, 70]
+                },
+                {
+                  "id": "concatenate_tasks",
+                  "type": "for_loop",
+                  "description": "iterate through tasks and concatenate their string representations",
+                  "line_range": [71, 72]
+                },
+                {
+                  "id": "return_result",
+                  "type": "return_statement",
+                  "description": "return the concatenated result",
+                  "line_range": [73, 73]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution",
+          "type": "if_statement",
+          "description": "when run as main: create TaskManager, add hierarchical tasks (Study with Math and CS subtasks, Workout with Cardio and Strength), mark Frontend task done, print task hierarchy, and export to JSON file",
+          "line_range": [76, 107]
+        }
+      ]
+    }
+  }
+}
