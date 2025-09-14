@@ -1,4 +1,4 @@
-
+import json 
 import subprocess
 from pathlib import Path
 
@@ -259,8 +259,17 @@ Your output must be only the abstracted .phy JSON, nothing else.
     if result.returncode != 0:
         print("❌ Error:", result.stderr.strip())
     else:
-        Path(pyh_file).write_text(output)   # write cleaned output
-        print(f"✅ Generated {pyh_file}")
+        try:
+            # Parse and inject metadata
+            parsed = json.loads(output)
+            parsed["metadata"] = {
+                "source_file": str(Path(json_file).resolve())
+            }
+            Path(pyh_file).write_text(json.dumps(parsed, indent=2), encoding="utf-8")
+            print(f"✅ Generated {pyh_file}")
+        except Exception as e:
+            print(f"❌ Failed to parse Claude output as JSON: {e}")
+            Path(pyh_file).write_text(output, encoding="utf-8")
 
 
 
