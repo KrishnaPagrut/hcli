@@ -1,34 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../hooks/useStore';
-import { FolderOpen, Search } from 'lucide-react';
+import { FolderOpen, Search, Github } from 'lucide-react';
 
 const TopBar: React.FC = () => {
   const [selectedBranch, setSelectedBranch] = useState('main');
   const [isDirectoryDialogOpen, setIsDirectoryDialogOpen] = useState(false);
-  const { crawlRepository, isLoading, repository, setCurrentDirectory, loadFiles } = useStore();
+  const [isGitHubDialogOpen, setIsGitHubDialogOpen] = useState(false);
+  const [repoUrl, setRepoUrl] = useState('');
+  const [directoryInput, setDirectoryInput] = useState('');
+  const { crawlRepository, isLoading, repository, setCurrentDirectory, loadFiles, cloneGitHubRepo } = useStore();
 
-  const handleCloneRepo = async () => {
-    console.log("Trigger backend crawl_repo.py");
-    await crawlRepository();
-  };
 
   const handleCrawlDirectory = async () => {
     console.log("Crawling current directory:", repository.currentDirectory);
     await crawlRepository(repository.currentDirectory);
   };
 
+  // Debounced directory loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (directoryInput.trim() && directoryInput !== repository.currentDirectory) {
+        setCurrentDirectory(directoryInput.trim());
+        loadFiles(directoryInput.trim());
+      }
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [directoryInput, repository.currentDirectory, setCurrentDirectory, loadFiles]);
+
   const handleDirectoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentDirectory(event.target.value);
+    setDirectoryInput(event.target.value);
   };
 
   const handleDirectoryConfirm = async () => {
     setIsDirectoryDialogOpen(false);
-    // Just load files for the new directory (don't crawl)
-    await loadFiles(repository.currentDirectory);
+    if (directoryInput.trim()) {
+      setCurrentDirectory(directoryInput.trim());
+      await loadFiles(directoryInput.trim());
+    }
   };
 
   const handleDirectorySelect = () => {
+    setDirectoryInput(repository.currentDirectory);
     setIsDirectoryDialogOpen(true);
+  };
+
+  const handleGitHubClone = () => {
+    setIsGitHubDialogOpen(true);
+  };
+
+  const handleRepoUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRepoUrl(event.target.value);
+  };
+
+  const handleGitHubConfirm = async () => {
+    if (repoUrl.trim()) {
+      setIsGitHubDialogOpen(false);
+      await cloneGitHubRepo(repoUrl.trim());
+      setRepoUrl('');
+    }
+  };
+
+  const handleGitHubCancel = () => {
+    setIsGitHubDialogOpen(false);
+    setRepoUrl('');
   };
 
   const handleBranchChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -55,11 +90,12 @@ const TopBar: React.FC = () => {
         {/* Center - Action Buttons */}
         <div className="flex-1 flex justify-center space-x-3">
           <button
-            onClick={handleCloneRepo}
+            onClick={handleGitHubClone}
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
           >
-            Clone Repo
+            <Github className="h-4 w-4" />
+            <span>Clone GitHub</span>
           </button>
           
           <button
@@ -74,16 +110,19 @@ const TopBar: React.FC = () => {
 
         {/* Right - Directory and Branch Selectors */}
         <div className="flex items-center space-x-3">
-          {/* Directory Selector */}
+          {/* Current Directory Display */}
           <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
+              <FolderOpen className="h-4 w-4" />
+              <span className="text-sm max-w-64 truncate" title={repository.currentDirectory}>
+                {repository.currentDirectory}
+              </span>
+            </div>
             <button
               onClick={handleDirectorySelect}
-              className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <FolderOpen className="h-4 w-4" />
-              <span className="text-sm max-w-32 truncate">
-                {repository.currentDirectory.split('/').pop() || 'Select Directory'}
-              </span>
+              Change
             </button>
           </div>
           
@@ -113,7 +152,7 @@ const TopBar: React.FC = () => {
                 <input
                   type="text"
                   id="directory-path"
-                  value={repository.currentDirectory}
+                  value={directoryInput}
                   onChange={handleDirectoryChange}
                   placeholder="/path/to/your/directory"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -131,6 +170,45 @@ const TopBar: React.FC = () => {
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   Load Directory
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GitHub Clone Dialog */}
+      {isGitHubDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Clone GitHub Repository</h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="repo-url" className="block text-sm font-medium text-gray-700 mb-2">
+                  Repository URL
+                </label>
+                <input
+                  id="repo-url"
+                  type="url"
+                  value={repoUrl}
+                  onChange={handleRepoUrlChange}
+                  placeholder="https://github.com/username/repository"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleGitHubCancel}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleGitHubConfirm}
+                  disabled={!repoUrl.trim() || isLoading}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Cloning...' : 'Clone Repository'}
                 </button>
               </div>
             </div>

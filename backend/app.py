@@ -12,10 +12,12 @@ import tempfile
 import shutil
 from pathlib import Path
 import re
-
-# Add parent directory to path to import existing modules
 import sys
+
+# Add the parent directory to the path so we can import pyh_ast_to_output and github_utils
 sys.path.append(str(Path(__file__).parent.parent))
+import pyh_ast_to_output
+import github_utils
 
 try:
     import ast_chunker
@@ -41,6 +43,56 @@ def health_check():
         'status': 'healthy',
         'message': 'HCLI IDE Backend API is running'
     })
+
+@app.route('/api/clone-repo', methods=['POST'])
+def clone_repo():
+    """Clone a GitHub repository (without crawling)"""
+    try:
+        data = request.get_json()
+        repo_url = data.get('repo_url')
+        force = data.get('force', False)
+        
+        if not repo_url:
+            return jsonify({'error': 'repo_url is required'}), 400
+        
+        # Clone the repository
+        repo_path = github_utils.clone_repo(repo_url, force=force)
+        
+        # Get list of files in the repository
+        files = list(github_utils.list_files(repo_path, extensions=['.py']))
+        
+        return jsonify({
+            'message': 'Repository cloned successfully',
+            'repo_path': repo_path,
+            'repo_name': Path(repo_path).name,
+            'files': files
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/repo-files', methods=['GET'])
+def get_repo_files():
+    """Get files from a cloned repository"""
+    try:
+        repo_path = request.args.get('repo_path')
+        
+        if not repo_path:
+            return jsonify({'error': 'repo_path is required'}), 400
+        
+        if not os.path.exists(repo_path):
+            return jsonify({'error': 'Repository path does not exist'}), 404
+        
+        files = list(github_utils.list_files(repo_path, extensions=['.py']))
+        
+        return jsonify({
+            'files': files,
+            'repo_path': repo_path,
+            'repo_name': Path(repo_path).name
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/clone', methods=['POST'])
 def clone_repository():
@@ -532,4 +584,4 @@ def apply_phy_changes():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5002)

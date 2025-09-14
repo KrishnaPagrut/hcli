@@ -165,9 +165,10 @@ const TwoPanelEditor: React.FC<TwoPanelEditorProps> = ({ pyhContent, pyContent }
             {pyhLines.map((_, index) => (
               <div
                 key={index}
-                className={`h-5 text-xs text-gray-500 flex items-center justify-center ${
+                className={`text-xs text-gray-500 flex items-center justify-center ${
                   hoveredLine === index + 1 ? 'bg-blue-100' : ''
                 } ${activeLine === index + 1 ? 'bg-blue-200' : ''}`}
+                style={{ height: '20px', lineHeight: '20px' }}
               >
                 {index + 1}
               </div>
@@ -182,24 +183,40 @@ const TwoPanelEditor: React.FC<TwoPanelEditorProps> = ({ pyhContent, pyContent }
                 onChange={handlePyhChange}
                 onFocus={handleTextareaFocus}
                 onBlur={handleTextareaBlur}
-                className="w-full h-full resize-none border-none outline-none bg-transparent text-gray-800 leading-5 min-h-0"
+                className="w-full h-full resize-none border-none outline-none bg-transparent text-gray-800 min-h-0"
                 placeholder="Edit PHY content here..."
                 spellCheck={false}
-                style={{ height: 'calc(100vh - 250px)' }}
+                style={{ 
+                  height: 'calc(100vh - 250px)',
+                  lineHeight: '20px',
+                  fontSize: '14px'
+                }}
               />
             ) : (
               <div 
-                className="w-full h-full overflow-auto text-gray-800 leading-5"
-                style={{ height: 'calc(100vh - 250px)' }}
+                className="w-full h-full overflow-auto text-gray-800 font-mono"
+                style={{ 
+                  height: 'calc(100vh - 250px)',
+                  lineHeight: '20px',
+                  fontSize: '14px',
+                  whiteSpace: 'pre-wrap'
+                }}
               >
                 {pyhLines.map((line, index) => (
                   <div
                     key={index}
-                    className={`h-5 leading-5 ${
+                    className={`${
                       hoveredLine === index + 1 ? 'bg-blue-50' : ''
-                    }`}
+                    } ${activeLine === index + 1 ? 'bg-blue-100' : ''}`}
+                    style={{ 
+                      minHeight: '20px', 
+                      lineHeight: '20px',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-all'
+                    }}
                     onMouseEnter={() => handleLineHover(index + 1, 'pyh')}
                     onMouseLeave={handleLineLeave}
+                    onClick={() => setActiveLine(index + 1)}
                   >
                     {line || '\u00A0'}
                   </div>
@@ -243,13 +260,27 @@ const TwoPanelEditor: React.FC<TwoPanelEditorProps> = ({ pyhContent, pyContent }
 
         {/* Content */}
         <div className="pl-10 pr-2 py-2 h-full">
-          <div className="w-full h-full overflow-auto" style={{ height: 'calc(100vh - 200px)' }}>
+          <div 
+            className="w-full h-full overflow-auto font-mono text-gray-800" 
+            style={{ 
+              height: 'calc(100vh - 200px)',
+              lineHeight: '20px',
+              fontSize: '14px',
+              whiteSpace: 'pre-wrap'
+            }}
+          >
             {pyLines.map((line, index) => (
               <div
                 key={index}
-                className={`h-5 leading-5 text-gray-800 ${
+                className={`${
                   hoveredLine === index + 1 ? 'bg-blue-50' : ''
                 }`}
+                style={{ 
+                  minHeight: '20px', 
+                  lineHeight: '20px',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all'
+                }}
                 onMouseEnter={() => handleLineHover(index + 1, 'py')}
                 onMouseLeave={handleLineLeave}
               >

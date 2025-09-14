@@ -39,6 +39,7 @@ interface AppStore extends AppState {
   applyChanges: (pyFilePath: string) => Promise<void>;
   saveUserPhy: (pyFilePath: string, phyContent: string) => Promise<void>;
   applyPhyChanges: (pyFilePath: string) => Promise<void>;
+  cloneGitHubRepo: (repoUrl: string) => Promise<void>;
   
   // App actions
   setLoading: (loading: boolean) => void;
@@ -334,6 +335,42 @@ export const useStore = create<AppStore>((set, get) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to apply PHY changes',
+        isLoading: false,
+      });
+    }
+  },
+
+  cloneGitHubRepo: async (repoUrl) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch('/api/clone-repo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo_url: repoUrl, force: false }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to clone repository');
+      }
+      
+      const data = await response.json();
+      console.log('Repository cloned:', data);
+      
+      // Update repository state with cloned repo info
+      set((state) => ({
+        repository: {
+          ...state.repository,
+          isConnected: true,
+          repoUrl: repoUrl,
+          currentDirectory: data.repo_path,
+          files: data.files,
+        },
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to clone repository',
         isLoading: false,
       });
     }
