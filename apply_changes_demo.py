@@ -9,55 +9,83 @@ import os
 import sys
 from claude_code_sdk import query, ClaudeCodeOptions, AssistantMessage, TextBlock, CLINotFoundError, ProcessError
 from claude_config import get_config_for_use_case
+from pathlib import Path
 
 
-async def apply_changes_from_json():
-    """Apply changes from changes.json to test.py using Claude"""
-    print("=== Applying Changes from changes.json to test.py ===")
-    
+async def apply_changes_from_json(file_stem: str):
+    """Apply changes from changes.json to the target Python file using Claude"""
     try:
-        # Read the changes file
-        with open('changes.json', 'r') as f:
+        # Load changes.json
+        with open("changes.json", "r") as f:
             changes_data = json.load(f)
-        
-        # Read the metadata from test.ast.pyh.json
-        with open('test.ast.pyh.json', 'r') as f:
+
+        # Resolve AST file path
+        ast_path = changes_data.get("ast_file")
+        if not ast_path:
+            raise ValueError("❌ ast_file missing from changes.json")
+
+        with open(ast_path, "r") as f:
             ast_data = json.load(f)
-            source_file = ast_data.get('metadata', {}).get('source_file', '/Users/krishnapagrut/Developer/hcli/test.py')
-        
-        config = get_config_for_use_case('development')
-        
+
+        # Resolve source_file safely
+        metadata = ast_data.get("metadata", {})
+        print("DEBUG: metadata =", metadata)
+
+        # Support both keys: source_file and source_py
+        source_file = (
+            metadata.get("source_file")
+            or metadata.get("source_py")
+            or f"{file_stem}.py"
+        )
+
+        # Normalize AST → .py if necessary
+        if source_file.endswith(".ast.pyh.json"):
+            source_file = source_file.replace(".ast.pyh.json", ".py")
+
+        print(f"DEBUG: Using source_file = {source_file}")
+
+        # Load Claude config
+        config = get_config_for_use_case("development")
+
         # Extract just the line numbers and changes
         changes_summary = "Changes to apply:\n"
-        for i, change in enumerate(changes_data['changes'], 1):
-            line_range = change.get('line_range', [])
-            original = change.get('original_content', '')
-            modified = change.get('modified_content', '')
-            
-            changes_summary += f"{i}. Lines {line_range[0]}-{line_range[1]}: {original} → {modified}\n"
-        
+        for i, change in enumerate(changes_data["changes"], 1):
+            line_range = change.get("line_range") or []
+            original = change.get("original_content", "")
+            modified = change.get("modified_content", "")
+            if len(line_range) == 2:
+                line_info = f"Lines {line_range[0]}-{line_range[1]}"
+            elif len(line_range) == 1:
+                line_info = f"Line {line_range[0]}"
+            else:
+                line_info = "(unspecified lines)"
+            changes_summary += (
+                f"{i}. Lines {line_range[0]}-{line_range[1]}: {original} → {modified}\n"
+            )
+
         # Create the prompt in readable multi-line format
         prompt_template = f"""You are an assistant that applies abstracted diffs back onto original Python code.
 
-Context
-The user edits Python code indirectly by changing a natural-language .pyh.json.
-We now have a diff JSON (diff.json) describing:
-Which AST nodes or sections changed.
-What was added/removed/modified in plain language.
-Your job: rewrite the original Python file so it fully reflects the user's intended changes.
+## Context
+- The user edits Python code indirectly by changing a natural-language `.pyh.json`.
+- We now have a diff JSON (`diff.json`) describing:
+  - Which AST nodes or sections changed.
+  - What was added/removed/modified in plain language.
+- Your job: rewrite the original Python file so it **fully reflects the user’s intended changes**.
 
-Rules
-Strictly follow the changes mentioned in the diff and make changes to the referred file according to the lines specified.
-For every change you make, see if there are any references (in other files as well)to the change in the code. If there are, make the changes to the references as well.
-Be very careful. Only change the code that needs to be changed according to the diffs.
-Preserve all unaffected code exactly as-is.
-Apply every diff faithfully:
-If a constructor gains a new parameter → add it everywhere (signature + assignments).
-If a method changes logic → update its implementation accordingly.
-If a class/method is removed → remove it.
-If diff implies major restructuring, rewrite the file consistently.
-Keep formatting PEP8-compliant.
-Do not output explanations, only code.
+## Rules
+- Strictly follow the changes mentioned in the diff and make changes to the referred file according to the lines specified.
+- Identify any affected files or functions in the repo from these changes. If necessary, make any required changes to them.
+- Be very careful. Only change the code that needs to be changed according to the diffs.
+- Preserve all unaffected code exactly as-is.
+- Apply every diff faithfully:
+  - If a constructor gains a new parameter → add it everywhere (signature + assignments).
+  - If a method changes logic → update its implementation accordingly.
+  - If a class/method is removed → remove it.
+- If diff implies major restructuring, rewrite the file consistently.
+- Keep formatting PEP8-compliant.
+- Do not output explanations, only code.
+
 
 ---
 
@@ -70,7 +98,13 @@ Diff file to change (other referenced files can be changed as well):
     "source_file": "{source_file}"
   }}
 
-  can you also modify the test2.py file to reflect the changes?
+### Output Format
+For each modified file, return:
+FILE: <path/to/file>
+```python
+<full updated file content>
+After all modified files, output:
+{{ "modified_files": ["list", "of", "changed", "file_paths"] }}
 
 Return all the paths and changes made."""
 
@@ -195,62 +229,59 @@ Please provide the complete updated Task class code with a timeToComplete field 
         print(f"❌ Error creating updated file: {e}")
 
 
-async def check_prerequisites():
-    """Check if all prerequisites are met"""
-    print("=== Checking Prerequisites ===")
+# async def check_prerequisites():
+#     """Check if all prerequisites are met"""
+#     print("=== Checking Prerequisites ===")
     
-    # Check if files exist
-    files_to_check = ['changes.json', 'test.py']
-    for file in files_to_check:
-        if os.path.exists(file):
-            print(f"✅ {file} found")
-        else:
-            print(f"❌ {file} not found")
-            return False
+#     # Check if files exist
+#     files_to_check = ['changes.json', 'test.py']
+#     for file in files_to_check:
+#         if os.path.exists(file):
+#             print(f"✅ {file} found")
+#         else:
+#             print(f"❌ {file} not found")
+#             return False
     
-    # Check if API key is set
-    if os.environ.get('ANTHROPIC_API_KEY'):
-        print("✅ ANTHROPIC_API_KEY is set")
-    else:
-        print("❌ ANTHROPIC_API_KEY not set")
-        print("Set it with: $env:ANTHROPIC_API_KEY = 'your-api-key'")
-        return False
+#     # Check if API key is set
+#     if os.environ.get('ANTHROPIC_API_KEY'):
+#         print("✅ ANTHROPIC_API_KEY is set")
+#     else:
+#         print("❌ ANTHROPIC_API_KEY not set")
+#         print("Set it with: $env:ANTHROPIC_API_KEY = 'your-api-key'")
+#         return False
     
-    print("✅ All prerequisites met!")
-    return True
+#     print("✅ All prerequisites met!")
+#     return True
 
 
 async def main():
-    """Run the apply changes demo"""
     print("Claude Code SDK - Apply Changes Demo")
     print("=" * 50)
-    
-    # Check prerequisites first
-    if not await check_prerequisites():
-        print("\n❌ Prerequisites not met. Please fix the issues above and try again.")
-        return
-    
+
     try:
-        # Analyze the changes structure first
-        # await analyze_changes_structure()
-        
-        # Apply the changes
-        await apply_changes_from_json()
-        
-        # # Create updated file
-        # await create_updated_test_file()
-        
+        # Load the changes.json
+        with open("changes.json", "r") as f:
+            changes_data = json.load(f)
+
+        # Option A: derive from ast_file
+        ast_file = changes_data.get("ast_file", "")
+        file_stem = Path(ast_file).stem.split(".")[0]  # "test01"
+
+        # Option B (fallback): from metadata.source_file
+        if not file_stem and "metadata" in changes_data:
+            meta_source = changes_data["metadata"].get("source_file", "")
+            file_stem = Path(meta_source).stem.split(".")[0]
+
+        if not file_stem:
+            raise ValueError("❌ Could not determine file stem from changes.json")
+
+        # Now call with the correct file
+        await apply_changes_from_json(file_stem)
+
         print("\n🎉 Demo completed successfully!")
-        
+
     except Exception as e:
         print(f"\n❌ Demo failed with error: {e}")
-        print("\nTroubleshooting:")
-        print("1. Make sure Claude Code CLI is installed: npm install -g @anthropic-ai/claude-code")
-        print("2. Ensure you have an Anthropic API key configured")
-        print("3. Check that the virtual environment is activated")
-        print("4. Verify that changes.json and test.py exist in the current directory")
-        print("5. Check that the Claude Code CLI is working: claude-code --help")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,0 +1,75 @@
+{
+  "file1": "test04_strict_op.txt",
+  "file2": "test04_user_op.txt",
+  "ast_file": "test04.ast.pyh.json",
+  "total_changes": 4,
+  "changes": [
+    {
+      "node_id": "function_fibonacci",
+      "node_type": "function_definition",
+      "signature": "function fibonacci(takes input n) -> ReturnType",
+      "description": null,
+      "line_range": [
+        0,
+        0
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        1
+      ],
+      "original_content": "    function fibonacci(takes input n) -> ReturnType",
+      "modified_content": "    function fibonacci(n: int)  (lines 1\u20134)"
+    },
+    {
+      "node_id": "if1_abstract",
+      "node_type": "if_statement",
+      "signature": null,
+      "description": "base case: if n is less than or equal to 1, return n",
+      "line_range": [
+        2,
+        3
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        2
+      ],
+      "original_content": "        base case: if n is less than or equal to 1, return n  (lines 2\u20133)",
+      "modified_content": "        implement iterative fibonacci instead of recursive for performance"
+    },
+    {
+      "node_id": "recursive_call",
+      "node_type": "return_statement",
+      "signature": null,
+      "description": "return the sum of fibonacci(n-1) and fibonacci(n-2)",
+      "line_range": [
+        4,
+        4
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        3
+      ],
+      "original_content": "        return the sum of fibonacci(n-1) and fibonacci(n-2)  (lines 4\u20134)",
+      "modified_content": "    main block  (lines 7\u20139)"
+    },
+    {
+      "node_id": "if2_abstract",
+      "node_type": "if_statement",
+      "signature": null,
+      "description": "when run as main: iterate through range(10) and print fibonacci of each number",
+      "line_range": [
+        7,
+        9
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        4
+      ],
+      "original_content": "    when run as main: iterate through range(10) and print fibonacci of each number  (lines 7\u20139)",
+      "modified_content": "        print the first 15 fibonacci numbers"
+    }
+  ],
+  "metadata": {
+    "source_file": "test04.ast.pyh.json"
+  }
+}
