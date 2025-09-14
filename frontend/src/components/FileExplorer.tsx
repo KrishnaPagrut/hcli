@@ -56,7 +56,10 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect }) => {
     onFileSelect(filePath);
   };
 
-  const getFileIcon = (fileName: string) => {
+  const getFileIcon = (fileName: string | undefined) => {
+    if (!fileName) {
+      return <File className="h-4 w-4 text-gray-500" />;
+    }
     if (fileName.endsWith('.py')) {
       return <FileCode className="h-4 w-4 text-blue-500" />;
     } else {
@@ -65,10 +68,16 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect }) => {
   };
 
   const renderNode = (node: FileNode, level: number = 0): React.ReactNode => {
+    // Safety check for undefined node properties
+    if (!node || !node.path) {
+      return null;
+    }
+    
     const isExpanded = expandedNodes.has(node.path);
     const isSelected = selectedFile === node.path;
     const hasChildren = node.children && node.children.length > 0;
     const isFolder = node.type === 'directory';
+    const nodeName = node.name || 'Unknown';
 
     return (
       <div key={node.path}>
@@ -103,20 +112,20 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect }) => {
                 <Folder className="h-4 w-4 text-blue-500" />
               )
             ) : (
-              getFileIcon(node.name)
+              getFileIcon(nodeName)
             )}
           </div>
           
           <span className={`text-sm truncate ${
             isSelected ? 'text-blue-700 font-medium' : isFolder ? 'font-bold text-gray-800' : 'text-gray-700'
           }`}>
-            {node.name}
+            {nodeName}
           </span>
         </div>
         
         {isFolder && isExpanded && hasChildren && (
           <div>
-            {node.children!.map(child => renderNode(child, level + 1))}
+            {node.children!.filter(child => child).map(child => renderNode(child, level + 1))}
           </div>
         )}
       </div>
