@@ -182,28 +182,51 @@ def get_files():
         files = []
         
         def scan_directory(path, relative_path=""):
-            for item in path.iterdir():
-                if item.name.startswith('.') or item.name in ['__pycache__', 'node_modules', 'out']:
-                    continue
+            current_files = []
+            print(f"Scanning directory: {path} (relative: {relative_path})")
+            
+            try:
+                for item in path.iterdir():
+                    print(f"  Found item: {item.name} (is_dir: {item.is_dir()})")
+                    
+                    if item.name.startswith('.') or item.name in ['__pycache__', 'node_modules', 'out']:
+                        print(f"    Skipping {item.name} (filtered)")
+                        continue
+                    
+                    item_relative = f"{relative_path}/{item.name}" if relative_path else item.name
+                    
+                    if item.is_dir():
+                        print(f"    Processing directory: {item.name}")
+                        children = scan_directory(item, item_relative)
+                        current_files.append({
+                            'name': item.name,
+                            'type': 'directory',
+                            'path': item_relative,
+                            'children': children
+                        })
+                        print(f"    Added directory {item.name} with {len(children)} children")
+                    else:
+                        print(f"    Processing file: {item.name}")
+                        current_files.append({
+                            'name': item.name,
+                            'type': 'file',
+                            'path': item_relative
+                        })
+                        print(f"    Added file {item.name}")
+            except PermissionError as e:
+                print(f"    Permission error accessing {path}: {e}")
+            except Exception as e:
+                print(f"    Error scanning {path}: {e}")
                 
-                item_relative = f"{relative_path}/{item.name}" if relative_path else item.name
-                
-                if item.is_dir():
-                    files.append({
-                        'name': item.name,
-                        'type': 'directory',
-                        'path': item_relative,
-                        'children': []
-                    })
-                    scan_directory(item, item_relative)
-                else:
-                    files.append({
-                        'name': item.name,
-                        'type': 'file',
-                        'path': item_relative
-                    })
+            print(f"  Returning {len(current_files)} items from {path}")
+            return current_files
         
-        scan_directory(target_dir)
+        files = scan_directory(target_dir)
+        print(f"Scanned directory {target_dir}, found {len(files)} items")
+        for item in files:
+            print(f"  - {item['name']} ({item['type']})")
+            if item['type'] == 'directory' and item['children']:
+                print(f"    Children: {len(item['children'])}")
         return jsonify({'files': files, 'directory': str(target_dir)})
         
     except Exception as e:
@@ -248,15 +271,33 @@ def get_pyh_output(py_file_path):
             return jsonify({'error': 'Python file not found'}), 404
         
         # Look for corresponding .ast.pyh.json file in the out directory
+        # For files in subdirectories, maintain the same subdirectory structure in out/
         out_dir = target_dir / "out"
-        pyh_path = out_dir / f"{py_path.stem}.pyh.ast.json"
+        
+        # Get the relative path from the target directory
+        relative_path = py_path.relative_to(target_dir)
+        
+        # If the file is in a subdirectory, create the same structure in out/
+        if len(relative_path.parts) > 1:
+            # File is in a subdirectory
+            subdir = relative_path.parent
+            pyh_path = out_dir / subdir / f"{py_path.stem}.pyh.ast.json"
+        else:
+            # File is in the root directory
+            pyh_path = out_dir / f"{py_path.stem}.pyh.ast.json"
         
         if not pyh_path.exists():
             return jsonify({'error': 'No corresponding .ast.pyh.json file found'}), 404
         
         # Check if user PHY content exists first
-        out_dir = target_dir / "out"
-        user_file_path = out_dir / f"{py_path.stem}.pyh.user.txt"
+        # Use the same subdirectory structure for user files
+        if len(relative_path.parts) > 1:
+            # File is in a subdirectory
+            subdir = relative_path.parent
+            user_file_path = out_dir / subdir / f"{py_path.stem}.pyh.user.txt"
+        else:
+            # File is in the root directory
+            user_file_path = out_dir / f"{py_path.stem}.pyh.user.txt"
         
         if user_file_path.exists():
             # Return user's edited PHY content
@@ -281,11 +322,18 @@ def get_pyh_output(py_file_path):
             return jsonify({'error': 'Invalid .pyh JSON: missing phy_chunks/main'}), 400
         
         root = data["phy_chunks"]["main"]
+        
         result = format_pyh_output(pyh_ast_to_output.render_node(root))
         
         # Save strict version (original PHY output) to out/.pyh.strict.txt
-        out_dir.mkdir(exist_ok=True)
-        strict_file_path = out_dir / f"{py_path.stem}.pyh.strict.txt"
+        # Create subdirectory if needed
+        if len(relative_path.parts) > 1:
+            subdir = relative_path.parent
+            (out_dir / subdir).mkdir(parents=True, exist_ok=True)
+            strict_file_path = out_dir / subdir / f"{py_path.stem}.pyh.strict.txt"
+        else:
+            out_dir.mkdir(exist_ok=True)
+            strict_file_path = out_dir / f"{py_path.stem}.pyh.strict.txt"
         strict_file_path.write_text(result, encoding='utf-8')
         
         return jsonify({
@@ -293,7 +341,8 @@ def get_pyh_output(py_file_path):
             'path': py_file_path,
             'is_user_edited': False,
             'line_mappings': extract_line_mappings(data),
-            'strict_file_path': str(strict_file_path.relative_to(target_dir))
+            'strict_file_path': str(strict_file_path.relative_to(target_dir)),
+            'phy_data': data  # Include the PHY AST data
         })
         
     except Exception as e:
@@ -317,18 +366,54 @@ def format_pyh_output(lines):
     return "\n".join(formatted_lines)
 
 def extract_line_mappings(pyh_data):
-    """Extract line number mappings from PHY data"""
+    """Extract line number mappings from PHY data with proper chunk-to-chunk mapping"""
     mappings = []
+    pyh_line_counter = [0]  # Use list to allow modification in nested function
     
     def extract_from_node(node, path=""):
         if "line_range" in node and node["line_range"]:
-            mappings.append({
-                'pyhLine': node["line_range"][0],  # Start line
-                'pyLine': node["line_range"][0],   # For now, map 1:1
-                'description': node.get('description', ''),
-                'signature': node.get('signature', '')
-            })
+            # Map PHY lines to Python lines based on the actual line ranges
+            py_start, py_end = node["line_range"]
+            
+            # For each line in the PHY content that corresponds to this node
+            # We need to map it to the appropriate Python line range
+            pyh_start = pyh_line_counter[0] + 1
+            
+            # Count how many lines this node will generate in PHY content
+            phy_lines_for_node = 0
+            if node.get('signature'):
+                phy_lines_for_node += 1
+            if node.get('description'):
+                phy_lines_for_node += 1
+            
+            # If no signature or description, count as 1 line
+            if phy_lines_for_node == 0:
+                phy_lines_for_node = 1
+            
+            pyh_end = pyh_start + phy_lines_for_node - 1
+            
+            # Create mapping for each PHY line to Python line range
+            for i in range(phy_lines_for_node):
+                pyh_line = pyh_start + i
+                # Map to the corresponding Python line (distribute across the range)
+                if py_end > py_start:
+                    py_line = py_start + int((i / max(1, phy_lines_for_node - 1)) * (py_end - py_start))
+                else:
+                    py_line = py_start
+                
+                mappings.append({
+                    'pyhLine': pyh_line,
+                    'pyLine': py_line,
+                    'description': node.get('description', ''),
+                    'signature': node.get('signature', ''),
+                    'nodeId': node.get('id', ''),
+                    'nodeType': node.get('type', ''),
+                    'pyLineRange': [py_start, py_end]
+                })
+            
+            pyh_line_counter[0] += phy_lines_for_node
         
+        # Process children
         for child in node.get("children", []):
             child_path = f"{path}.{node.get('id', '')}" if path else node.get('id', '')
             extract_from_node(child, child_path)
@@ -469,9 +554,22 @@ def apply_phy_changes():
         
         # Find the corresponding files
         out_dir = target_dir / "out"
-        strict_file_path = out_dir / f"{py_path.stem}.pyh.strict.txt"
-        user_file_path = out_dir / f"{py_path.stem}.pyh.user.txt"
-        pyh_json_path = out_dir / f"{py_path.stem}.pyh.ast.json"
+        
+        # Get the relative path from the target directory
+        relative_path = py_path.relative_to(target_dir)
+        
+        # Use the same subdirectory structure for all files
+        if len(relative_path.parts) > 1:
+            # File is in a subdirectory
+            subdir = relative_path.parent
+            strict_file_path = out_dir / subdir / f"{py_path.stem}.pyh.strict.txt"
+            user_file_path = out_dir / subdir / f"{py_path.stem}.pyh.user.txt"
+            pyh_json_path = out_dir / subdir / f"{py_path.stem}.pyh.ast.json"
+        else:
+            # File is in the root directory
+            strict_file_path = out_dir / f"{py_path.stem}.pyh.strict.txt"
+            user_file_path = out_dir / f"{py_path.stem}.pyh.user.txt"
+            pyh_json_path = out_dir / f"{py_path.stem}.pyh.ast.json"
         
         if not strict_file_path.exists():
             return jsonify({'error': 'Strict PHY file not found. Please load the file first.'}), 404
