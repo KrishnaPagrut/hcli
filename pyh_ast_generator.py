@@ -254,5 +254,12 @@ Your output must be only the abstracted .phy JSON, nothing else.
         print(f"✅ Generated {pyh_file}")
 
 
+import argparse
+
 if __name__ == "__main__":
-    generate_pyh_with_claude("test_chunked.json", "test.pyh")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input_file", help="Path to AST JSON file")
+    parser.add_argument("-o", "--output", required=True, help="Path to output .pyh file")
+    args = parser.parse_args()
+
+    generate_pyh_with_claude(args.input_file, args.output)
