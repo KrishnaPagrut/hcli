@@ -10,6 +10,7 @@ import sys
 from claude_code_sdk import query, ClaudeCodeOptions, AssistantMessage, TextBlock, CLINotFoundError, ProcessError
 from claude_config import get_config_for_use_case
 from pathlib import Path
+import re
 
 
 async def apply_changes_from_json(file_stem: str):
@@ -128,14 +129,21 @@ Return all the paths and changes made."""
                 for block in message.content:
                     if isinstance(block, TextBlock):
                         text = block.text.strip()
-                        print(text)
-                        if text.startswith("{") and "modified_files" in text:
+                        print("RAW BLOCK:", repr(text))  # <-- NEW DEBUG
+                        if "modified_files" in text:
                             try:
-                                data = json.loads(text)
-                                modified_files = data.get("modified_files", [])
-                            except Exception:
-                                pass
+                                # Extract JSON object from block using regex
+                                match = re.search(r"\{[\s\S]*\}", text)
+                                if match:
+                                    json_str = match.group(0)
+                                    data = json.loads(json_str)
+                                    modified_files = data.get("modified_files", [])
+                                    print("PARSED JSON:", data)
+                            except json.JSONDecodeError as e:
+                                print("JSON decode failed:", e)  # <-- NEW DEBUG
 
+
+        print("DEBUG: Final modified_files =", modified_files)
         return modified_files
 
                         
@@ -272,9 +280,15 @@ import pyh_ast_generator
 def regenerate_ast_files(py_file: str, repo_root: str = "."):
     py_path = Path(py_file).resolve()
     repo_root = Path(repo_root).resolve()
-    out_root = repo_root / "out"
+    
+    try:
+        rel_path = py_path.relative_to(repo_root)
+    except ValueError:
+        # File is not inside repo_root, fallback to its own parent directory
+        repo_root = py_path.parent
+        rel_path = py_path.relative_to(repo_root)
 
-    rel_path = py_path.relative_to(repo_root)
+    out_root = repo_root / "out"
     out_dir = out_root / rel_path.parent
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -297,7 +311,6 @@ def regenerate_ast_files(py_file: str, repo_root: str = "."):
         print(f"✅ Wrote {pyh_json}")
     except Exception as e:
         print(f"❌ pyh generator failed for {py_path}: {e}")
-
 
 
 async def main():
@@ -328,7 +341,7 @@ async def main():
         if modified_files:
             print("\n🔄 Regenerating AST files for modified files...")
             for f in modified_files:
-                regenerate_ast_files(f, repo_root=".")
+                regenerate_ast_files(f, repo_root="/Users/krishnapagrut/Developer/hcli_test")
         else:
             print("\n✅ No modified files returned, skipping AST regeneration")
 

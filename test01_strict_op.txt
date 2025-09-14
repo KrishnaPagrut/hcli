@@ -1,6 +1,7 @@
+    class TextUtils
+        method word_count(takes self and text)  (lines 2–4)
+            returns the number of words in a string by splitting and counting
     class MathUtils
-        method factorial(self, n) -> ReturnType
-            docstring explaining this is a recursive factorial implementation, inefficient for large n  (lines 3–3)
-            base case: if n is less than or equal to 1, return 1  (lines 4–5)
-            recursive case: return n multiplied by factorial of (n-1)  (lines 6–6)
-    when run as main: create MathUtils instance and print factorial of 5  (lines 9–11)
+        method add(takes self, a, and b)  (lines 8–10)
+            returns the sum of two numbers
+    when run as main: create instances of TextUtils and MathUtils, then print word count of 'hello world' and sum of 2 and 3  (lines 13–17)
