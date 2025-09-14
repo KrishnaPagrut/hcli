@@ -19,7 +19,7 @@
             {
               "id": "Task___init__",
               "type": "method_definition",
-              "signature": "constructor __init__(takes title, description, done)",
+              "signature": "method __init__(takes title, description, done)",
               "description": "initialize task with title, description, done status, and empty subtasks list",
               "line_range": [6, 10]
             },
@@ -27,7 +27,7 @@
               "id": "Task_add_subtask",
               "type": "method_definition",
               "signature": "method add_subtask(takes subtask)",
-              "description": "append the given subtask to this task's subtasks list",
+              "description": "append subtask to the subtasks list",
               "line_range": [12, 13]
             },
             {
@@ -53,7 +53,7 @@
               "id": "Task_to_dict",
               "type": "method_definition",
               "signature": "method to_dict()",
-              "description": "return a dictionary representation with title, description, done status, and recursively converted subtasks",
+              "description": "return dictionary representation with title, description, done status, and subtasks converted to dictionaries",
               "line_range": [20, 26]
             },
             {
@@ -64,19 +64,19 @@
                 {
                   "id": "format_setup",
                   "type": "assignments",
-                  "description": "create indentation based on level, determine status symbol ([x] or [ ]), and format the main task line",
+                  "description": "create indentation based on level, determine status symbol ([x] or [ ]), and format task string",
                   "line_range": [29, 31]
                 },
                 {
                   "id": "append_subtasks",
                   "type": "for_loop",
-                  "description": "iterate through subtasks and append their string representations with increased indentation level",
+                  "description": "iterate through subtasks and append their string representation with increased level",
                   "line_range": [32, 33]
                 },
                 {
                   "id": "return_result",
                   "type": "return_statement",
-                  "description": "return the formatted task hierarchy string",
+                  "description": "return the formatted string",
                   "line_range": [34, 34]
                 }
               ]
@@ -91,15 +91,15 @@
             {
               "id": "TaskManager___init__",
               "type": "method_definition",
-              "signature": "constructor __init__()",
-              "description": "initialize with an empty list of tasks",
+              "signature": "method __init__()",
+              "description": "initialize with empty tasks list",
               "line_range": [38, 39]
             },
             {
               "id": "TaskManager_add_task",
               "type": "method_definition",
               "signature": "method add_task(takes title, description)",
-              "description": "create a new Task, add it to the tasks list, and return the created task",
+              "description": "create new Task, add it to tasks list, and return the task",
               "line_range": [41, 44]
             },
             {
@@ -113,10 +113,28 @@
                   "signature": "nested function _find(takes task_list)",
                   "children": [
                     {
-                      "id": "recursive_search",
+                      "id": "search_loop",
                       "type": "for_loop",
-                      "description": "iterate through tasks, return immediately if title matches, otherwise recursively search subtasks and return if found",
-                      "line_range": [48, 53]
+                      "children": [
+                        {
+                          "id": "title_match_check",
+                          "type": "if_statement",
+                          "description": "if task title matches, return the task",
+                          "line_range": [49, 50]
+                        },
+                        {
+                          "id": "recursive_search",
+                          "type": "assignment",
+                          "description": "recursively search in subtasks",
+                          "line_range": [51, 51]
+                        },
+                        {
+                          "id": "result_check",
+                          "type": "if_statement",
+                          "description": "if recursive search found result, return it",
+                          "line_range": [52, 53]
+                        }
+                      ]
                     },
                     {
                       "id": "not_found",
@@ -129,7 +147,7 @@
                 {
                   "id": "call_find",
                   "type": "return_statement",
-                  "description": "call the nested _find function with the manager's tasks list",
+                  "description": "call _find with tasks list",
                   "line_range": [56, 56]
                 }
               ]
@@ -140,16 +158,22 @@
               "signature": "method mark_done(takes title)",
               "children": [
                 {
-                  "id": "find_and_mark",
+                  "id": "find_task",
                   "type": "assignment",
-                  "description": "find the task by title",
+                  "description": "find task by title",
                   "line_range": [59, 59]
                 },
                 {
-                  "id": "conditional_mark",
+                  "id": "mark_if_found",
                   "type": "if_statement",
-                  "description": "if task exists, mark it done and return True, otherwise return False",
-                  "line_range": [60, 63]
+                  "description": "if task found, mark it done and return True",
+                  "line_range": [60, 62]
+                },
+                {
+                  "id": "not_found_return",
+                  "type": "return_statement",
+                  "description": "return False if task not found",
+                  "line_range": [63, 63]
                 }
               ]
             },
@@ -172,15 +196,15 @@
                   "line_range": [70, 70]
                 },
                 {
-                  "id": "concatenate_tasks",
+                  "id": "build_string",
                   "type": "for_loop",
-                  "description": "iterate through all tasks and append their string representations to result",
+                  "description": "iterate through tasks and concatenate their string representations",
                   "line_range": [71, 72]
                 },
                 {
-                  "id": "return_formatted",
+                  "id": "return_string",
                   "type": "return_statement",
-                  "description": "return the concatenated task strings",
+                  "description": "return the built string",
                   "line_range": [73, 73]
                 }
               ]
@@ -190,7 +214,7 @@
         {
           "id": "main_execution",
           "type": "if_statement",
-          "description": "when run as main: create TaskManager, add study and workout tasks with nested subtasks, mark one task done, print the hierarchy, export to JSON, and confirm export completion",
+          "description": "when run as main: create TaskManager, add study and workout tasks with subtasks, mark one task done, print hierarchy, and export to JSON",
           "line_range": [76, 107]
         }
       ]
