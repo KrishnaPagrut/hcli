@@ -8,6 +8,7 @@ import {
   FileCode,
   Loader
 } from 'lucide-react';
+import { useStore } from '../hooks/useStore';
 
 interface FileExplorerProps {
   onFileSelect: (filePath: string) => void;
@@ -23,32 +24,22 @@ interface FileNode {
 const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect }) => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [files, setFiles] = useState<FileNode[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { repository, isLoading, error, loadFiles } = useStore();
+  const files = repository.files;
 
-  // Fetch files from backend API
+  // Update selected file when repository changes
   useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/files');
-        if (!response.ok) {
-          throw new Error('Failed to fetch files');
-        }
-        const data = await response.json();
-        setFiles(data.files || []);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load files');
-        console.error('Error fetching files:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (repository.selectedFile) {
+      setSelectedFile(repository.selectedFile);
+    }
+  }, [repository.selectedFile]);
 
-    fetchFiles();
-  }, []);
+  // Load files when directory changes
+  useEffect(() => {
+    if (repository.currentDirectory) {
+      loadFiles(repository.currentDirectory);
+    }
+  }, [repository.currentDirectory, loadFiles]);
 
   const toggleNode = (nodePath: string) => {
     const newExpanded = new Set(expandedNodes);
@@ -137,7 +128,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect }) => {
       <div className="p-3">
         <h3 className="text-sm font-semibold text-gray-800 mb-2">Files</h3>
         
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader className="h-6 w-6 animate-spin text-gray-500" />
             <span className="ml-2 text-sm text-gray-500">Loading files...</span>
@@ -156,7 +147,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect }) => {
           files.map(node => renderNode(node))
         ) : (
           <div className="text-center py-8 text-sm text-gray-500">
-            No files found
+            No files found. Select a directory and click "Crawl" to load files.
           </div>
         )}
       </div>

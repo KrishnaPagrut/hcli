@@ -1,10 +1,34 @@
 import React, { useState } from 'react';
+import { useStore } from '../hooks/useStore';
+import { FolderOpen, Search } from 'lucide-react';
 
 const TopBar: React.FC = () => {
   const [selectedBranch, setSelectedBranch] = useState('main');
+  const [isDirectoryDialogOpen, setIsDirectoryDialogOpen] = useState(false);
+  const { crawlRepository, isLoading, repository, setCurrentDirectory, loadFiles } = useStore();
 
-  const handleCloneRepo = () => {
+  const handleCloneRepo = async () => {
     console.log("Trigger backend crawl_repo.py");
+    await crawlRepository();
+  };
+
+  const handleCrawlDirectory = async () => {
+    console.log("Crawling current directory:", repository.currentDirectory);
+    await crawlRepository(repository.currentDirectory);
+  };
+
+  const handleDirectoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentDirectory(event.target.value);
+  };
+
+  const handleDirectoryConfirm = async () => {
+    setIsDirectoryDialogOpen(false);
+    // Just load files for the new directory (don't crawl)
+    await loadFiles(repository.currentDirectory);
+  };
+
+  const handleDirectorySelect = () => {
+    setIsDirectoryDialogOpen(true);
   };
 
   const handleBranchChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -28,18 +52,42 @@ const TopBar: React.FC = () => {
           <span className="text-gray-800 font-medium">HCLI IDE</span>
         </div>
 
-        {/* Center - Clone Repo Button */}
-        <div className="flex-1 flex justify-center">
+        {/* Center - Action Buttons */}
+        <div className="flex-1 flex justify-center space-x-3">
           <button
             onClick={handleCloneRepo}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Clone Repo
           </button>
+          
+          <button
+            onClick={handleCrawlDirectory}
+            disabled={isLoading}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          >
+            <Search className="h-4 w-4" />
+            <span>Crawl</span>
+          </button>
         </div>
 
-        {/* Right - Branch Selector */}
-        <div className="flex items-center">
+        {/* Right - Directory and Branch Selectors */}
+        <div className="flex items-center space-x-3">
+          {/* Directory Selector */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleDirectorySelect}
+              className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <FolderOpen className="h-4 w-4" />
+              <span className="text-sm max-w-32 truncate">
+                {repository.currentDirectory.split('/').pop() || 'Select Directory'}
+              </span>
+            </button>
+          </div>
+          
+          {/* Branch Selector */}
           <select
             value={selectedBranch}
             onChange={handleBranchChange}
@@ -51,6 +99,44 @@ const TopBar: React.FC = () => {
           </select>
         </div>
       </div>
+      
+      {/* Directory Selection Dialog */}
+      {isDirectoryDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Select Directory</h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="directory-path" className="block text-sm font-medium text-gray-700 mb-2">
+                  Directory Path
+                </label>
+                <input
+                  type="text"
+                  id="directory-path"
+                  value={repository.currentDirectory}
+                  onChange={handleDirectoryChange}
+                  placeholder="/path/to/your/directory"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setIsDirectoryDialogOpen(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDirectoryConfirm}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Load Directory
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

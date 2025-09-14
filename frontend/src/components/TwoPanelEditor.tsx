@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useStore } from '../hooks/useStore';
+import { Edit3, Save, Eye } from 'lucide-react';
 
 interface TwoPanelEditorProps {
   pyhContent: string;   // text output from pyh_ast_to_output.py
@@ -6,10 +8,13 @@ interface TwoPanelEditorProps {
 }
 
 const TwoPanelEditor: React.FC<TwoPanelEditorProps> = ({ pyhContent, pyContent }) => {
+  const { repository, updatePyhContent, saveUserPhy } = useStore();
   const [leftWidth, setLeftWidth] = useState(50); // percentage
   const [isDragging, setIsDragging] = useState(false);
   const [hoveredLine, setHoveredLine] = useState<number | null>(null);
   const [activeLine, setActiveLine] = useState<number | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
 
@@ -67,9 +72,22 @@ const TwoPanelEditor: React.FC<TwoPanelEditorProps> = ({ pyhContent, pyContent }
 
   // Handle textarea change for editable content
   const handlePyhChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // In a real implementation, this would update the pyhContent state
-    // and trigger diff generation
-    console.log('PYH content changed:', e.target.value);
+    const newContent = e.target.value;
+    updatePyhContent(newContent);
+    setHasUnsavedChanges(true);
+  };
+
+  // Handle save button
+  const handleSave = async () => {
+    if (repository.selectedFile) {
+      await saveUserPhy(repository.selectedFile, pyhContent);
+      setHasUnsavedChanges(false);
+    }
+  };
+
+  // Handle edit toggle
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
   };
 
   // Handle textarea focus for active line highlighting
@@ -104,35 +122,91 @@ const TwoPanelEditor: React.FC<TwoPanelEditorProps> = ({ pyhContent, pyContent }
     >
       {/* Left Panel - PYH Content (Editable) */}
       <div 
-        className="bg-gray-100 border-r border-gray-300 font-mono text-sm relative"
+        className="bg-gray-100 border-r border-gray-300 font-mono text-sm relative flex flex-col"
         style={{ width: `${leftWidth}%` }}
       >
-        {/* Line Numbers */}
-        <div className="absolute left-0 top-0 w-8 bg-gray-200 border-r border-gray-300 h-full overflow-hidden">
-          {pyhLines.map((_, index) => (
-            <div
-              key={index}
-              className={`h-5 text-xs text-gray-500 flex items-center justify-center ${
-                hoveredLine === index + 1 ? 'bg-blue-100' : ''
-              } ${activeLine === index + 1 ? 'bg-blue-200' : ''}`}
+        {/* Header with Edit Toggle and Save Button */}
+        <div className="flex items-center justify-between p-2 bg-gray-200 border-b border-gray-300">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-gray-700">PHY Content</span>
+            {hasUnsavedChanges && (
+              <span className="text-xs text-orange-600">• Unsaved changes</span>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleEditToggle}
+              className={`flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                isEditing 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-gray-500 text-white hover:bg-gray-600'
+              }`}
             >
-              {index + 1}
-            </div>
-          ))}
+              {isEditing ? <Eye className="h-3 w-3" /> : <Edit3 className="h-3 w-3" />}
+              <span>{isEditing ? 'View' : 'Edit'}</span>
+            </button>
+            {isEditing && (
+              <button
+                onClick={handleSave}
+                disabled={!hasUnsavedChanges}
+                className="flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 text-white hover:bg-green-700"
+              >
+                <Save className="h-3 w-3" />
+                <span>Save</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="pl-10 pr-2 py-2 h-full">
-          <textarea
-            value={pyhContent}
-            onChange={handlePyhChange}
-            onFocus={handleTextareaFocus}
-            onBlur={handleTextareaBlur}
-            className="w-full h-full resize-none border-none outline-none bg-transparent text-gray-800 leading-5 min-h-0"
-            placeholder="PYH content will appear here..."
-            spellCheck={false}
-            style={{ height: 'calc(100vh - 200px)' }}
-          />
+        {/* Content Area */}
+        <div className="flex-1 relative">
+          {/* Line Numbers */}
+          <div className="absolute left-0 top-0 w-8 bg-gray-200 border-r border-gray-300 h-full overflow-hidden">
+            {pyhLines.map((_, index) => (
+              <div
+                key={index}
+                className={`h-5 text-xs text-gray-500 flex items-center justify-center ${
+                  hoveredLine === index + 1 ? 'bg-blue-100' : ''
+                } ${activeLine === index + 1 ? 'bg-blue-200' : ''}`}
+              >
+                {index + 1}
+              </div>
+            ))}
+          </div>
+
+          {/* Content */}
+          <div className="pl-10 pr-2 py-2 h-full">
+            {isEditing ? (
+              <textarea
+                value={pyhContent}
+                onChange={handlePyhChange}
+                onFocus={handleTextareaFocus}
+                onBlur={handleTextareaBlur}
+                className="w-full h-full resize-none border-none outline-none bg-transparent text-gray-800 leading-5 min-h-0"
+                placeholder="Edit PHY content here..."
+                spellCheck={false}
+                style={{ height: 'calc(100vh - 250px)' }}
+              />
+            ) : (
+              <div 
+                className="w-full h-full overflow-auto text-gray-800 leading-5"
+                style={{ height: 'calc(100vh - 250px)' }}
+              >
+                {pyhLines.map((line, index) => (
+                  <div
+                    key={index}
+                    className={`h-5 leading-5 ${
+                      hoveredLine === index + 1 ? 'bg-blue-50' : ''
+                    }`}
+                    onMouseEnter={() => handleLineHover(index + 1, 'pyh')}
+                    onMouseLeave={handleLineLeave}
+                  >
+                    {line || '\u00A0'}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

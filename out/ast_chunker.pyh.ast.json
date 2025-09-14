@@ -1,0 +1,273 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports_abstract",
+          "type": "imports",
+          "description": "import standard libraries: ast, json, typing components (Dict, List, Any, Optional, Tuple), and datetime",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "class_CodeChunker",
+          "type": "class_definition",
+          "signature": "class CodeChunker",
+          "children": [
+            {
+              "id": "CodeChunker___init__",
+              "type": "method_definition",
+              "signature": "method __init__(takes self)",
+              "description": "initialize instance with empty chunks dictionary, chunk counters for control structures, source lines list, and mappings between AST nodes and chunk IDs",
+              "line_range": [
+                8,
+                18
+              ]
+            },
+            {
+              "id": "CodeChunker_chunk_file",
+              "type": "method_definition",
+              "signature": "method chunk_file(takes self, file_path)",
+              "children": [
+                {
+                  "id": "read_file_abstract",
+                  "type": "with_statement",
+                  "description": "read source code from file and split into lines",
+                  "line_range": [
+                    22,
+                    25
+                  ]
+                },
+                {
+                  "id": "parse_ast_abstract",
+                  "type": "try_statement",
+                  "description": "parse source code into AST tree with error handling",
+                  "line_range": [
+                    27,
+                    30
+                  ]
+                },
+                {
+                  "id": "two_pass_processing_abstract",
+                  "type": "processing",
+                  "description": "perform two-pass processing: first pass creates chunk IDs and structure, second pass populates content, then return final output structure",
+                  "line_range": [
+                    33,
+                    38
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__first_pass_create_ids",
+              "type": "method_definition",
+              "signature": "method _first_pass_create_ids(takes self, tree)",
+              "description": "create main module chunk and recursively generate IDs for all nested structures",
+              "line_range": [
+                40,
+                54
+              ]
+            },
+            {
+              "id": "CodeChunker__create_ids_recursive",
+              "type": "method_definition",
+              "signature": "method _create_ids_recursive(takes self, nodes, parent_scope)",
+              "children": [
+                {
+                  "id": "node_processing_loop_abstract",
+                  "type": "for_loop",
+                  "description": "iterate through each AST node and create appropriate chunk structures based on node type: classes with methods, functions, if/elif/else blocks, for/while loops, try statements, and with statements, maintaining parent-child relationships and processing nested bodies recursively",
+                  "line_range": [
+                    59,
+                    261
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__second_pass_populate_content",
+              "type": "method_definition",
+              "signature": "method _second_pass_populate_content(takes self, tree)",
+              "description": "populate main module code blocks by categorizing nodes as chunk references or simple code statements, then populate content for all other chunks by finding their corresponding AST nodes",
+              "line_range": [
+                263,
+                294
+              ]
+            },
+            {
+              "id": "CodeChunker__find_node_by_chunk_id",
+              "type": "method_definition",
+              "signature": "method _find_node_by_chunk_id(takes self, tree, chunk_id)",
+              "description": "locate AST node corresponding to a chunk ID by searching through node mappings and handling special cases like else statements",
+              "line_range": [
+                296,
+                313
+              ]
+            },
+            {
+              "id": "CodeChunker__populate_chunk_content",
+              "type": "method_definition",
+              "signature": "method _populate_chunk_content(takes self, node, chunk_id)",
+              "description": "populate code blocks for different chunk types: handle else statements specially, create class chunks with member references, delegate function processing, build if/elif/else container structures, and process loop bodies with nested control structure references",
+              "line_range": [
+                315,
+                442
+              ]
+            },
+            {
+              "id": "CodeChunker__populate_function_content",
+              "type": "method_definition",
+              "signature": "method _populate_function_content(takes self, node, chunk_id)",
+              "description": "create function signature block and process function body statements, creating chunk references for nested structures or direct code blocks for simple statements",
+              "line_range": [
+                449,
+                478
+              ]
+            },
+            {
+              "id": "CodeChunker__get_body_end_line",
+              "type": "method_definition",
+              "signature": "method _get_body_end_line(takes self, body)",
+              "description": "calculate the end line number of a body of statements by finding the maximum end line among all statements",
+              "line_range": [
+                480,
+                484
+              ]
+            },
+            {
+              "id": "CodeChunker__get_source_segment",
+              "type": "method_definition",
+              "signature": "method _get_source_segment(takes self, node, include_body, body_only_if)",
+              "description": "extract source code lines for an AST node with options to include body content, handle indentation normalization, and return cleaned lines as list",
+              "line_range": [
+                486,
+                519
+              ]
+            },
+            {
+              "id": "CodeChunker__extract_dependencies",
+              "type": "method_definition",
+              "signature": "method _extract_dependencies(takes self, node)",
+              "description": "walk AST node to find all variable names used in Load context as dependencies",
+              "line_range": [
+                521,
+                527
+              ]
+            },
+            {
+              "id": "CodeChunker__extract_top_level_definitions",
+              "type": "method_definition",
+              "signature": "method _extract_top_level_definitions(takes self, tree)",
+              "description": "extract names of top-level class and function definitions from module body",
+              "line_range": [
+                529,
+                537
+              ]
+            },
+            {
+              "id": "CodeChunker__get_args_string",
+              "type": "method_definition",
+              "signature": "method _get_args_string(takes self, args)",
+              "description": "convert function argument list to comma-separated string",
+              "line_range": [
+                539,
+                542
+              ]
+            },
+            {
+              "id": "CodeChunker__get_returns_string",
+              "type": "method_definition",
+              "signature": "method _get_returns_string(takes self, node)",
+              "description": "extract return type annotation as string, defaulting to 'None' if not specified",
+              "line_range": [
+                544,
+                548
+              ]
+            },
+            {
+              "id": "CodeChunker__create_error_chunk",
+              "type": "method_definition",
+              "signature": "method _create_error_chunk(takes self, source_code, error_msg)",
+              "description": "create fallback chunk structure when AST parsing fails, containing error metadata and raw source code",
+              "line_range": [
+                550,
+                572
+              ]
+            },
+            {
+              "id": "CodeChunker__create_output_structure",
+              "type": "method_definition",
+              "signature": "method _create_output_structure(takes self, file_path)",
+              "description": "build final output structure with metadata, chunks, relationships, and context map",
+              "line_range": [
+                574,
+                586
+              ]
+            },
+            {
+              "id": "CodeChunker__build_relationships",
+              "type": "method_definition",
+              "signature": "method _build_relationships(takes self)",
+              "description": "create relationship mappings with execution flow starting from main and empty dependency graph",
+              "line_range": [
+                588,
+                599
+              ]
+            },
+            {
+              "id": "CodeChunker__build_context_map",
+              "type": "method_definition",
+              "signature": "method _build_context_map(takes self)",
+              "description": "build global context mapping with empty lists for imports, variables, functions, and classes",
+              "line_range": [
+                601,
+                608
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_main",
+          "type": "function_definition",
+          "signature": "function main()",
+          "children": [
+            {
+              "id": "arg_validation_abstract",
+              "type": "if_statement",
+              "description": "validate command line arguments and exit with usage message if incorrect",
+              "line_range": [
+                615,
+                617
+              ]
+            },
+            {
+              "id": "chunker_execution_abstract",
+              "type": "try_statement",
+              "description": "create CodeChunker instance, process specified file, and output results with error handling",
+              "line_range": [
+                619,
+                635
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution_abstract",
+          "type": "if_statement",
+          "description": "execute main function when script is run directly",
+          "line_range": [
+            638,
+            639
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/ast_chunker.py"
+  }
+}

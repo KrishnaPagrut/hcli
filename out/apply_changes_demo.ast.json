@@ -1,0 +1,1502 @@
+{
+  "metadata": {
+    "original_file": "/Users/krishnapagrut/Developer/hcli/apply_changes_demo.py",
+    "total_chunks": 57,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T08:10:15.139445"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "Apply Changes Demo - Uses Claude to apply changes from changes.json to test.py",
+            "This demonstrates how to use Claude Code SDK to apply specific code changes.",
+            "\"\"\""
+          ],
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import asyncio"
+          ],
+          "line_range": [
+            6,
+            6
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import json"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import os"
+          ],
+          "line_range": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import sys"
+          ],
+          "line_range": [
+            9,
+            9
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from claude_code_sdk import query, ClaudeCodeOptions, AssistantMessage, TextBlock, CLINotFoundError, ProcessError"
+          ],
+          "line_range": [
+            10,
+            10
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from claude_config import get_config_for_use_case"
+          ],
+          "line_range": [
+            11,
+            11
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            12,
+            12
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import re"
+          ],
+          "line_range": [
+            13,
+            13
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def apply_changes_from_json(file_stem: str):",
+            "\"\"\"Apply changes from changes.json to the target Python file using Claude\"\"\"",
+            "try:",
+            "# Load changes.json",
+            "with open(\"changes.json\", \"r\") as f:",
+            "changes_data = json.load(f)",
+            "",
+            "# Resolve AST file path",
+            "ast_path = changes_data.get(\"ast_file\")",
+            "if not ast_path:",
+            "raise ValueError(\"\u274c ast_file missing from changes.json\")",
+            "",
+            "with open(ast_path, \"r\") as f:",
+            "ast_data = json.load(f)",
+            "",
+            "# Resolve source_file safely",
+            "metadata = ast_data.get(\"metadata\", {})",
+            "print(\"DEBUG: metadata =\", metadata)",
+            "",
+            "# Support both keys: source_file and source_py",
+            "source_file = (",
+            "metadata.get(\"source_file\")",
+            "or metadata.get(\"source_py\")",
+            "or f\"{file_stem}.py\"",
+            ")",
+            "",
+            "# Normalize AST \u2192 .py if necessary",
+            "if source_file.endswith(\".ast.pyh.json\"):",
+            "source_file = source_file.replace(\".ast.pyh.json\", \".py\")",
+            "",
+            "print(f\"DEBUG: Using source_file = {source_file}\")",
+            "",
+            "# Load Claude config",
+            "config = get_config_for_use_case(\"development\")",
+            "",
+            "# Extract just the line numbers and changes",
+            "changes_summary = \"Changes to apply:\\n\"",
+            "for i, change in enumerate(changes_data[\"changes\"], 1):",
+            "line_range = change.get(\"line_range\") or []",
+            "original = change.get(\"original_content\", \"\")",
+            "modified = change.get(\"modified_content\", \"\")",
+            "if len(line_range) == 2:",
+            "line_info = f\"Lines {line_range[0]}-{line_range[1]}\"",
+            "elif len(line_range) == 1:",
+            "line_info = f\"Line {line_range[0]}\"",
+            "else:",
+            "line_info = \"(unspecified lines)\"",
+            "changes_summary += (",
+            "f\"{i}. Lines{line_info}: {original} \u2192 {modified}\\n\"",
+            ")",
+            "",
+            "# Create the prompt in readable multi-line format",
+            "prompt_template = f\"\"\"You are an assistant that applies abstracted diffs back onto original Python code.",
+            "",
+            "## Context",
+            "- The user edits Python code indirectly by changing a natural-language `.pyh.json`.",
+            "- We now have a diff JSON (`diff.json`) describing:",
+            "- Which AST nodes or sections changed.",
+            "- What was added/removed/modified in plain language.",
+            "- Your job: rewrite the original Python file so it **fully reflects the user\u2019s intended changes**.",
+            "",
+            "## Rules",
+            "- Strictly follow the changes mentioned in the diff and make changes to the referred file according to the lines specified.",
+            "- Identify any affected files or functions in the repo from these changes. If necessary, make any required changes to them.",
+            "- Be very careful. Only change the code that needs to be changed according to the diffs.",
+            "- Preserve all unaffected code exactly as-is.",
+            "- Apply every diff faithfully:",
+            "- If a constructor gains a new parameter \u2192 add it everywhere (signature + assignments).",
+            "- If a method changes logic \u2192 update its implementation accordingly.",
+            "- If a class/method is removed \u2192 remove it.",
+            "- If diff implies major restructuring, rewrite the file consistently.",
+            "- Keep formatting PEP8-compliant.",
+            "- Do not output explanations, only code.",
+            "",
+            "",
+            "---",
+            "",
+            "Actual Diff",
+            "",
+            "{changes_summary}",
+            "",
+            "Diff file to change (other referenced files can be changed as well):",
+            "\"metadata\": {{",
+            "\"source_file\": \"{source_file}\"",
+            "}}",
+            "",
+            "### Output Format",
+            "For each modified file, return:",
+            "FILE: <path/to/file>",
+            "```python",
+            "<full updated file content>",
+            "After all modified files, output:",
+            "{{ \"modified_files\": [\"list\", \"of\", \"changed\", \"file_paths\"] }}",
+            "",
+            "Return all the paths and changes made.\"\"\"",
+            "",
+            "# Convert to single line for CLI compatibility",
+            "prompt = prompt_template.replace('\\n', ' ').replace('  ', ' ').strip()",
+            "",
+            "print(\"Sending request to Claude...\")",
+            "print(\"Changes to apply:\")",
+            "for i, change in enumerate(changes_data['changes'], 1):",
+            "print(f\"  {i}. {change['node_id']}: {change['original_content']} -> {change['modified_content']}\")",
+            "",
+            "print(\"\\nClaude's response:\")",
+            "print(\"-\" * 50)",
+            "",
+            "print(prompt)",
+            "",
+            "modified_files = []",
+            "",
+            "async for message in query(prompt=prompt, options=config):",
+            "if isinstance(message, AssistantMessage):",
+            "for block in message.content:",
+            "if isinstance(block, TextBlock):",
+            "text = block.text.strip()",
+            "print(\"RAW BLOCK:\", repr(text))  # <-- NEW DEBUG",
+            "if \"modified_files\" in text:",
+            "try:",
+            "# Extract JSON object from block using regex",
+            "match = re.search(r\"\\{[\\s\\S]*\\}\", text)",
+            "if match:",
+            "json_str = match.group(0)",
+            "data = json.loads(json_str)",
+            "modified_files = data.get(\"modified_files\", [])",
+            "print(\"PARSED JSON:\", data)",
+            "except json.JSONDecodeError as e:",
+            "print(\"JSON decode failed:\", e)  # <-- NEW DEBUG",
+            "",
+            "",
+            "print(\"DEBUG: Final modified_files =\", modified_files)",
+            "return modified_files",
+            "",
+            "",
+            "except FileNotFoundError as e:",
+            "print(f\"\u274c File not found: {e}\")",
+            "print(\"Make sure changes.json and test.py exist in the current directory\")",
+            "except json.JSONDecodeError as e:",
+            "print(f\"\u274c JSON decode error: {e}\")",
+            "print(\"Make sure changes.json is valid JSON\")",
+            "except CLINotFoundError:",
+            "print(\"\u274c Claude Code CLI not found\")",
+            "print(\"Install it with: npm install -g @anthropic-ai/claude-code\")",
+            "except ProcessError as e:",
+            "print(f\"\u274c Process error: {e}\")",
+            "print(\"Check that Claude Code CLI is properly configured\")",
+            "except Exception as e:",
+            "print(f\"\u274c Unexpected error: {e}\")",
+            "print(\"Check your setup and try again\")"
+          ],
+          "line_range": [
+            16,
+            164
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def analyze_changes_structure():",
+            "\"\"\"Analyze the structure of changes.json\"\"\"",
+            "print(\"\\n=== Analyzing changes.json Structure ===\")",
+            "",
+            "try:",
+            "with open('changes.json', 'r') as f:",
+            "changes_data = json.load(f)",
+            "",
+            "print(f\"Total changes: {changes_data['total_changes']}\")",
+            "print(f\"Files involved: {changes_data['file1']}, {changes_data['file2']}\")",
+            "print(f\"AST file: {changes_data['ast_file']}\")",
+            "",
+            "print(\"\\nDetailed changes:\")",
+            "for i, change in enumerate(changes_data['changes'], 1):",
+            "print(f\"\\n{i}. {change['node_id']}\")",
+            "print(f\"   Type: {change['node_type']}\")",
+            "print(f\"   Signature: {change['signature']}\")",
+            "print(f\"   Description: {change['description']}\")",
+            "print(f\"   Line range: {change['line_range']}\")",
+            "print(f\"   Change type: {change['change_type']}\")",
+            "print(f\"   Original: {change['original_content']}\")",
+            "print(f\"   Modified: {change['modified_content']}\")",
+            "",
+            "except FileNotFoundError:",
+            "print(\"\u274c changes.json not found in current directory\")",
+            "except json.JSONDecodeError as e:",
+            "print(f\"\u274c Invalid JSON in changes.json: {e}\")",
+            "except Exception as e:",
+            "print(f\"\u274c Error analyzing changes: {e}\")"
+          ],
+          "line_range": [
+            167,
+            195
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def create_updated_test_file():",
+            "\"\"\"Create an updated version of test.py with the changes applied\"\"\"",
+            "print(\"\\n=== Creating Updated test.py ===\")",
+            "",
+            "try:",
+            "# Read the current test.py file",
+            "with open('test.py', 'r') as f:",
+            "current_code = f.read()",
+            "",
+            "config = get_config_for_use_case('development')",
+            "",
+            "prompt = f\"\"\"",
+            "I need to create an updated Python Task class with these modifications:",
+            "",
+            "1. Add timeToComplete parameter to Task constructor",
+            "2. Include timeToComplete in the to_dict method",
+            "3. Update method descriptions",
+            "",
+            "Please provide the complete updated Task class code with a timeToComplete field added. The class should have a constructor that takes title, description, done status, and timeToComplete parameters, and the to_dict method should include the timeToComplete field in the returned dictionary.",
+            "\"\"\"",
+            "",
+            "print(\"Creating updated test.py file...\")",
+            "",
+            "# Try a simpler approach first",
+            "try:",
+            "async for message in query(prompt=prompt, options=config):",
+            "if isinstance(message, AssistantMessage):",
+            "for block in message.content:",
+            "if isinstance(block, TextBlock):",
+            "print(f\"{block.text}\")",
+            "except Exception as cli_error:",
+            "print(f\"CLI Error: {cli_error}\")",
+            "print(\"Trying alternative approach...\")",
+            "",
+            "# Alternative: Use a simpler prompt",
+            "simple_prompt = \"Create Python Task class with timeToComplete parameter.\"",
+            "",
+            "try:",
+            "async for message in query(prompt=simple_prompt, options=config):",
+            "if isinstance(message, AssistantMessage):",
+            "for block in message.content:",
+            "if isinstance(block, TextBlock):",
+            "print(f\"{block.text}\")",
+            "except Exception as simple_error:",
+            "print(f\"Simple prompt also failed: {simple_error}\")",
+            "print(\"The CLI might need to be configured differently.\")",
+            "print(\"Try running: claude-code --help\")",
+            "",
+            "except FileNotFoundError:",
+            "print(\"\u274c test.py not found in current directory\")",
+            "except Exception as e:",
+            "print(f\"\u274c Error creating updated file: {e}\")"
+          ],
+          "line_range": [
+            198,
+            249
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import ast_chunker"
+          ],
+          "line_range": [
+            277,
+            277
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import pyh_ast_generator"
+          ],
+          "line_range": [
+            278,
+            278
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_regenerate_ast_files",
+          "line_range": [
+            280,
+            313
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "async def main():",
+            "print(\"Claude Code SDK - Apply Changes Demo\")",
+            "print(\"=\" * 50)",
+            "",
+            "try:",
+            "# Load the changes.json",
+            "with open(\"changes.json\", \"r\") as f:",
+            "changes_data = json.load(f)",
+            "",
+            "# Option A: derive from ast_file",
+            "ast_file = changes_data.get(\"ast_file\", \"\")",
+            "file_stem = Path(ast_file).stem.split(\".\")[0]  # \"test01\"",
+            "",
+            "# Option B (fallback): from metadata.source_file",
+            "if not file_stem and \"metadata\" in changes_data:",
+            "meta_source = changes_data[\"metadata\"].get(\"source_file\", \"\")",
+            "file_stem = Path(meta_source).stem.split(\".\")[0]",
+            "",
+            "if not file_stem:",
+            "raise ValueError(\"\u274c Could not determine file stem from changes.json\")",
+            "",
+            "# Call apply_changes and capture modified files",
+            "modified_files = await apply_changes_from_json(file_stem)",
+            "",
+            "# If Claude actually modified files, regenerate AST/pyh",
+            "if modified_files:",
+            "print(\"\\n\ud83d\udd04 Regenerating AST files for modified files...\")",
+            "for f in modified_files:",
+            "regenerate_ast_files(f, repo_root=\"/Users/krishnapagrut/Developer/hcli_test\")",
+            "else:",
+            "print(\"\\n\u2705 No modified files returned, skipping AST regeneration\")",
+            "",
+            "print(\"\\n\ud83c\udf89 Demo completed successfully!\")",
+            "",
+            "except Exception as e:",
+            "print(f\"\\n\u274c Demo failed with error: {e}\")"
+          ],
+          "line_range": [
+            316,
+            351
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15_block",
+          "line_range": [
+            354,
+            355
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "try1_block": {
+      "id": "try1_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "with1_statement": {
+      "id": "with1_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try1_block"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not ast_path:",
+            "raise ValueError(\"\u274c ast_file missing from changes.json\")"
+          ],
+          "line_range": [
+            25,
+            26
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "with2_statement": {
+      "id": "with2_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try1_block"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if source_file.endswith(\".ast.pyh.json\"):",
+            "source_file = source_file.replace(\".ast.pyh.json\", \".py\")"
+          ],
+          "line_range": [
+            43,
+            44
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (i, change) in enumerate(changes_data['changes'], 1):"
+          ],
+          "line_range": [
+            53,
+            53
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_range = change.get(\"line_range\") or []"
+          ],
+          "line_range": [
+            54,
+            54
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "original = change.get(\"original_content\", \"\")"
+          ],
+          "line_range": [
+            55,
+            55
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "modified = change.get(\"modified_content\", \"\")"
+          ],
+          "line_range": [
+            56,
+            56
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3_block",
+          "line_range": [
+            57,
+            62
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes_summary += (",
+            "f\"{i}. Lines{line_info}: {original} \u2192 {modified}\\n\"",
+            ")"
+          ],
+          "line_range": [
+            63,
+            65
+          ]
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else3"
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if len(line_range) == 2:",
+            "line_info = f\"Lines {line_range[0]}-{line_range[1]}\"",
+            "elif len(line_range) == 1:",
+            "line_info = f\"Line {line_range[0]}\"",
+            "else:",
+            "line_info = \"(unspecified lines)\""
+          ],
+          "line_range": [
+            57,
+            58
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "elif1": {
+      "id": "elif1",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if3_block"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "line_info = \"(unspecified lines)\""
+          ],
+          "line_range": [
+            62,
+            62
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (i, change) in enumerate(changes_data['changes'], 1):"
+          ],
+          "line_range": [
+            117,
+            117
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"  {i}. {change['node_id']}: {change['original_content']} -> {change['modified_content']}\")"
+          ],
+          "line_range": [
+            118,
+            118
+          ]
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(message, AssistantMessage):",
+            "for block in message.content:",
+            "if isinstance(block, TextBlock):",
+            "text = block.text.strip()",
+            "print(\"RAW BLOCK:\", repr(text))  # <-- NEW DEBUG",
+            "if \"modified_files\" in text:",
+            "try:",
+            "# Extract JSON object from block using regex",
+            "match = re.search(r\"\\{[\\s\\S]*\\}\", text)",
+            "if match:",
+            "json_str = match.group(0)",
+            "data = json.loads(json_str)",
+            "modified_files = data.get(\"modified_files\", [])",
+            "print(\"PARSED JSON:\", data)",
+            "except json.JSONDecodeError as e:",
+            "print(\"JSON decode failed:\", e)  # <-- NEW DEBUG"
+          ],
+          "line_range": [
+            128,
+            143
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "for3_loop": {
+      "id": "for3_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for block in message.content:"
+          ],
+          "line_range": [
+            129,
+            129
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5_block",
+          "line_range": [
+            130,
+            143
+          ]
+        }
+      ],
+      "parent_scope": "if4"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "for3_loop"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(block, TextBlock):",
+            "text = block.text.strip()",
+            "print(\"RAW BLOCK:\", repr(text))  # <-- NEW DEBUG",
+            "if \"modified_files\" in text:",
+            "try:",
+            "# Extract JSON object from block using regex",
+            "match = re.search(r\"\\{[\\s\\S]*\\}\", text)",
+            "if match:",
+            "json_str = match.group(0)",
+            "data = json.loads(json_str)",
+            "modified_files = data.get(\"modified_files\", [])",
+            "print(\"PARSED JSON:\", data)",
+            "except json.JSONDecodeError as e:",
+            "print(\"JSON decode failed:\", e)  # <-- NEW DEBUG"
+          ],
+          "line_range": [
+            130,
+            143
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        }
+      ],
+      "parent_scope": "if5"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if \"modified_files\" in text:",
+            "try:",
+            "# Extract JSON object from block using regex",
+            "match = re.search(r\"\\{[\\s\\S]*\\}\", text)",
+            "if match:",
+            "json_str = match.group(0)",
+            "data = json.loads(json_str)",
+            "modified_files = data.get(\"modified_files\", [])",
+            "print(\"PARSED JSON:\", data)",
+            "except json.JSONDecodeError as e:",
+            "print(\"JSON decode failed:\", e)  # <-- NEW DEBUG"
+          ],
+          "line_range": [
+            133,
+            143
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "try2_block": {
+      "id": "try2_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "if6"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        }
+      ],
+      "parent_scope": "try2_block"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if match:",
+            "json_str = match.group(0)",
+            "data = json.loads(json_str)",
+            "modified_files = data.get(\"modified_files\", [])",
+            "print(\"PARSED JSON:\", data)"
+          ],
+          "line_range": [
+            137,
+            141
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "try3_block": {
+      "id": "try3_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "with3_statement": {
+      "id": "with3_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try3_block"
+    },
+    "for4_loop": {
+      "id": "for4_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (i, change) in enumerate(changes_data['changes'], 1):"
+          ],
+          "line_range": [
+            180,
+            180
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"\\n{i}. {change['node_id']}\")"
+          ],
+          "line_range": [
+            181,
+            181
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Type: {change['node_type']}\")"
+          ],
+          "line_range": [
+            182,
+            182
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Signature: {change['signature']}\")"
+          ],
+          "line_range": [
+            183,
+            183
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Description: {change['description']}\")"
+          ],
+          "line_range": [
+            184,
+            184
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Line range: {change['line_range']}\")"
+          ],
+          "line_range": [
+            185,
+            185
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Change type: {change['change_type']}\")"
+          ],
+          "line_range": [
+            186,
+            186
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Original: {change['original_content']}\")"
+          ],
+          "line_range": [
+            187,
+            187
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"   Modified: {change['modified_content']}\")"
+          ],
+          "line_range": [
+            188,
+            188
+          ]
+        }
+      ],
+      "parent_scope": "try3_block"
+    },
+    "try4_block": {
+      "id": "try4_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "with4_statement": {
+      "id": "with4_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try4_block"
+    },
+    "try5_block": {
+      "id": "try5_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "try4_block"
+    },
+    "if8_block": {
+      "id": "if8_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8"
+        }
+      ],
+      "parent_scope": "try5_block"
+    },
+    "if8": {
+      "id": "if8",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(message, AssistantMessage):",
+            "for block in message.content:",
+            "if isinstance(block, TextBlock):",
+            "print(f\"{block.text}\")"
+          ],
+          "line_range": [
+            224,
+            227
+          ]
+        }
+      ],
+      "parent_scope": "if8_block"
+    },
+    "for5_loop": {
+      "id": "for5_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for block in message.content:"
+          ],
+          "line_range": [
+            225,
+            225
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9_block",
+          "line_range": [
+            226,
+            227
+          ]
+        }
+      ],
+      "parent_scope": "if8"
+    },
+    "if9_block": {
+      "id": "if9_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9"
+        }
+      ],
+      "parent_scope": "for5_loop"
+    },
+    "if9": {
+      "id": "if9",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(block, TextBlock):",
+            "print(f\"{block.text}\")"
+          ],
+          "line_range": [
+            226,
+            227
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "try6_block": {
+      "id": "try6_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "try5_block"
+    },
+    "if10_block": {
+      "id": "if10_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10"
+        }
+      ],
+      "parent_scope": "try6_block"
+    },
+    "if10": {
+      "id": "if10",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(message, AssistantMessage):",
+            "for block in message.content:",
+            "if isinstance(block, TextBlock):",
+            "print(f\"{block.text}\")"
+          ],
+          "line_range": [
+            237,
+            240
+          ]
+        }
+      ],
+      "parent_scope": "if10_block"
+    },
+    "for6_loop": {
+      "id": "for6_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for block in message.content:"
+          ],
+          "line_range": [
+            238,
+            238
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11_block",
+          "line_range": [
+            239,
+            240
+          ]
+        }
+      ],
+      "parent_scope": "if10"
+    },
+    "if11_block": {
+      "id": "if11_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11"
+        }
+      ],
+      "parent_scope": "for6_loop"
+    },
+    "if11": {
+      "id": "if11",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(block, TextBlock):",
+            "print(f\"{block.text}\")"
+          ],
+          "line_range": [
+            239,
+            240
+          ]
+        }
+      ],
+      "parent_scope": "if11_block"
+    },
+    "function_regenerate_ast_files": {
+      "id": "function_regenerate_ast_files",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def regenerate_ast_files(py_file, repo_root) -> None:"
+          ],
+          "line_range": [
+            280,
+            280
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "py_path = Path(py_file).resolve()"
+          ],
+          "line_range": [
+            281,
+            281
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "repo_root = Path(repo_root).resolve()"
+          ],
+          "line_range": [
+            282,
+            282
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try7_block",
+          "line_range": [
+            284,
+            289
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "out_root = repo_root / \"out\""
+          ],
+          "line_range": [
+            291,
+            291
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "out_dir = out_root / rel_path.parent"
+          ],
+          "line_range": [
+            292,
+            292
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "out_dir.mkdir(parents=True, exist_ok=True)"
+          ],
+          "line_range": [
+            293,
+            293
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "ast_json = out_dir / f\"{py_path.stem}.ast.json\""
+          ],
+          "line_range": [
+            295,
+            295
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "pyh_json = out_dir / f\"{py_path.stem}.pyh.ast.json\""
+          ],
+          "line_range": [
+            296,
+            296
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "print(f\"\\n\ud83d\udd04 Regenerating AST for {py_path}\")"
+          ],
+          "line_range": [
+            298,
+            298
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try8_block",
+          "line_range": [
+            300,
+            307
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try9_block",
+          "line_range": [
+            309,
+            313
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try7_block": {
+      "id": "try7_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_regenerate_ast_files"
+    },
+    "try8_block": {
+      "id": "try8_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_regenerate_ast_files"
+    },
+    "try9_block": {
+      "id": "try9_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_regenerate_ast_files"
+    },
+    "try10_block": {
+      "id": "try10_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "with5_statement": {
+      "id": "with5_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try10_block"
+    },
+    "if12_block": {
+      "id": "if12_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if12": {
+      "id": "if12",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not file_stem and \"metadata\" in changes_data:",
+            "meta_source = changes_data[\"metadata\"].get(\"source_file\", \"\")",
+            "file_stem = Path(meta_source).stem.split(\".\")[0]"
+          ],
+          "line_range": [
+            330,
+            332
+          ]
+        }
+      ],
+      "parent_scope": "if12_block"
+    },
+    "if13_block": {
+      "id": "if13_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if13": {
+      "id": "if13",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not file_stem:",
+            "raise ValueError(\"\u274c Could not determine file stem from changes.json\")"
+          ],
+          "line_range": [
+            334,
+            335
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "if14_block": {
+      "id": "if14_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else14"
+        }
+      ],
+      "parent_scope": "try10_block"
+    },
+    "if14": {
+      "id": "if14",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if modified_files:",
+            "print(\"\\n\ud83d\udd04 Regenerating AST files for modified files...\")",
+            "for f in modified_files:",
+            "regenerate_ast_files(f, repo_root=\"/Users/krishnapagrut/Developer/hcli_test\")",
+            "else:",
+            "print(\"\\n\u2705 No modified files returned, skipping AST regeneration\")"
+          ],
+          "line_range": [
+            341,
+            344
+          ]
+        }
+      ],
+      "parent_scope": "if14_block"
+    },
+    "for7_loop": {
+      "id": "for7_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for f in modified_files:"
+          ],
+          "line_range": [
+            343,
+            343
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "regenerate_ast_files(f, repo_root=\"/Users/krishnapagrut/Developer/hcli_test\")"
+          ],
+          "line_range": [
+            344,
+            344
+          ]
+        }
+      ],
+      "parent_scope": "if14"
+    },
+    "else2": {
+      "id": "else2",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "print(\"\\n\u2705 No modified files returned, skipping AST regeneration\")"
+          ],
+          "line_range": [
+            346,
+            346
+          ]
+        }
+      ],
+      "parent_scope": "if14_block"
+    },
+    "if15_block": {
+      "id": "if15_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if15": {
+      "id": "if15",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "asyncio.run(main())"
+          ],
+          "line_range": [
+            354,
+            355
+          ]
+        }
+      ],
+      "parent_scope": "if15_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}

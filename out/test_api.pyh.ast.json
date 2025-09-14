@@ -1,0 +1,152 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "module_docstring",
+          "type": "docstring",
+          "description": "module docstring explaining this is a test script for the HCLI Backend API to test all endpoints",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "imports_and_constants",
+          "type": "imports_and_constants",
+          "description": "import asyncio, json, requests, time, and pathlib; define API_BASE_URL constant as localhost:8000",
+          "line_range": [
+            6,
+            13
+          ]
+        },
+        {
+          "id": "function_test_health_check",
+          "type": "function_definition",
+          "signature": "function test_health_check() -> None",
+          "children": [
+            {
+              "id": "health_check_logic",
+              "type": "try_statement",
+              "description": "send GET request to /health endpoint, check if response status is 200 and print success with response JSON, otherwise print failure with status code",
+              "line_range": [
+                19,
+                27
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_test_root_endpoint",
+          "type": "function_definition",
+          "signature": "function test_root_endpoint() -> None",
+          "children": [
+            {
+              "id": "root_endpoint_logic",
+              "type": "try_statement",
+              "description": "send GET request to root endpoint, check if response status is 200 and print success with response JSON, otherwise print failure with status code",
+              "line_range": [
+                33,
+                41
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_test_crawl_endpoint",
+          "type": "function_definition",
+          "signature": "function test_crawl_endpoint() -> None",
+          "children": [
+            {
+              "id": "crawl_endpoint_logic",
+              "type": "try_statement",
+              "description": "send POST request to /crawl endpoint with current directory path, check if response status is 200 and print success with processed files count and output directory, otherwise print failure with status code and error text",
+              "line_range": [
+                47,
+                64
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_test_display_pyh_endpoint",
+          "type": "function_definition",
+          "signature": "function test_display_pyh_endpoint() -> None",
+          "children": [
+            {
+              "id": "display_pyh_logic",
+              "type": "try_statement",
+              "description": "find pyh files in output directory, skip test if none found, otherwise send GET request to /display_pyh/{file_path} for first pyh file, check response status and print success with file path and content length or failure with error details",
+              "line_range": [
+                70,
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_test_pyh_to_py_endpoint",
+          "type": "function_definition",
+          "signature": "function test_pyh_to_py_endpoint() -> None",
+          "children": [
+            {
+              "id": "pyh_to_py_logic",
+              "type": "try_statement",
+              "description": "find pyh and py files in output directory, skip if no pyh files found, find corresponding python file by matching stem names, skip if no matching py file found, send POST request to /pyh_to_py with pyh and source py file paths, check response and print success with changes applied and modified files or failure with error details",
+              "line_range": [
+                98,
+                143
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_test_temp_files_endpoints",
+          "type": "function_definition",
+          "signature": "function test_temp_files_endpoints() -> None",
+          "children": [
+            {
+              "id": "temp_files_logic",
+              "type": "try_statement",
+              "description": "send GET request to /temp_files endpoint, check response status and print success with active sessions count or failure with status code",
+              "line_range": [
+                149,
+                159
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_main",
+          "type": "function_definition",
+          "signature": "function main() -> None",
+          "children": [
+            {
+              "id": "test_suite_execution",
+              "type": "sequential_statements",
+              "description": "print test suite header with separator lines, wait 2 seconds for server readiness, then sequentially call all test functions: health check, root endpoint, crawl endpoint, display pyh, pyh to py, and temp files endpoints, finally print completion message",
+              "line_range": [
+                164,
+                180
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution",
+          "type": "if_statement",
+          "description": "if script is run as main module, call the main function",
+          "line_range": [
+            183,
+            184
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/test_api.py"
+  }
+}

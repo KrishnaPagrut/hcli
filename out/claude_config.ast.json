@@ -1,0 +1,1039 @@
+{
+  "metadata": {
+    "original_file": "/Users/krishnapagrut/Developer/hcli/claude_config.py",
+    "total_chunks": 33,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T08:07:36.219042"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "Claude Code SDK Configuration",
+            "This file contains pre-configured options for different use cases.",
+            "\"\"\""
+          ],
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from claude_code_sdk import ClaudeCodeOptions"
+          ],
+          "line_range": [
+            6,
+            6
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import os"
+          ],
+          "line_range": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_ClaudeConfig",
+          "line_range": [
+            11,
+            92
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "TOOL_SETS = {",
+            "\"file_operations\": [\"Read\", \"Write\", \"Edit\", \"MultiEdit\", \"Glob\"],",
+            "\"code_analysis\": [\"Read\", \"Glob\", \"Grep\"],",
+            "\"web_research\": [\"WebSearch\", \"WebFetch\"],",
+            "\"system_commands\": [\"Bash\"],",
+            "\"notebook_editing\": [\"NotebookEdit\"],",
+            "\"task_management\": [\"TodoWrite\"],",
+            "\"full_access\": [",
+            "\"Read\", \"Write\", \"Edit\", \"MultiEdit\", \"Bash\", \"Glob\", \"Grep\",",
+            "\"WebSearch\", \"WebFetch\", \"NotebookEdit\", \"TodoWrite\"",
+            "]",
+            "}"
+          ],
+          "line_range": [
+            96,
+            107
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_get_config_for_use_case",
+          "line_range": [
+            110,
+            139
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_add_tools_to_config",
+          "line_range": [
+            142,
+            162
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10_block",
+          "line_range": [
+            166,
+            183
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "class_ClaudeConfig": {
+      "id": "class_ClaudeConfig",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class ClaudeConfig:"
+          ],
+          "line_range": [
+            11,
+            11
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Pre-configured Claude Code options for different scenarios\"\"\""
+          ],
+          "line_range": [
+            12,
+            12
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "ClaudeConfig_basic_config",
+          "line_range": [
+            15,
+            19
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "ClaudeConfig_development_config",
+          "line_range": [
+            22,
+            32
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "ClaudeConfig_analysis_config",
+          "line_range": [
+            35,
+            43
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "ClaudeConfig_project_management_config",
+          "line_range": [
+            46,
+            54
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "ClaudeConfig_research_config",
+          "line_range": [
+            57,
+            65
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "ClaudeConfig_custom_config",
+          "line_range": [
+            68,
+            92
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "ClaudeConfig_basic_config": {
+      "id": "ClaudeConfig_basic_config",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def basic_config() -> None:"
+          ],
+          "line_range": [
+            15,
+            15
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Basic configuration for simple queries\"\"\""
+          ],
+          "line_range": [
+            16,
+            16
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return ClaudeCodeOptions(",
+            "system_prompt=\"You are a helpful AI assistant\"",
+            ")"
+          ],
+          "line_range": [
+            17,
+            19
+          ]
+        }
+      ],
+      "parent_scope": "class_ClaudeConfig"
+    },
+    "ClaudeConfig_development_config": {
+      "id": "ClaudeConfig_development_config",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def development_config() -> None:"
+          ],
+          "line_range": [
+            22,
+            22
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Configuration for development tasks\"\"\""
+          ],
+          "line_range": [
+            23,
+            23
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return ClaudeCodeOptions(",
+            "system_prompt=\"You are an expert Python developer. Write clean, well-documented code.\",",
+            "permission_mode='acceptEdits',",
+            "cwd=os.getcwd(),",
+            "allowed_tools=[",
+            "\"Read\", \"Write\", \"Edit\", \"MultiEdit\", \"Bash\",",
+            "\"Glob\", \"Grep\", \"WebSearch\", \"WebFetch\"",
+            "]",
+            ")"
+          ],
+          "line_range": [
+            24,
+            32
+          ]
+        }
+      ],
+      "parent_scope": "class_ClaudeConfig"
+    },
+    "ClaudeConfig_analysis_config": {
+      "id": "ClaudeConfig_analysis_config",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def analysis_config() -> None:"
+          ],
+          "line_range": [
+            35,
+            35
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Configuration for code analysis tasks\"\"\""
+          ],
+          "line_range": [
+            36,
+            36
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return ClaudeCodeOptions(",
+            "system_prompt=\"You are a code analysis expert. Provide detailed insights and recommendations.\",",
+            "permission_mode='plan',  # Planning mode - no execution",
+            "allowed_tools=[",
+            "\"Read\", \"Glob\", \"Grep\", \"WebSearch\"",
+            "]",
+            ")"
+          ],
+          "line_range": [
+            37,
+            43
+          ]
+        }
+      ],
+      "parent_scope": "class_ClaudeConfig"
+    },
+    "ClaudeConfig_project_management_config": {
+      "id": "ClaudeConfig_project_management_config",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def project_management_config() -> None:"
+          ],
+          "line_range": [
+            46,
+            46
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Configuration for project management tasks\"\"\""
+          ],
+          "line_range": [
+            47,
+            47
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return ClaudeCodeOptions(",
+            "system_prompt=\"You are a project management assistant. Help organize, prioritize, and track tasks.\",",
+            "permission_mode='acceptEdits',",
+            "allowed_tools=[",
+            "\"Read\", \"Write\", \"Edit\", \"Bash\", \"WebSearch\"",
+            "]",
+            ")"
+          ],
+          "line_range": [
+            48,
+            54
+          ]
+        }
+      ],
+      "parent_scope": "class_ClaudeConfig"
+    },
+    "ClaudeConfig_research_config": {
+      "id": "ClaudeConfig_research_config",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def research_config() -> None:"
+          ],
+          "line_range": [
+            57,
+            57
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Configuration for research tasks\"\"\""
+          ],
+          "line_range": [
+            58,
+            58
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return ClaudeCodeOptions(",
+            "system_prompt=\"You are a research assistant. Provide thorough, well-sourced information.\",",
+            "permission_mode='plan',",
+            "allowed_tools=[",
+            "\"WebSearch\", \"WebFetch\", \"Read\"",
+            "]",
+            ")"
+          ],
+          "line_range": [
+            59,
+            65
+          ]
+        }
+      ],
+      "parent_scope": "class_ClaudeConfig"
+    },
+    "ClaudeConfig_custom_config": {
+      "id": "ClaudeConfig_custom_config",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def custom_config(system_prompt, permission_mode, allowed_tools, cwd) -> None:"
+          ],
+          "line_range": [
+            68,
+            68
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Create a custom configuration\"\"\""
+          ],
+          "line_range": [
+            75,
+            75
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "config = ClaudeCodeOptions()"
+          ],
+          "line_range": [
+            76,
+            76
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1_block",
+          "line_range": [
+            78,
+            79
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2_block",
+          "line_range": [
+            80,
+            81
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3_block",
+          "line_range": [
+            82,
+            83
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4_block",
+          "line_range": [
+            84,
+            85
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for1_loop",
+          "line_range": [
+            88,
+            90
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return config"
+          ],
+          "line_range": [
+            92,
+            92
+          ]
+        }
+      ],
+      "parent_scope": "class_ClaudeConfig"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "ClaudeConfig_custom_config"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if system_prompt:",
+            "config.system_prompt = system_prompt"
+          ],
+          "line_range": [
+            78,
+            79
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "ClaudeConfig_custom_config"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if permission_mode:",
+            "config.permission_mode = permission_mode"
+          ],
+          "line_range": [
+            80,
+            81
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        }
+      ],
+      "parent_scope": "ClaudeConfig_custom_config"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if allowed_tools:",
+            "config.allowed_tools = allowed_tools"
+          ],
+          "line_range": [
+            82,
+            83
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "ClaudeConfig_custom_config"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if cwd:",
+            "config.cwd = cwd"
+          ],
+          "line_range": [
+            84,
+            85
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (key, value) in kwargs.items():"
+          ],
+          "line_range": [
+            88,
+            88
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5_block",
+          "line_range": [
+            89,
+            90
+          ]
+        }
+      ],
+      "parent_scope": "ClaudeConfig_custom_config"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if hasattr(config, key):",
+            "setattr(config, key, value)"
+          ],
+          "line_range": [
+            89,
+            90
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "function_get_config_for_use_case": {
+      "id": "function_get_config_for_use_case",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def get_config_for_use_case(use_case) -> None:"
+          ],
+          "line_range": [
+            110,
+            110
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "Get a pre-configured setup for common use cases",
+            "",
+            "Args:",
+            "use_case: One of 'basic', 'development', 'analysis', 'project_management', 'research'",
+            "**overrides: Additional parameters to override defaults",
+            "",
+            "Returns:",
+            "ClaudeCodeOptions: Configured options",
+            "\"\"\""
+          ],
+          "line_range": [
+            111,
+            120
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "configs = {",
+            "'basic': ClaudeConfig.basic_config,",
+            "'development': ClaudeConfig.development_config,",
+            "'analysis': ClaudeConfig.analysis_config,",
+            "'project_management': ClaudeConfig.project_management_config,",
+            "'research': ClaudeConfig.research_config",
+            "}"
+          ],
+          "line_range": [
+            121,
+            127
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6_block",
+          "line_range": [
+            129,
+            130
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "config = configs[use_case]()"
+          ],
+          "line_range": [
+            132,
+            132
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for2_loop",
+          "line_range": [
+            135,
+            137
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return config"
+          ],
+          "line_range": [
+            139,
+            139
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        }
+      ],
+      "parent_scope": "function_get_config_for_use_case"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if use_case not in configs:",
+            "raise ValueError(f\"Unknown use case: {use_case}. Available: {list(configs.keys())}\")"
+          ],
+          "line_range": [
+            129,
+            130
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (key, value) in overrides.items():"
+          ],
+          "line_range": [
+            135,
+            135
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7_block",
+          "line_range": [
+            136,
+            137
+          ]
+        }
+      ],
+      "parent_scope": "function_get_config_for_use_case"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        }
+      ],
+      "parent_scope": "for2_loop"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if hasattr(config, key):",
+            "setattr(config, key, value)"
+          ],
+          "line_range": [
+            136,
+            137
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "function_add_tools_to_config": {
+      "id": "function_add_tools_to_config",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def add_tools_to_config(config, tool_set_name) -> None:"
+          ],
+          "line_range": [
+            142,
+            142
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "Add a predefined set of tools to a configuration",
+            "",
+            "Args:",
+            "config: Existing ClaudeCodeOptions",
+            "tool_set_name: Name of tool set from TOOL_SETS",
+            "",
+            "Returns:",
+            "ClaudeCodeOptions: Updated configuration",
+            "\"\"\""
+          ],
+          "line_range": [
+            143,
+            152
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8_block",
+          "line_range": [
+            153,
+            154
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "tools = TOOL_SETS[tool_set_name]"
+          ],
+          "line_range": [
+            156,
+            156
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9_block",
+          "line_range": [
+            157,
+            160
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return config"
+          ],
+          "line_range": [
+            162,
+            162
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if8_block": {
+      "id": "if8_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8"
+        }
+      ],
+      "parent_scope": "function_add_tools_to_config"
+    },
+    "if8": {
+      "id": "if8",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if tool_set_name not in TOOL_SETS:",
+            "raise ValueError(f\"Unknown tool set: {tool_set_name}. Available: {list(TOOL_SETS.keys())}\")"
+          ],
+          "line_range": [
+            153,
+            154
+          ]
+        }
+      ],
+      "parent_scope": "if8_block"
+    },
+    "if9_block": {
+      "id": "if9_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else9"
+        }
+      ],
+      "parent_scope": "function_add_tools_to_config"
+    },
+    "if9": {
+      "id": "if9",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if config.allowed_tools:",
+            "config.allowed_tools.extend(tools)",
+            "else:",
+            "config.allowed_tools = tools"
+          ],
+          "line_range": [
+            157,
+            158
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "config.allowed_tools = tools"
+          ],
+          "line_range": [
+            160,
+            160
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "if10_block": {
+      "id": "if10_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if10": {
+      "id": "if10",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "# Example 1: Get a development configuration",
+            "dev_config = get_config_for_use_case('development')",
+            "print(\"Development config:\", dev_config.system_prompt)",
+            "",
+            "# Example 2: Get a custom configuration",
+            "custom_config = get_config_for_use_case(",
+            "'basic',",
+            "system_prompt=\"You are a Python expert\",",
+            "permission_mode='acceptEdits',",
+            "cwd='/path/to/project'",
+            ")",
+            "print(\"Custom config:\", custom_config.system_prompt)",
+            "",
+            "# Example 3: Add tools to existing config",
+            "basic_config = get_config_for_use_case('basic')",
+            "add_tools_to_config(basic_config, 'file_operations')",
+            "print(\"Basic config with file operations:\", basic_config.allowed_tools)"
+          ],
+          "line_range": [
+            166,
+            183
+          ]
+        }
+      ],
+      "parent_scope": "if10_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}

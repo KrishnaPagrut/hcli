@@ -1,0 +1,3734 @@
+{
+  "metadata": {
+    "original_file": "ast_chunker.py",
+    "total_chunks": 127,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T07:20:46.000124"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "import ast"
+          ],
+          "line_range": [
+            1,
+            1
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import json"
+          ],
+          "line_range": [
+            2,
+            2
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from typing import Dict, List, Any, Optional, Tuple"
+          ],
+          "line_range": [
+            3,
+            3
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from datetime import datetime"
+          ],
+          "line_range": [
+            4,
+            4
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_CodeChunker",
+          "line_range": [
+            7,
+            608
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_main",
+          "line_range": [
+            611,
+            635
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if32_block",
+          "line_range": [
+            638,
+            639
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "class_CodeChunker": {
+      "id": "class_CodeChunker",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class CodeChunker:"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker___init__",
+          "line_range": [
+            8,
+            18
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker_chunk_file",
+          "line_range": [
+            20,
+            38
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__first_pass_create_ids",
+          "line_range": [
+            40,
+            54
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__create_ids_recursive",
+          "line_range": [
+            56,
+            261
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__second_pass_populate_content",
+          "line_range": [
+            263,
+            294
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__find_node_by_chunk_id",
+          "line_range": [
+            296,
+            313
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__populate_chunk_content",
+          "line_range": [
+            315,
+            442
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__populate_function_content",
+          "line_range": [
+            449,
+            478
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__get_body_end_line",
+          "line_range": [
+            480,
+            484
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__get_source_segment",
+          "line_range": [
+            486,
+            519
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__extract_dependencies",
+          "line_range": [
+            521,
+            527
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__extract_top_level_definitions",
+          "line_range": [
+            529,
+            537
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__get_args_string",
+          "line_range": [
+            539,
+            542
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__get_returns_string",
+          "line_range": [
+            544,
+            548
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__create_error_chunk",
+          "line_range": [
+            550,
+            572
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__create_output_structure",
+          "line_range": [
+            574,
+            586
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__build_relationships",
+          "line_range": [
+            588,
+            599
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "CodeChunker__build_context_map",
+          "line_range": [
+            601,
+            608
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "CodeChunker___init__": {
+      "id": "CodeChunker___init__",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def __init__(self) -> None:"
+          ],
+          "line_range": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.chunks = {}"
+          ],
+          "line_range": [
+            9,
+            9
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.chunk_counters = {",
+            "'if': 0, 'elif': 0, 'else': 0, 'for': 0, 'while': 0,",
+            "'try': 0, 'except': 0, 'finally': 0, 'with': 0,",
+            "'function': 0, 'class': 0, 'method': 0",
+            "}"
+          ],
+          "line_range": [
+            10,
+            14
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.source_lines = []"
+          ],
+          "line_range": [
+            15,
+            15
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.node_to_chunk_id = {}  # Maps AST nodes to their chunk IDs"
+          ],
+          "line_range": [
+            16,
+            16
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.if_node_to_chunk_id = {}  # Maps individual if/elif/else nodes to their chunk IDs"
+          ],
+          "line_range": [
+            17,
+            17
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.else_chunk_to_statements = {}  # Maps else chunk IDs to their statement lists"
+          ],
+          "line_range": [
+            18,
+            18
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "CodeChunker_chunk_file": {
+      "id": "CodeChunker_chunk_file",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def chunk_file(self, file_path) -> ReturnType:"
+          ],
+          "line_range": [
+            20,
+            20
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Main entry point to chunk a Python file\"\"\""
+          ],
+          "line_range": [
+            21,
+            21
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "with1_statement",
+          "line_range": [
+            22,
+            23
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.source_lines = source_code.split('\\n')"
+          ],
+          "line_range": [
+            25,
+            25
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try1_block",
+          "line_range": [
+            27,
+            30
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self._first_pass_create_ids(tree)"
+          ],
+          "line_range": [
+            33,
+            33
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self._second_pass_populate_content(tree)"
+          ],
+          "line_range": [
+            36,
+            36
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return self._create_output_structure(file_path)"
+          ],
+          "line_range": [
+            38,
+            38
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "with1_statement": {
+      "id": "with1_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "CodeChunker_chunk_file"
+    },
+    "try1_block": {
+      "id": "try1_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "CodeChunker_chunk_file"
+    },
+    "CodeChunker__first_pass_create_ids": {
+      "id": "CodeChunker__first_pass_create_ids",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _first_pass_create_ids(self, tree) -> None:"
+          ],
+          "line_range": [
+            40,
+            40
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"First pass: Create all chunk IDs and basic structure\"\"\""
+          ],
+          "line_range": [
+            41,
+            41
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.chunks[\"main\"] = {",
+            "\"id\": \"main\",",
+            "\"type\": \"module\",",
+            "\"code_blocks\": [],  # Will be populated in second pass",
+            "# \"dependencies\": [],",
+            "# \"defines\": self._extract_top_level_definitions(tree),",
+            "\"parent_scope\": None",
+            "}"
+          ],
+          "line_range": [
+            44,
+            51
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self._create_ids_recursive(tree.body, \"main\")"
+          ],
+          "line_range": [
+            54,
+            54
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "CodeChunker__create_ids_recursive": {
+      "id": "CodeChunker__create_ids_recursive",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _create_ids_recursive(self, nodes, parent_scope) -> None:"
+          ],
+          "line_range": [
+            56,
+            56
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Recursively create IDs for all nodes that need chunks\"\"\""
+          ],
+          "line_range": [
+            57,
+            57
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for1_loop",
+          "line_range": [
+            59,
+            261
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for node in nodes:"
+          ],
+          "line_range": [
+            59,
+            59
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1_block",
+          "line_range": [
+            61,
+            261
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__create_ids_recursive"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif2"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif3"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif4"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif5"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif6"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif7"
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(node, ast.ClassDef):",
+            "chunk_id = f\"class_{node.name}\"",
+            "self.chunks[chunk_id] = {",
+            "\"id\": chunk_id,",
+            "\"type\": \"class_definition\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [node.name],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = chunk_id",
+            "",
+            "# Process class methods",
+            "for item in node.body:",
+            "if isinstance(item, ast.FunctionDef):",
+            "method_id = f\"{node.name}_{item.name}\"",
+            "self.chunks[method_id] = {",
+            "\"id\": method_id,",
+            "\"type\": \"method_definition\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": chunk_id",
+            "}",
+            "self.node_to_chunk_id[item] = method_id",
+            "",
+            "# Process method body",
+            "self._create_ids_recursive(item.body, method_id)",
+            "",
+            "# Function definitions",
+            "elif isinstance(node, ast.FunctionDef):",
+            "self.chunk_counters['function'] += 1",
+            "chunk_id = f\"function_{node.name}\"",
+            "self.chunks[chunk_id] = {",
+            "\"id\": chunk_id,",
+            "\"type\": \"function_definition\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [node.name],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = chunk_id",
+            "",
+            "# Process function body",
+            "self._create_ids_recursive(node.body, chunk_id)",
+            "",
+            "# If statements",
+            "elif isinstance(node, ast.If):",
+            "self.chunk_counters['if'] += 1",
+            "container_id = f\"if{self.chunk_counters['if']}_block\"",
+            "",
+            "# Container chunk for the entire if/elif/else structure",
+            "self.chunks[container_id] = {",
+            "\"id\": container_id,",
+            "\"type\": \"if_else_block\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = container_id",
+            "",
+            "# Individual if chunk",
+            "if_id = f\"if{self.chunk_counters['if']}\"",
+            "self.chunks[if_id] = {",
+            "\"id\": if_id,",
+            "\"type\": \"if_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the individual if node to its chunk ID",
+            "self.if_node_to_chunk_id[node] = if_id",
+            "",
+            "# Process if body",
+            "self._create_ids_recursive(node.body, if_id)",
+            "",
+            "# Handle elif/else chains",
+            "current = node",
+            "while current.orelse:",
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "# This is an elif",
+            "self.chunk_counters['elif'] += 1",
+            "elif_node = current.orelse[0]",
+            "elif_id = f\"elif{self.chunk_counters['elif']}\"",
+            "",
+            "self.chunks[elif_id] = {",
+            "\"id\": elif_id,",
+            "\"type\": \"elif_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the elif node to its chunk ID",
+            "self.if_node_to_chunk_id[elif_node] = elif_id",
+            "",
+            "self._create_ids_recursive(elif_node.body, elif_id)",
+            "current = elif_node",
+            "else:",
+            "# This is an else",
+            "self.chunk_counters['else'] += 1",
+            "else_id = f\"else{self.chunk_counters['else']}\"",
+            "",
+            "self.chunks[else_id] = {",
+            "\"id\": else_id,",
+            "\"type\": \"else_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the else statements to their chunk ID",
+            "# Note: else is a list of statements, not a single node",
+            "self.else_chunk_to_statements[else_id] = current.orelse",
+            "",
+            "self._create_ids_recursive(current.orelse, else_id)",
+            "break",
+            "",
+            "# For loops",
+            "elif isinstance(node, ast.For):",
+            "self.chunk_counters['for'] += 1",
+            "chunk_id = f\"for{self.chunk_counters['for']}_loop\"",
+            "",
+            "self.chunks[chunk_id] = {",
+            "\"id\": chunk_id,",
+            "\"type\": \"for_loop\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [node.target.id if isinstance(node.target, ast.Name) else \"loop_var\"],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = chunk_id",
+            "",
+            "# Process for body",
+            "self._create_ids_recursive(node.body, chunk_id)",
+            "",
+            "# While loops",
+            "elif isinstance(node, ast.While):",
+            "self.chunk_counters['while'] += 1",
+            "chunk_id = f\"while{self.chunk_counters['while']}_loop\"",
+            "",
+            "self.chunks[chunk_id] = {",
+            "\"id\": chunk_id,",
+            "\"type\": \"while_loop\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = chunk_id",
+            "",
+            "# Process while body",
+            "self._create_ids_recursive(node.body, chunk_id)",
+            "",
+            "# Try statements",
+            "elif isinstance(node, ast.Try):",
+            "self.chunk_counters['try'] += 1",
+            "chunk_id = f\"try{self.chunk_counters['try']}_block\"",
+            "",
+            "self.chunks[chunk_id] = {",
+            "\"id\": chunk_id,",
+            "\"type\": \"try_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = chunk_id",
+            "",
+            "# Process try body and handlers",
+            "self._create_ids_recursive(node.body, chunk_id)",
+            "for handler in node.handlers:",
+            "self._create_ids_recursive(handler.body, chunk_id)",
+            "if node.orelse:",
+            "self._create_ids_recursive(node.orelse, chunk_id)",
+            "if node.finalbody:",
+            "self._create_ids_recursive(node.finalbody, chunk_id)",
+            "",
+            "# With statements",
+            "elif isinstance(node, ast.With):",
+            "self.chunk_counters['with'] += 1",
+            "chunk_id = f\"with{self.chunk_counters['with']}_statement\"",
+            "",
+            "self.chunks[chunk_id] = {",
+            "\"id\": chunk_id,",
+            "\"type\": \"with_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": parent_scope",
+            "}",
+            "self.node_to_chunk_id[node] = chunk_id",
+            "",
+            "# Process with body",
+            "self._create_ids_recursive(node.body, chunk_id)",
+            "",
+            "# For other nodes, continue recursively if they have body",
+            "elif hasattr(node, 'body') and isinstance(node.body, list):",
+            "self._create_ids_recursive(node.body, parent_scope)"
+          ],
+          "line_range": [
+            61,
+            88
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for item in node.body:"
+          ],
+          "line_range": [
+            74,
+            74
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2_block",
+          "line_range": [
+            75,
+            88
+          ]
+        }
+      ],
+      "parent_scope": "if1"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "for2_loop"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(item, ast.FunctionDef):",
+            "method_id = f\"{node.name}_{item.name}\"",
+            "self.chunks[method_id] = {",
+            "\"id\": method_id,",
+            "\"type\": \"method_definition\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": chunk_id",
+            "}",
+            "self.node_to_chunk_id[item] = method_id",
+            "",
+            "# Process method body",
+            "self._create_ids_recursive(item.body, method_id)"
+          ],
+          "line_range": [
+            75,
+            88
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "elif1": {
+      "id": "elif1",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "elif2": {
+      "id": "elif2",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "while1_loop": {
+      "id": "while1_loop",
+      "type": "while_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "while current.orelse:",
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "# This is an elif",
+            "self.chunk_counters['elif'] += 1",
+            "elif_node = current.orelse[0]",
+            "elif_id = f\"elif{self.chunk_counters['elif']}\"",
+            "",
+            "self.chunks[elif_id] = {",
+            "\"id\": elif_id,",
+            "\"type\": \"elif_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the elif node to its chunk ID",
+            "self.if_node_to_chunk_id[elif_node] = elif_id",
+            "",
+            "self._create_ids_recursive(elif_node.body, elif_id)",
+            "current = elif_node",
+            "else:",
+            "# This is an else",
+            "self.chunk_counters['else'] += 1",
+            "else_id = f\"else{self.chunk_counters['else']}\"",
+            "",
+            "self.chunks[else_id] = {",
+            "\"id\": else_id,",
+            "\"type\": \"else_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the else statements to their chunk ID",
+            "# Note: else is a list of statements, not a single node",
+            "self.else_chunk_to_statements[else_id] = current.orelse",
+            "",
+            "self._create_ids_recursive(current.orelse, else_id)",
+            "break"
+          ],
+          "line_range": [
+            141,
+            179
+          ]
+        }
+      ],
+      "parent_scope": "elif2"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else3"
+        }
+      ],
+      "parent_scope": "while1_loop"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "# This is an elif",
+            "self.chunk_counters['elif'] += 1",
+            "elif_node = current.orelse[0]",
+            "elif_id = f\"elif{self.chunk_counters['elif']}\"",
+            "",
+            "self.chunks[elif_id] = {",
+            "\"id\": elif_id,",
+            "\"type\": \"elif_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the elif node to its chunk ID",
+            "self.if_node_to_chunk_id[elif_node] = elif_id",
+            "",
+            "self._create_ids_recursive(elif_node.body, elif_id)",
+            "current = elif_node",
+            "else:",
+            "# This is an else",
+            "self.chunk_counters['else'] += 1",
+            "else_id = f\"else{self.chunk_counters['else']}\"",
+            "",
+            "self.chunks[else_id] = {",
+            "\"id\": else_id,",
+            "\"type\": \"else_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}",
+            "# Map the else statements to their chunk ID",
+            "# Note: else is a list of statements, not a single node",
+            "self.else_chunk_to_statements[else_id] = current.orelse",
+            "",
+            "self._create_ids_recursive(current.orelse, else_id)",
+            "break"
+          ],
+          "line_range": [
+            142,
+            160
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "self.chunk_counters['else'] += 1"
+          ],
+          "line_range": [
+            163,
+            163
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "else_id = f\"else{self.chunk_counters['else']}\""
+          ],
+          "line_range": [
+            164,
+            164
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.chunks[else_id] = {",
+            "\"id\": else_id,",
+            "\"type\": \"else_statement\",",
+            "\"code_blocks\": [],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": container_id",
+            "}"
+          ],
+          "line_range": [
+            166,
+            173
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.else_chunk_to_statements[else_id] = current.orelse"
+          ],
+          "line_range": [
+            176,
+            176
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self._create_ids_recursive(current.orelse, else_id)"
+          ],
+          "line_range": [
+            178,
+            178
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "break"
+          ],
+          "line_range": [
+            179,
+            179
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "elif3": {
+      "id": "elif3",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "elif4": {
+      "id": "elif4",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "elif5": {
+      "id": "elif5",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "for3_loop": {
+      "id": "for3_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for handler in node.handlers:"
+          ],
+          "line_range": [
+            234,
+            234
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self._create_ids_recursive(handler.body, chunk_id)"
+          ],
+          "line_range": [
+            235,
+            235
+          ]
+        }
+      ],
+      "parent_scope": "elif5"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "elif5"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node.orelse:",
+            "self._create_ids_recursive(node.orelse, chunk_id)"
+          ],
+          "line_range": [
+            236,
+            237
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "elif5"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node.finalbody:",
+            "self._create_ids_recursive(node.finalbody, chunk_id)"
+          ],
+          "line_range": [
+            238,
+            239
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "elif6": {
+      "id": "elif6",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "elif7": {
+      "id": "elif7",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if1_block"
+    },
+    "CodeChunker__second_pass_populate_content": {
+      "id": "CodeChunker__second_pass_populate_content",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _second_pass_populate_content(self, tree) -> None:"
+          ],
+          "line_range": [
+            263,
+            263
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Second pass: Populate code_blocks with actual content\"\"\""
+          ],
+          "line_range": [
+            264,
+            264
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "main_blocks = []"
+          ],
+          "line_range": [
+            267,
+            267
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for4_loop",
+          "line_range": [
+            268,
+            282
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.chunks[\"main\"][\"code_blocks\"] = main_blocks"
+          ],
+          "line_range": [
+            284,
+            284
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for5_loop",
+          "line_range": [
+            287,
+            294
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "for4_loop": {
+      "id": "for4_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for node in tree.body:"
+          ],
+          "line_range": [
+            268,
+            268
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6_block",
+          "line_range": [
+            269,
+            282
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__second_pass_populate_content"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else6"
+        }
+      ],
+      "parent_scope": "for4_loop"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node in self.node_to_chunk_id:",
+            "# This node has its own chunk",
+            "main_blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": self.node_to_chunk_id[node],",
+            "\"line_range\": [node.lineno, getattr(node, 'end_lineno', node.lineno)]",
+            "})",
+            "else:",
+            "# This is a simple statement (like imports)",
+            "main_blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(node),",
+            "\"line_range\": [node.lineno, getattr(node, 'end_lineno', node.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            269,
+            275
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "else2": {
+      "id": "else2",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "main_blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(node),",
+            "\"line_range\": [node.lineno, getattr(node, 'end_lineno', node.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            278,
+            282
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "for5_loop": {
+      "id": "for5_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (chunk_id, chunk) in self.chunks.items():"
+          ],
+          "line_range": [
+            287,
+            287
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7_block",
+          "line_range": [
+            288,
+            289
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node = self._find_node_by_chunk_id(tree, chunk_id)"
+          ],
+          "line_range": [
+            292,
+            292
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8_block",
+          "line_range": [
+            293,
+            294
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__second_pass_populate_content"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        }
+      ],
+      "parent_scope": "for5_loop"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if chunk_id == \"main\":",
+            "continue"
+          ],
+          "line_range": [
+            288,
+            289
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "if8_block": {
+      "id": "if8_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8"
+        }
+      ],
+      "parent_scope": "for5_loop"
+    },
+    "if8": {
+      "id": "if8",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node:",
+            "self._populate_chunk_content(node, chunk_id)"
+          ],
+          "line_range": [
+            293,
+            294
+          ]
+        }
+      ],
+      "parent_scope": "if8_block"
+    },
+    "CodeChunker__find_node_by_chunk_id": {
+      "id": "CodeChunker__find_node_by_chunk_id",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _find_node_by_chunk_id(self, tree, chunk_id) -> ReturnType:"
+          ],
+          "line_range": [
+            296,
+            296
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Find the AST node corresponding to a chunk ID\"\"\""
+          ],
+          "line_range": [
+            297,
+            297
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for6_loop",
+          "line_range": [
+            299,
+            301
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for7_loop",
+          "line_range": [
+            304,
+            306
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11_block",
+          "line_range": [
+            309,
+            311
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return None"
+          ],
+          "line_range": [
+            313,
+            313
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "for6_loop": {
+      "id": "for6_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (node, node_chunk_id) in self.node_to_chunk_id.items():"
+          ],
+          "line_range": [
+            299,
+            299
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9_block",
+          "line_range": [
+            300,
+            301
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__find_node_by_chunk_id"
+    },
+    "if9_block": {
+      "id": "if9_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9"
+        }
+      ],
+      "parent_scope": "for6_loop"
+    },
+    "if9": {
+      "id": "if9",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node_chunk_id == chunk_id:",
+            "return node"
+          ],
+          "line_range": [
+            300,
+            301
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "for7_loop": {
+      "id": "for7_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (node, node_chunk_id) in self.if_node_to_chunk_id.items():"
+          ],
+          "line_range": [
+            304,
+            304
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10_block",
+          "line_range": [
+            305,
+            306
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__find_node_by_chunk_id"
+    },
+    "if10_block": {
+      "id": "if10_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10"
+        }
+      ],
+      "parent_scope": "for7_loop"
+    },
+    "if10": {
+      "id": "if10",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node_chunk_id == chunk_id:",
+            "return node"
+          ],
+          "line_range": [
+            305,
+            306
+          ]
+        }
+      ],
+      "parent_scope": "if10_block"
+    },
+    "if11_block": {
+      "id": "if11_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11"
+        }
+      ],
+      "parent_scope": "CodeChunker__find_node_by_chunk_id"
+    },
+    "if11": {
+      "id": "if11",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if chunk_id in self.else_chunk_to_statements:",
+            "# For else statements, we'll handle them specially in _populate_chunk_content",
+            "return \"else_statements\""
+          ],
+          "line_range": [
+            309,
+            311
+          ]
+        }
+      ],
+      "parent_scope": "if11_block"
+    },
+    "CodeChunker__populate_chunk_content": {
+      "id": "CodeChunker__populate_chunk_content",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _populate_chunk_content(self, node, chunk_id) -> None:"
+          ],
+          "line_range": [
+            315,
+            315
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Populate the code_blocks for a specific chunk\"\"\""
+          ],
+          "line_range": [
+            316,
+            316
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "chunk = self.chunks[chunk_id]"
+          ],
+          "line_range": [
+            317,
+            317
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12_block",
+          "line_range": [
+            320,
+            337
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14_block",
+          "line_range": [
+            339,
+            442
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "if12_block": {
+      "id": "if12_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12"
+        }
+      ],
+      "parent_scope": "CodeChunker__populate_chunk_content"
+    },
+    "if12": {
+      "id": "if12",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node == \"else_statements\" and chunk_id in self.else_chunk_to_statements:",
+            "statements = self.else_chunk_to_statements[chunk_id]",
+            "blocks = []",
+            "for stmt in statements:",
+            "if stmt in self.node_to_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": self.node_to_chunk_id[stmt],",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "else:",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "chunk[\"code_blocks\"] = blocks",
+            "return"
+          ],
+          "line_range": [
+            320,
+            337
+          ]
+        }
+      ],
+      "parent_scope": "if12_block"
+    },
+    "for8_loop": {
+      "id": "for8_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for stmt in statements:"
+          ],
+          "line_range": [
+            323,
+            323
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13_block",
+          "line_range": [
+            324,
+            335
+          ]
+        }
+      ],
+      "parent_scope": "if12"
+    },
+    "if13_block": {
+      "id": "if13_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else13"
+        }
+      ],
+      "parent_scope": "for8_loop"
+    },
+    "if13": {
+      "id": "if13",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if stmt in self.node_to_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": self.node_to_chunk_id[stmt],",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "else:",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            324,
+            329
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "else3": {
+      "id": "else3",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            331,
+            335
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "if14_block": {
+      "id": "if14_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif2"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif3"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif4"
+        }
+      ],
+      "parent_scope": "CodeChunker__populate_chunk_content"
+    },
+    "if14": {
+      "id": "if14",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(node, ast.ClassDef):",
+            "# Class chunk - only class declaration, everything else should be references",
+            "blocks = [{",
+            "\"type\": \"code\",",
+            "\"content\": [f\"class {node.name}:\".strip()],",
+            "\"line_range\": [node.lineno, node.lineno]",
+            "}]",
+            "",
+            "# Add references to all class members",
+            "for item in node.body:",
+            "if item in self.node_to_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": self.node_to_chunk_id[item],",
+            "\"line_range\": [item.lineno, getattr(item, 'end_lineno', item.lineno)]",
+            "})",
+            "else:",
+            "# Simple statements without their own chunks",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(item),",
+            "\"line_range\": [item.lineno, getattr(item, 'end_lineno', item.lineno)]",
+            "})",
+            "",
+            "chunk[\"code_blocks\"] = blocks",
+            "",
+            "elif isinstance(node, ast.FunctionDef):",
+            "# Method or function chunk",
+            "self._populate_function_content(node, chunk_id)",
+            "",
+            "elif isinstance(node, ast.If):",
+            "# If-else container chunk",
+            "if chunk[\"type\"] == \"if_else_block\":",
+            "blocks = []",
+            "",
+            "# Add if chunk reference",
+            "if_id = f\"if{chunk_id.split('if')[1].split('_')[0]}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": if_id})",
+            "",
+            "# Add elif/else references",
+            "current = node",
+            "elif_count = 0",
+            "while current.orelse:",
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "elif_count += 1",
+            "elif_id = f\"elif{elif_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": elif_id})",
+            "current = current.orelse[0]",
+            "else:",
+            "else_count = chunk_id.split('if')[1].split('_')[0]",
+            "else_id = f\"else{else_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": else_id})",
+            "break",
+            "",
+            "chunk[\"code_blocks\"] = blocks",
+            "",
+            "elif chunk[\"type\"] == \"if_statement\":",
+            "# Individual if chunk - get the entire if statement including condition and body",
+            "chunk[\"code_blocks\"] = [{",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(node, include_body=True),",
+            "\"line_range\": [node.lineno, self._get_body_end_line(node.body)]",
+            "}]",
+            "",
+            "elif isinstance(node, ast.For):",
+            "# For loop chunk - create chunk references for nested control structures",
+            "blocks = []",
+            "",
+            "# Add the for loop header",
+            "for_header = f\"for {ast.unparse(node.target)} in {ast.unparse(node.iter)}:\"",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": [for_header],",
+            "\"line_range\": [node.lineno, node.lineno]",
+            "})",
+            "",
+            "# Process the body and create chunk references for nested structures",
+            "for stmt in node.body:",
+            "if isinstance(stmt, (ast.If, ast.For, ast.While, ast.Try, ast.With)):",
+            "# Create chunk reference for nested control structure",
+            "child_chunk_id = self.node_to_chunk_id.get(stmt)",
+            "if child_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": child_chunk_id,",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "else:",
+            "# Regular statement - include directly",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "",
+            "chunk[\"code_blocks\"] = blocks",
+            "",
+            "elif isinstance(node, ast.While):",
+            "# While loop chunk",
+            "chunk[\"code_blocks\"] = [{",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(node, include_body=True),",
+            "\"line_range\": [node.lineno, getattr(node, 'end_lineno', node.lineno)]",
+            "}]"
+          ],
+          "line_range": [
+            339,
+            363
+          ]
+        }
+      ],
+      "parent_scope": "if14_block"
+    },
+    "for9_loop": {
+      "id": "for9_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for item in node.body:"
+          ],
+          "line_range": [
+            348,
+            348
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15_block",
+          "line_range": [
+            349,
+            361
+          ]
+        }
+      ],
+      "parent_scope": "if14"
+    },
+    "if15_block": {
+      "id": "if15_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else15"
+        }
+      ],
+      "parent_scope": "for9_loop"
+    },
+    "if15": {
+      "id": "if15",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if item in self.node_to_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": self.node_to_chunk_id[item],",
+            "\"line_range\": [item.lineno, getattr(item, 'end_lineno', item.lineno)]",
+            "})",
+            "else:",
+            "# Simple statements without their own chunks",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(item),",
+            "\"line_range\": [item.lineno, getattr(item, 'end_lineno', item.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            349,
+            354
+          ]
+        }
+      ],
+      "parent_scope": "if15_block"
+    },
+    "else4": {
+      "id": "else4",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(item),",
+            "\"line_range\": [item.lineno, getattr(item, 'end_lineno', item.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            357,
+            361
+          ]
+        }
+      ],
+      "parent_scope": "if15_block"
+    },
+    "elif8": {
+      "id": "elif8",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if14_block"
+    },
+    "elif9": {
+      "id": "elif9",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if14_block"
+    },
+    "if16_block": {
+      "id": "if16_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if16"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        }
+      ],
+      "parent_scope": "elif9"
+    },
+    "if16": {
+      "id": "if16",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if chunk[\"type\"] == \"if_else_block\":",
+            "blocks = []",
+            "",
+            "# Add if chunk reference",
+            "if_id = f\"if{chunk_id.split('if')[1].split('_')[0]}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": if_id})",
+            "",
+            "# Add elif/else references",
+            "current = node",
+            "elif_count = 0",
+            "while current.orelse:",
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "elif_count += 1",
+            "elif_id = f\"elif{elif_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": elif_id})",
+            "current = current.orelse[0]",
+            "else:",
+            "else_count = chunk_id.split('if')[1].split('_')[0]",
+            "else_id = f\"else{else_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": else_id})",
+            "break",
+            "",
+            "chunk[\"code_blocks\"] = blocks",
+            "",
+            "elif chunk[\"type\"] == \"if_statement\":",
+            "# Individual if chunk - get the entire if statement including condition and body",
+            "chunk[\"code_blocks\"] = [{",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(node, include_body=True),",
+            "\"line_range\": [node.lineno, self._get_body_end_line(node.body)]",
+            "}]"
+          ],
+          "line_range": [
+            371,
+            393
+          ]
+        }
+      ],
+      "parent_scope": "if16_block"
+    },
+    "while2_loop": {
+      "id": "while2_loop",
+      "type": "while_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "while current.orelse:",
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "elif_count += 1",
+            "elif_id = f\"elif{elif_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": elif_id})",
+            "current = current.orelse[0]",
+            "else:",
+            "else_count = chunk_id.split('if')[1].split('_')[0]",
+            "else_id = f\"else{else_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": else_id})",
+            "break"
+          ],
+          "line_range": [
+            381,
+            391
+          ]
+        }
+      ],
+      "parent_scope": "if16"
+    },
+    "if17_block": {
+      "id": "if17_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if17"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else17"
+        }
+      ],
+      "parent_scope": "while2_loop"
+    },
+    "if17": {
+      "id": "if17",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):",
+            "elif_count += 1",
+            "elif_id = f\"elif{elif_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": elif_id})",
+            "current = current.orelse[0]",
+            "else:",
+            "else_count = chunk_id.split('if')[1].split('_')[0]",
+            "else_id = f\"else{else_count}\"",
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": else_id})",
+            "break"
+          ],
+          "line_range": [
+            382,
+            386
+          ]
+        }
+      ],
+      "parent_scope": "if17_block"
+    },
+    "else5": {
+      "id": "else5",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "else_count = chunk_id.split('if')[1].split('_')[0]"
+          ],
+          "line_range": [
+            388,
+            388
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "else_id = f\"else{else_count}\""
+          ],
+          "line_range": [
+            389,
+            389
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "blocks.append({\"type\": \"chunk_ref\", \"chunk_id\": else_id})"
+          ],
+          "line_range": [
+            390,
+            390
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "break"
+          ],
+          "line_range": [
+            391,
+            391
+          ]
+        }
+      ],
+      "parent_scope": "if17_block"
+    },
+    "elif10": {
+      "id": "elif10",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if16_block"
+    },
+    "elif11": {
+      "id": "elif11",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if14_block"
+    },
+    "for10_loop": {
+      "id": "for10_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for stmt in node.body:"
+          ],
+          "line_range": [
+            416,
+            416
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if18_block",
+          "line_range": [
+            417,
+            432
+          ]
+        }
+      ],
+      "parent_scope": "elif11"
+    },
+    "if18_block": {
+      "id": "if18_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if18"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else18"
+        }
+      ],
+      "parent_scope": "for10_loop"
+    },
+    "if18": {
+      "id": "if18",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(stmt, (ast.If, ast.For, ast.While, ast.Try, ast.With)):",
+            "# Create chunk reference for nested control structure",
+            "child_chunk_id = self.node_to_chunk_id.get(stmt)",
+            "if child_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": child_chunk_id,",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "else:",
+            "# Regular statement - include directly",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            417,
+            425
+          ]
+        }
+      ],
+      "parent_scope": "if18_block"
+    },
+    "if19_block": {
+      "id": "if19_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if19"
+        }
+      ],
+      "parent_scope": "if18"
+    },
+    "if19": {
+      "id": "if19",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if child_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": child_chunk_id,",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            420,
+            425
+          ]
+        }
+      ],
+      "parent_scope": "if19_block"
+    },
+    "else6": {
+      "id": "else6",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            428,
+            432
+          ]
+        }
+      ],
+      "parent_scope": "if18_block"
+    },
+    "elif12": {
+      "id": "elif12",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if14_block"
+    },
+    "CodeChunker__populate_function_content": {
+      "id": "CodeChunker__populate_function_content",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _populate_function_content(self, node, chunk_id) -> None:"
+          ],
+          "line_range": [
+            449,
+            449
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Populate content for function/method chunks\"\"\""
+          ],
+          "line_range": [
+            450,
+            450
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "chunk = self.chunks[chunk_id]"
+          ],
+          "line_range": [
+            451,
+            451
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "blocks = []"
+          ],
+          "line_range": [
+            452,
+            452
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "func_signature = f\"def {node.name}({self._get_args_string(node.args)}) -> {self._get_returns_string(node)}:\""
+          ],
+          "line_range": [
+            455,
+            455
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": [func_signature.strip()],",
+            "\"line_range\": [node.lineno, node.lineno]",
+            "})"
+          ],
+          "line_range": [
+            456,
+            460
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for11_loop",
+          "line_range": [
+            463,
+            476
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "chunk[\"code_blocks\"] = blocks"
+          ],
+          "line_range": [
+            478,
+            478
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "for11_loop": {
+      "id": "for11_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for stmt in node.body:"
+          ],
+          "line_range": [
+            463,
+            463
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if20_block",
+          "line_range": [
+            464,
+            476
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__populate_function_content"
+    },
+    "if20_block": {
+      "id": "if20_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if20"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else20"
+        }
+      ],
+      "parent_scope": "for11_loop"
+    },
+    "if20": {
+      "id": "if20",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if stmt in self.node_to_chunk_id:",
+            "blocks.append({",
+            "\"type\": \"chunk_ref\",",
+            "\"chunk_id\": self.node_to_chunk_id[stmt],",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})",
+            "else:",
+            "# Create a simple code block for statements without their own chunks",
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            464,
+            469
+          ]
+        }
+      ],
+      "parent_scope": "if20_block"
+    },
+    "else7": {
+      "id": "else7",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "blocks.append({",
+            "\"type\": \"code\",",
+            "\"content\": self._get_source_segment(stmt),",
+            "\"line_range\": [stmt.lineno, getattr(stmt, 'end_lineno', stmt.lineno)]",
+            "})"
+          ],
+          "line_range": [
+            472,
+            476
+          ]
+        }
+      ],
+      "parent_scope": "if20_block"
+    },
+    "CodeChunker__get_body_end_line": {
+      "id": "CodeChunker__get_body_end_line",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _get_body_end_line(self, body) -> ReturnType:"
+          ],
+          "line_range": [
+            480,
+            480
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Get the end line of a body of statements\"\"\""
+          ],
+          "line_range": [
+            481,
+            481
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if21_block",
+          "line_range": [
+            482,
+            483
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return max(getattr(stmt, 'end_lineno', stmt.lineno) for stmt in body)"
+          ],
+          "line_range": [
+            484,
+            484
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "if21_block": {
+      "id": "if21_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if21"
+        }
+      ],
+      "parent_scope": "CodeChunker__get_body_end_line"
+    },
+    "if21": {
+      "id": "if21",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not body:",
+            "return 0"
+          ],
+          "line_range": [
+            482,
+            483
+          ]
+        }
+      ],
+      "parent_scope": "if21_block"
+    },
+    "CodeChunker__get_source_segment": {
+      "id": "CodeChunker__get_source_segment",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _get_source_segment(self, node, include_body, body_only_if) -> ReturnType:"
+          ],
+          "line_range": [
+            486,
+            486
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Extract source code for a given AST node as a list of statements\"\"\""
+          ],
+          "line_range": [
+            487,
+            487
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "start_line = node.lineno - 1"
+          ],
+          "line_range": [
+            488,
+            488
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "end_line = getattr(node, 'end_lineno', node.lineno) - 1"
+          ],
+          "line_range": [
+            489,
+            489
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if22_block",
+          "line_range": [
+            491,
+            497
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if24_block",
+          "line_range": [
+            499,
+            500
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "lines = self.source_lines[start_line:end_line + 1]"
+          ],
+          "line_range": [
+            502,
+            502
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if25_block",
+          "line_range": [
+            504,
+            517
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return [line.strip() for line in lines]"
+          ],
+          "line_range": [
+            519,
+            519
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "if22_block": {
+      "id": "if22_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if22"
+        }
+      ],
+      "parent_scope": "CodeChunker__get_source_segment"
+    },
+    "if22": {
+      "id": "if22",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if include_body and hasattr(node, 'body') and node.body:",
+            "if body_only_if and hasattr(node, 'test'):",
+            "body_end = self._get_body_end_line(node.body) - 1",
+            "end_line = body_end",
+            "else:",
+            "body_end = self._get_body_end_line(node.body) - 1",
+            "end_line = max(end_line, body_end)"
+          ],
+          "line_range": [
+            491,
+            497
+          ]
+        }
+      ],
+      "parent_scope": "if22_block"
+    },
+    "if23_block": {
+      "id": "if23_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if23"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else23"
+        }
+      ],
+      "parent_scope": "if22"
+    },
+    "if23": {
+      "id": "if23",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if body_only_if and hasattr(node, 'test'):",
+            "body_end = self._get_body_end_line(node.body) - 1",
+            "end_line = body_end",
+            "else:",
+            "body_end = self._get_body_end_line(node.body) - 1",
+            "end_line = max(end_line, body_end)"
+          ],
+          "line_range": [
+            492,
+            494
+          ]
+        }
+      ],
+      "parent_scope": "if23_block"
+    },
+    "else8": {
+      "id": "else8",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "body_end = self._get_body_end_line(node.body) - 1"
+          ],
+          "line_range": [
+            496,
+            496
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "end_line = max(end_line, body_end)"
+          ],
+          "line_range": [
+            497,
+            497
+          ]
+        }
+      ],
+      "parent_scope": "if23_block"
+    },
+    "if24_block": {
+      "id": "if24_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if24"
+        }
+      ],
+      "parent_scope": "CodeChunker__get_source_segment"
+    },
+    "if24": {
+      "id": "if24",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if hasattr(node, 'end_lineno') and node.end_lineno:",
+            "end_line = max(end_line, node.end_lineno - 1)"
+          ],
+          "line_range": [
+            499,
+            500
+          ]
+        }
+      ],
+      "parent_scope": "if24_block"
+    },
+    "if25_block": {
+      "id": "if25_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if25"
+        }
+      ],
+      "parent_scope": "CodeChunker__get_source_segment"
+    },
+    "if25": {
+      "id": "if25",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if lines:",
+            "non_empty_lines = [line for line in lines if line.strip()]",
+            "if non_empty_lines:",
+            "min_indent = min(len(line) - len(line.lstrip()) for line in non_empty_lines)",
+            "cleaned_lines = []",
+            "for line in lines:",
+            "if line.strip():",
+            "# Remove indentation and strip whitespace",
+            "cleaned_line = line[min_indent:] if len(line) > min_indent else line",
+            "cleaned_lines.append(cleaned_line.strip())",
+            "else:",
+            "# Keep empty lines as empty strings",
+            "cleaned_lines.append(\"\")",
+            "return cleaned_lines"
+          ],
+          "line_range": [
+            504,
+            517
+          ]
+        }
+      ],
+      "parent_scope": "if25_block"
+    },
+    "if26_block": {
+      "id": "if26_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if26"
+        }
+      ],
+      "parent_scope": "if25"
+    },
+    "if26": {
+      "id": "if26",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if non_empty_lines:",
+            "min_indent = min(len(line) - len(line.lstrip()) for line in non_empty_lines)",
+            "cleaned_lines = []",
+            "for line in lines:",
+            "if line.strip():",
+            "# Remove indentation and strip whitespace",
+            "cleaned_line = line[min_indent:] if len(line) > min_indent else line",
+            "cleaned_lines.append(cleaned_line.strip())",
+            "else:",
+            "# Keep empty lines as empty strings",
+            "cleaned_lines.append(\"\")",
+            "return cleaned_lines"
+          ],
+          "line_range": [
+            506,
+            517
+          ]
+        }
+      ],
+      "parent_scope": "if26_block"
+    },
+    "for12_loop": {
+      "id": "for12_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for line in lines:"
+          ],
+          "line_range": [
+            509,
+            509
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if27_block",
+          "line_range": [
+            510,
+            516
+          ]
+        }
+      ],
+      "parent_scope": "if26"
+    },
+    "if27_block": {
+      "id": "if27_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if27"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else27"
+        }
+      ],
+      "parent_scope": "for12_loop"
+    },
+    "if27": {
+      "id": "if27",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if line.strip():",
+            "# Remove indentation and strip whitespace",
+            "cleaned_line = line[min_indent:] if len(line) > min_indent else line",
+            "cleaned_lines.append(cleaned_line.strip())",
+            "else:",
+            "# Keep empty lines as empty strings",
+            "cleaned_lines.append(\"\")"
+          ],
+          "line_range": [
+            510,
+            513
+          ]
+        }
+      ],
+      "parent_scope": "if27_block"
+    },
+    "else9": {
+      "id": "else9",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "cleaned_lines.append(\"\")"
+          ],
+          "line_range": [
+            516,
+            516
+          ]
+        }
+      ],
+      "parent_scope": "if27_block"
+    },
+    "CodeChunker__extract_dependencies": {
+      "id": "CodeChunker__extract_dependencies",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _extract_dependencies(self, node) -> ReturnType:"
+          ],
+          "line_range": [
+            521,
+            521
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Extract variable dependencies from a node\"\"\""
+          ],
+          "line_range": [
+            522,
+            522
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "dependencies = set()"
+          ],
+          "line_range": [
+            523,
+            523
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for13_loop",
+          "line_range": [
+            524,
+            526
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return list(dependencies)"
+          ],
+          "line_range": [
+            527,
+            527
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "for13_loop": {
+      "id": "for13_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for child in ast.walk(node):"
+          ],
+          "line_range": [
+            524,
+            524
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if28_block",
+          "line_range": [
+            525,
+            526
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__extract_dependencies"
+    },
+    "if28_block": {
+      "id": "if28_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if28"
+        }
+      ],
+      "parent_scope": "for13_loop"
+    },
+    "if28": {
+      "id": "if28",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Load):",
+            "dependencies.add(child.id)"
+          ],
+          "line_range": [
+            525,
+            526
+          ]
+        }
+      ],
+      "parent_scope": "if28_block"
+    },
+    "CodeChunker__extract_top_level_definitions": {
+      "id": "CodeChunker__extract_top_level_definitions",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _extract_top_level_definitions(self, tree) -> ReturnType:"
+          ],
+          "line_range": [
+            529,
+            529
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Extract top-level class and function definitions\"\"\""
+          ],
+          "line_range": [
+            530,
+            530
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "definitions = []"
+          ],
+          "line_range": [
+            531,
+            531
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for14_loop",
+          "line_range": [
+            532,
+            536
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return definitions"
+          ],
+          "line_range": [
+            537,
+            537
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "for14_loop": {
+      "id": "for14_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for node in tree.body:"
+          ],
+          "line_range": [
+            532,
+            532
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if29_block",
+          "line_range": [
+            533,
+            536
+          ]
+        }
+      ],
+      "parent_scope": "CodeChunker__extract_top_level_definitions"
+    },
+    "if29_block": {
+      "id": "if29_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if29"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        }
+      ],
+      "parent_scope": "for14_loop"
+    },
+    "if29": {
+      "id": "if29",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if isinstance(node, ast.ClassDef):",
+            "definitions.append(node.name)",
+            "elif isinstance(node, ast.FunctionDef):",
+            "definitions.append(node.name)"
+          ],
+          "line_range": [
+            533,
+            534
+          ]
+        }
+      ],
+      "parent_scope": "if29_block"
+    },
+    "elif13": {
+      "id": "elif13",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if29_block"
+    },
+    "CodeChunker__get_args_string": {
+      "id": "CodeChunker__get_args_string",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _get_args_string(self, args) -> ReturnType:"
+          ],
+          "line_range": [
+            539,
+            539
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Convert function arguments to string\"\"\""
+          ],
+          "line_range": [
+            540,
+            540
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "arg_strs = [arg.arg for arg in args.args]"
+          ],
+          "line_range": [
+            541,
+            541
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return \", \".join(arg_strs)"
+          ],
+          "line_range": [
+            542,
+            542
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "CodeChunker__get_returns_string": {
+      "id": "CodeChunker__get_returns_string",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _get_returns_string(self, node) -> ReturnType:"
+          ],
+          "line_range": [
+            544,
+            544
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Get return type annotation as string\"\"\""
+          ],
+          "line_range": [
+            545,
+            545
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if30_block",
+          "line_range": [
+            546,
+            547
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return \"None\""
+          ],
+          "line_range": [
+            548,
+            548
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "if30_block": {
+      "id": "if30_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if30"
+        }
+      ],
+      "parent_scope": "CodeChunker__get_returns_string"
+    },
+    "if30": {
+      "id": "if30",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if node.returns:",
+            "return \"ReturnType\""
+          ],
+          "line_range": [
+            546,
+            547
+          ]
+        }
+      ],
+      "parent_scope": "if30_block"
+    },
+    "CodeChunker__create_error_chunk": {
+      "id": "CodeChunker__create_error_chunk",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _create_error_chunk(self, source_code, error_msg) -> ReturnType:"
+          ],
+          "line_range": [
+            550,
+            550
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Create a single chunk when parsing fails\"\"\""
+          ],
+          "line_range": [
+            551,
+            551
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return {",
+            "\"metadata\": {",
+            "\"error\": True,",
+            "\"error_message\": error_msg,",
+            "\"chunking_method\": \"error_fallback\"",
+            "},",
+            "\"chunks\": {",
+            "\"main\": {",
+            "\"id\": \"main\",",
+            "\"type\": \"error\",",
+            "\"code_blocks\": [{",
+            "\"type\": \"code\",",
+            "\"content\": [line.strip() for line in source_code.split('\\n')],",
+            "\"line_range\": [1, len(source_code.split('\\n'))]",
+            "}],",
+            "# \"dependencies\": [],",
+            "# \"defines\": [],",
+            "\"parent_scope\": None",
+            "}",
+            "}",
+            "}"
+          ],
+          "line_range": [
+            552,
+            572
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "CodeChunker__create_output_structure": {
+      "id": "CodeChunker__create_output_structure",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _create_output_structure(self, file_path) -> ReturnType:"
+          ],
+          "line_range": [
+            574,
+            574
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Create the final output structure\"\"\""
+          ],
+          "line_range": [
+            575,
+            575
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return {",
+            "\"metadata\": {",
+            "\"original_file\": file_path,",
+            "\"total_chunks\": len(self.chunks),",
+            "\"chunking_method\": \"ast_semantic\",",
+            "\"timestamp\": datetime.now().isoformat()",
+            "},",
+            "\"chunks\": self.chunks,",
+            "\"relationships\": self._build_relationships(),",
+            "\"context_map\": self._build_context_map()",
+            "}"
+          ],
+          "line_range": [
+            576,
+            586
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "CodeChunker__build_relationships": {
+      "id": "CodeChunker__build_relationships",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _build_relationships(self) -> ReturnType:"
+          ],
+          "line_range": [
+            588,
+            588
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Build relationship mappings between chunks\"\"\""
+          ],
+          "line_range": [
+            589,
+            589
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "execution_flow = [\"main\"]"
+          ],
+          "line_range": [
+            590,
+            590
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "dependency_graph = {}"
+          ],
+          "line_range": [
+            591,
+            591
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return {",
+            "\"execution_flow\": execution_flow,",
+            "\"dependency_graph\": dependency_graph",
+            "}"
+          ],
+          "line_range": [
+            596,
+            599
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "CodeChunker__build_context_map": {
+      "id": "CodeChunker__build_context_map",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def _build_context_map(self) -> ReturnType:"
+          ],
+          "line_range": [
+            601,
+            601
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Build global context mapping\"\"\""
+          ],
+          "line_range": [
+            602,
+            602
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return {",
+            "\"global_imports\": [],",
+            "\"global_variables\": [],",
+            "\"functions\": [],",
+            "\"classes\": []",
+            "}"
+          ],
+          "line_range": [
+            603,
+            608
+          ]
+        }
+      ],
+      "parent_scope": "class_CodeChunker"
+    },
+    "function_main": {
+      "id": "function_main",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def main() -> None:"
+          ],
+          "line_range": [
+            611,
+            611
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Main entry point\"\"\""
+          ],
+          "line_range": [
+            612,
+            612
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import sys"
+          ],
+          "line_range": [
+            613,
+            613
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if31_block",
+          "line_range": [
+            615,
+            617
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "file_path = sys.argv[1]"
+          ],
+          "line_range": [
+            619,
+            619
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "chunker = CodeChunker()"
+          ],
+          "line_range": [
+            620,
+            620
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try2_block",
+          "line_range": [
+            622,
+            635
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if31_block": {
+      "id": "if31_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if31"
+        }
+      ],
+      "parent_scope": "function_main"
+    },
+    "if31": {
+      "id": "if31",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if len(sys.argv) != 2:",
+            "print(\"Usage: python chunker.py <python_file>\")",
+            "sys.exit(1)"
+          ],
+          "line_range": [
+            615,
+            617
+          ]
+        }
+      ],
+      "parent_scope": "if31_block"
+    },
+    "try2_block": {
+      "id": "try2_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_main"
+    },
+    "with2_statement": {
+      "id": "with2_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try2_block"
+    },
+    "if32_block": {
+      "id": "if32_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if32"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if32": {
+      "id": "if32",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "main()"
+          ],
+          "line_range": [
+            638,
+            639
+          ]
+        }
+      ],
+      "parent_scope": "if32_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}
