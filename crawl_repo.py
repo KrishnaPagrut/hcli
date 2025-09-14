@@ -59,7 +59,7 @@ def crawl_repo(repo_root: str, out_root: str = "out"):
                 # 2. Run pyh AST generator (imported directly)
                 try:
                     pyh_ast_generator.generate_pyh_with_claude(
-                        str(ast_json), str(pyh_json)
+                        str(ast_json), str(pyh_json), str(py_file)
                     )
                     print(f"✅ Generated → {pyh_json}")
                 except Exception as e:

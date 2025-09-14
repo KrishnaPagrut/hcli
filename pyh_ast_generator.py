@@ -2,7 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 
-def generate_pyh_with_claude(json_file: str, pyh_file: str):
+def generate_pyh_with_claude(json_file: str, pyh_file: str, py_file: str):
     data = Path(json_file).read_text()
 
     # Build the full prompt
@@ -240,8 +240,6 @@ Now apply the same abstraction process to the following AST JSON:
 
 Your output must be only the abstracted .phy JSON, nothing else.
 """
-
-
     result = subprocess.run(
         ["claude", prompt],
         capture_output=True,
@@ -251,25 +249,38 @@ Your output must be only the abstracted .phy JSON, nothing else.
     output = result.stdout.strip()
 
     if output.startswith("```json") and output.endswith("```"):
-        output = output[len("```json"): -len("```")].strip()
+        output = output[len("```json"):-len("```")].strip()
     elif output.startswith("'''json") and output.endswith("'''"):
-        output = output[len("'''json"): -len("'''")].strip()
+        output = output[len("'''json"):-len("'''")].strip()
 
-    
     if result.returncode != 0:
         print("❌ Error:", result.stderr.strip())
     else:
         try:
-            # Parse and inject metadata
-            parsed = json.loads(output)
-            parsed["metadata"] = {
-                "source_file": str(Path(json_file).resolve())
-            }
-            Path(pyh_file).write_text(json.dumps(parsed, indent=2), encoding="utf-8")
-            print(f"✅ Generated {pyh_file}")
-        except Exception as e:
-            print(f"❌ Failed to parse Claude output as JSON: {e}")
-            Path(pyh_file).write_text(output, encoding="utf-8")
+            phy_data = json.loads(output)
+        except json.JSONDecodeError:
+            print("❌ Failed to parse Claude output as JSON")
+            return
+
+        # --- Inject metadata with the actual .py source file path ---
+        ast_path = Path(json_file).resolve()
+        if "out" in ast_path.parts:
+            # If file is inside /out, reconstruct relative path to repo and map to .py
+            out_index = ast_path.parts.index("out")
+            rel_parts = ast_path.parts[out_index+1:]
+            rel_py = Path(*rel_parts).with_suffix(".py")
+            source_py_path = ast_path.parents[out_index] / rel_py
+        else:
+            # Fallback: same name but .py instead of .ast.json
+            source_py_path = ast_path.with_suffix(".py")
+
+        phy_data["metadata"] = {
+            "source_py": str(py_file)
+        }
+
+        Path(pyh_file).write_text(json.dumps(phy_data, indent=2), encoding="utf-8")
+        print(f"✅ Generated {pyh_file} with metadata.source_py = {source_py_path}")
+
 
 
 
@@ -278,6 +289,7 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input_file", help="Path to AST JSON file")
+    parser.add_argument("py_file", help="Path to Original python file")
     parser.add_argument(
         "-o", "--output",
         help="Path to output .pyh.json file"
@@ -289,4 +301,4 @@ if __name__ == "__main__":
         base = Path(args.input_file).stem  # removes .json
         args.output = f"{base}.pyh.json"
 
-    generate_pyh_with_claude(args.input_file, args.output)
+    generate_pyh_with_claude(args.input_file, args.output, args.py_file)

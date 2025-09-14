@@ -7,7 +7,7 @@
         {
           "id": "imports",
           "type": "imports",
-          "description": "import json and typing modules",
+          "description": "import json and typing utilities",
           "line_range": [
             1,
             2
@@ -21,7 +21,7 @@
             {
               "id": "Task___init__",
               "type": "method_definition",
-              "signature": "__init__(self, title, description, done)",
+              "signature": "constructor __init__(title, description, done)",
               "description": "initialize task with title, description, done status and empty subtasks list",
               "line_range": [
                 6,
@@ -31,7 +31,7 @@
             {
               "id": "Task_add_subtask",
               "type": "method_definition",
-              "signature": "add_subtask(self, subtask)",
+              "signature": "method add_subtask(subtask)",
               "description": "append a subtask to the subtasks list",
               "line_range": [
                 12,
@@ -41,7 +41,7 @@
             {
               "id": "Task_mark_done",
               "type": "method_definition",
-              "signature": "mark_done(self)",
+              "signature": "method mark_done()",
               "children": [
                 {
                   "id": "mark_self_done",
@@ -66,8 +66,8 @@
             {
               "id": "Task_to_dict",
               "type": "method_definition",
-              "signature": "to_dict(self)",
-              "description": "return dictionary representation with title, description, done status and subtasks",
+              "signature": "method to_dict()",
+              "description": "return dictionary representation with title, description, done status and subtasks converted to dictionaries",
               "line_range": [
                 20,
                 26
@@ -76,21 +76,21 @@
             {
               "id": "Task___str__",
               "type": "method_definition",
-              "signature": "__str__(self, level)",
+              "signature": "method __str__(level)",
               "children": [
                 {
-                  "id": "format_setup",
+                  "id": "format_task_display",
                   "type": "assignments",
-                  "description": "create indentation, status checkbox, and result string with task info",
+                  "description": "create indentation, status checkbox, and formatted task string",
                   "line_range": [
                     29,
                     31
                   ]
                 },
                 {
-                  "id": "append_subtasks",
+                  "id": "append_subtask_strings",
                   "type": "for_loop",
-                  "description": "recursively append formatted subtasks to result",
+                  "description": "recursively append string representations of all subtasks",
                   "line_range": [
                     32,
                     33
@@ -99,7 +99,7 @@
                 {
                   "id": "return_result",
                   "type": "return_statement",
-                  "description": "return the formatted task hierarchy string",
+                  "description": "return the formatted string",
                   "line_range": [
                     34,
                     34
@@ -117,8 +117,8 @@
             {
               "id": "TaskManager___init__",
               "type": "method_definition",
-              "signature": "__init__(self)",
-              "description": "initialize empty tasks list",
+              "signature": "constructor __init__()",
+              "description": "initialize with empty tasks list",
               "line_range": [
                 38,
                 39
@@ -127,8 +127,8 @@
             {
               "id": "TaskManager_add_task",
               "type": "method_definition",
-              "signature": "add_task(self, title, description)",
-              "description": "create new task, add to tasks list, and return it",
+              "signature": "method add_task(title, description)",
+              "description": "create new task, add to tasks list, and return the task",
               "line_range": [
                 41,
                 44
@@ -137,12 +137,12 @@
             {
               "id": "TaskManager_find_task",
               "type": "method_definition",
-              "signature": "find_task(self, title)",
+              "signature": "method find_task(title)",
               "children": [
                 {
                   "id": "function__find",
                   "type": "function_definition",
-                  "signature": "_find(task_list)",
+                  "signature": "nested function _find(task_list)",
                   "children": [
                     {
                       "id": "search_tasks",
@@ -191,7 +191,7 @@
                 {
                   "id": "call_find",
                   "type": "return_statement",
-                  "description": "call _find helper function with task list",
+                  "description": "call nested function with tasks list",
                   "line_range": [
                     56,
                     56
@@ -202,19 +202,19 @@
             {
               "id": "TaskManager_mark_done",
               "type": "method_definition",
-              "signature": "mark_done(self, title)",
+              "signature": "method mark_done(title)",
               "children": [
                 {
-                  "id": "find_and_mark",
+                  "id": "find_task_to_mark",
                   "type": "assignment",
-                  "description": "find the task by title",
+                  "description": "find task by title",
                   "line_range": [
                     59,
                     59
                   ]
                 },
                 {
-                  "id": "mark_if_exists",
+                  "id": "mark_if_found",
                   "type": "if_statement",
                   "description": "if task exists, mark it done and return True",
                   "line_range": [
@@ -236,7 +236,7 @@
             {
               "id": "TaskManager_export_to_json",
               "type": "method_definition",
-              "signature": "export_to_json(self, file_name)",
+              "signature": "method export_to_json(file_name)",
               "description": "export tasks to JSON file using with statement",
               "line_range": [
                 65,
@@ -246,7 +246,7 @@
             {
               "id": "TaskManager___str__",
               "type": "method_definition",
-              "signature": "__str__(self)",
+              "signature": "method __str__()",
               "children": [
                 {
                   "id": "init_result",
@@ -258,7 +258,7 @@
                   ]
                 },
                 {
-                  "id": "build_string",
+                  "id": "concat_task_strings",
                   "type": "for_loop",
                   "description": "concatenate string representation of each task",
                   "line_range": [
@@ -269,7 +269,7 @@
                 {
                   "id": "return_result",
                   "type": "return_statement",
-                  "description": "return the complete task manager string",
+                  "description": "return concatenated result",
                   "line_range": [
                     73,
                     73
@@ -282,7 +282,7 @@
         {
           "id": "main_execution",
           "type": "if_statement",
-          "description": "when run as main: create TaskManager, add tasks with subtasks (Study with Math/CS subtasks, Workout with exercise subtasks), mark Frontend as done, print hierarchy, and export to JSON",
+          "description": "when run as main: create task manager, add hierarchical tasks (study with math and CS subtasks, workout with cardio and strength), mark frontend task done, print task hierarchy, and export to JSON",
           "line_range": [
             76,
             107
@@ -292,6 +292,6 @@
     }
   },
   "metadata": {
-    "source_file": "/Users/krishnapagrut/Developer/hcli/test.ast.json"
+    "source_py": "/Users/krishnapagrut/Developer/hcli/test.py"
   }
 }

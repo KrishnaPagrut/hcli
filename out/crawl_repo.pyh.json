@@ -1,0 +1,92 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports_and_constants",
+          "type": "imports_and_constants",
+          "description": "import standard libraries (os, pathlib), custom modules (ast_chunker, pyh_ast_generator), and define ignore patterns for directories and file suffixes",
+          "line_range": [
+            2,
+            13
+          ]
+        },
+        {
+          "id": "function_crawl_repo",
+          "type": "function_definition",
+          "signature": "function crawl_repo(takes repo_root and out_root)",
+          "children": [
+            {
+              "id": "path_setup",
+              "type": "assignment",
+              "description": "resolve repo_root path and set out_root to repo_root/out",
+              "line_range": [
+                16,
+                17
+              ]
+            },
+            {
+              "id": "for1_loop_abstract",
+              "type": "for_loop",
+              "description": "walk through repository directories, filtering out ignored directories",
+              "children": [
+                {
+                  "id": "directory_filtering",
+                  "type": "assignment",
+                  "description": "filter out ignored directories from the current directory list",
+                  "line_range": [
+                    21,
+                    21
+                  ]
+                },
+                {
+                  "id": "for2_loop_abstract",
+                  "type": "for_loop",
+                  "description": "process each file in the current directory",
+                  "children": [
+                    {
+                      "id": "if1_abstract",
+                      "type": "if_statement",
+                      "description": "skip files with ignored suffixes (pyc, pyo, egg-info)",
+                      "line_range": [
+                        25,
+                        26
+                      ]
+                    },
+                    {
+                      "id": "python_file_processing",
+                      "type": "if_statement",
+                      "description": "process Python files: create output directory structure, skip files in output directory, generate AST JSON using ast_chunker, generate PHY JSON using pyh_ast_generator, with error handling for both operations",
+                      "line_range": [
+                        28,
+                        67
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "line_range": [
+                19,
+                67
+              ]
+            }
+          ]
+        },
+        {
+          "id": "if4_abstract",
+          "type": "if_statement",
+          "description": "when run as main: parse command line arguments for repo root and output directory, then call crawl_repo function",
+          "line_range": [
+            70,
+            77
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/crawl_repo.py"
+  }
+}

@@ -1,0 +1,548 @@
+{
+  "metadata": {
+    "original_file": "/Users/krishnapagrut/Developer/hcli/pyh_ast_to_output.py",
+    "total_chunks": 20,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T01:51:37.849663"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "import json"
+          ],
+          "line_range": [
+            1,
+            1
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import argparse"
+          ],
+          "line_range": [
+            2,
+            2
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            3,
+            3
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_render_node",
+          "line_range": [
+            5,
+            30
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_phy_ast_to_output",
+          "line_range": [
+            32,
+            51
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7_block",
+          "line_range": [
+            53,
+            59
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "function_render_node": {
+      "id": "function_render_node",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def render_node(node, indent) -> None:"
+          ],
+          "line_range": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "lines = []"
+          ],
+          "line_range": [
+            6,
+            6
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "pad = \"    \" * indent"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "sig = node.get(\"signature\")"
+          ],
+          "line_range": [
+            9,
+            9
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "desc = node.get(\"description\")"
+          ],
+          "line_range": [
+            10,
+            10
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_range = node.get(\"line_range\")"
+          ],
+          "line_range": [
+            11,
+            11
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_info = \"\""
+          ],
+          "line_range": [
+            14,
+            14
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1_block",
+          "line_range": [
+            15,
+            16
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2_block",
+          "line_range": [
+            19,
+            24
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for1_loop",
+          "line_range": [
+            27,
+            28
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return lines"
+          ],
+          "line_range": [
+            30,
+            30
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "function_render_node"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if line_range:",
+            "line_info = f\"  (lines {line_range[0]}\u2013{line_range[1]})\""
+          ],
+          "line_range": [
+            15,
+            16
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        }
+      ],
+      "parent_scope": "function_render_node"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if sig:",
+            "lines.append(f\"{pad}{sig}{line_info}\")",
+            "if desc:",
+            "lines.append(f\"{pad}    {desc}\")  # plain sentence",
+            "elif desc:",
+            "lines.append(f\"{pad}{desc}{line_info}\")"
+          ],
+          "line_range": [
+            19,
+            22
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        }
+      ],
+      "parent_scope": "if2"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if desc:",
+            "lines.append(f\"{pad}    {desc}\")  # plain sentence"
+          ],
+          "line_range": [
+            21,
+            22
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "elif1": {
+      "id": "elif1",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if2_block"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for child in node.get('children', []):"
+          ],
+          "line_range": [
+            27,
+            27
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "lines.extend(render_node(child, indent + 1))"
+          ],
+          "line_range": [
+            28,
+            28
+          ]
+        }
+      ],
+      "parent_scope": "function_render_node"
+    },
+    "function_phy_ast_to_output": {
+      "id": "function_phy_ast_to_output",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def phy_ast_to_output(pyh_file, output_file) -> None:"
+          ],
+          "line_range": [
+            32,
+            32
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "text = Path(pyh_file).read_text().strip()"
+          ],
+          "line_range": [
+            33,
+            33
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4_block",
+          "line_range": [
+            36,
+            37
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "data = json.loads(text)"
+          ],
+          "line_range": [
+            39,
+            39
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5_block",
+          "line_range": [
+            41,
+            42
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "root = data[\"phy_chunks\"][\"main\"]"
+          ],
+          "line_range": [
+            44,
+            44
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "result = \"\\n\".join(render_node(root))"
+          ],
+          "line_range": [
+            45,
+            45
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6_block",
+          "line_range": [
+            47,
+            51
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "function_phy_ast_to_output"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if text.startswith(\"```\"):",
+            "text = \"\\n\".join(line for line in text.splitlines() if not line.strip().startswith(\"```\"))"
+          ],
+          "line_range": [
+            36,
+            37
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "function_phy_ast_to_output"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if \"phy_chunks\" not in data or \"main\" not in data[\"phy_chunks\"]:",
+            "raise ValueError(\"Invalid .pyh JSON: missing phy_chunks/main\")"
+          ],
+          "line_range": [
+            41,
+            42
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else6"
+        }
+      ],
+      "parent_scope": "function_phy_ast_to_output"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if output_file:",
+            "Path(output_file).write_text(result)",
+            "print(f\"Output written to {output_file}\")",
+            "else:",
+            "print(result)"
+          ],
+          "line_range": [
+            47,
+            49
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "print(result)"
+          ],
+          "line_range": [
+            51,
+            51
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "parser = argparse.ArgumentParser()",
+            "parser.add_argument(\"pyh_file\", help=\"Input .pyh JSON file\")",
+            "parser.add_argument(\"-o\", \"--output\", help=\"Optional output file (.txt)\")",
+            "args = parser.parse_args()",
+            "",
+            "phy_ast_to_output(args.pyh_file, args.output)"
+          ],
+          "line_range": [
+            53,
+            59
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}

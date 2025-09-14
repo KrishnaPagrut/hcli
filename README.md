@@ -11,8 +11,4 @@ Single File
 
 Need to figure out 
  The pyh json keeps putting '''json''' at the beginning and end of the file.
-<<<<<<< HEAD
  How is the UI going to handle 
-=======
- How is the UI going to handle 
->>>>>>> 00bc9837888155bfb5fe2b28ccecbf5f6822028d

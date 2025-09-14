@@ -1,0 +1,137 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "module_docstring",
+          "type": "docstring",
+          "description": "module documentation explaining this is a tool to apply user edits captured as diffs back onto original Python code using Claude SDK",
+          "line_range": [
+            2,
+            5
+          ]
+        },
+        {
+          "id": "imports_section",
+          "type": "imports",
+          "description": "import necessary modules: json, pathlib.Path, argparse, anthropic (Claude SDK), and subprocess",
+          "line_range": [
+            7,
+            11
+          ]
+        },
+        {
+          "id": "function_apply_diff_to_file",
+          "type": "function_definition",
+          "signature": "function apply_diff_to_file(takes diff_file, original_py, output_py)",
+          "children": [
+            {
+              "id": "read_diff_file",
+              "type": "assignment",
+              "description": "read the diff file content as text",
+              "line_range": [
+                16,
+                16
+              ]
+            },
+            {
+              "id": "try1_block_abstract",
+              "type": "try_statement",
+              "description": "attempt to parse diff file as JSON (empty try block)",
+              "line_range": [
+                17,
+                21
+              ]
+            },
+            {
+              "id": "read_original_code",
+              "type": "assignment",
+              "description": "read the original Python file content",
+              "line_range": [
+                23,
+                23
+              ]
+            },
+            {
+              "id": "build_prompt",
+              "type": "assignment",
+              "description": "construct a detailed prompt for Claude that includes instructions for applying abstracted diffs to Python code, with the diff data and file metadata",
+              "line_range": [
+                26,
+                61
+              ]
+            },
+            {
+              "id": "run_claude_cli",
+              "type": "subprocess_call",
+              "description": "execute Claude CLI with the prompt and capture output",
+              "line_range": [
+                64,
+                68
+              ]
+            },
+            {
+              "id": "if1_error_check",
+              "type": "if_statement",
+              "description": "if Claude CLI returned an error, print error message and return early",
+              "line_range": [
+                70,
+                72
+              ]
+            },
+            {
+              "id": "get_output",
+              "type": "assignment",
+              "description": "extract and strip the stdout from Claude CLI result",
+              "line_range": [
+                74,
+                74
+              ]
+            },
+            {
+              "id": "if2_clean_output",
+              "type": "if_statement",
+              "description": "if output is wrapped in python code blocks, remove the markdown formatting",
+              "line_range": [
+                77,
+                78
+              ]
+            },
+            {
+              "id": "write_output_file",
+              "type": "file_operation",
+              "description": "write the processed output to the specified output file",
+              "line_range": [
+                80,
+                80
+              ]
+            },
+            {
+              "id": "print_success",
+              "type": "print_statement",
+              "description": "print confirmation message with output file path",
+              "line_range": [
+                81,
+                81
+              ]
+            }
+          ]
+        },
+        {
+          "id": "if3_main_block",
+          "type": "if_statement",
+          "description": "main execution block: set up argument parser for diff file, original file, and optional output file, then call apply_diff_to_file with parsed arguments",
+          "line_range": [
+            83,
+            93
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/apply_diff.py"
+  }
+}

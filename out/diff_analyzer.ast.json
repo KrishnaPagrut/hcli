@@ -1,0 +1,2203 @@
+{
+  "metadata": {
+    "original_file": "/Users/krishnapagrut/Developer/hcli/diff_analyzer.py",
+    "total_chunks": 62,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T01:54:42.607138"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "Diff Analyzer",
+            "Combines file diffing and AST mapping to output changes in JSON format.",
+            "\"\"\""
+          ],
+          "line_range": [
+            2,
+            5
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import json"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import argparse"
+          ],
+          "line_range": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            9,
+            9
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from typing import List, Dict, Set, Tuple, Any, Optional"
+          ],
+          "line_range": [
+            10,
+            10
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from dataclasses import dataclass, asdict"
+          ],
+          "line_range": [
+            11,
+            11
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from difflib import SequenceMatcher"
+          ],
+          "line_range": [
+            12,
+            12
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from enum import Enum"
+          ],
+          "line_range": [
+            13,
+            13
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_ChangeType",
+          "line_range": [
+            15,
+            19
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_DiffResult",
+          "line_range": [
+            22,
+            26
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_OutputLineMapping",
+          "line_range": [
+            29,
+            36
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_ChangeAnalysis",
+          "line_range": [
+            39,
+            48
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "class_DiffAnalyzer",
+          "line_range": [
+            50,
+            279
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_main",
+          "line_range": [
+            281,
+            302
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14_block",
+          "line_range": [
+            304,
+            305
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "class_ChangeType": {
+      "id": "class_ChangeType",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class ChangeType:"
+          ],
+          "line_range": [
+            15,
+            15
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "ADDED = \"added\""
+          ],
+          "line_range": [
+            16,
+            16
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "REMOVED = \"removed\""
+          ],
+          "line_range": [
+            17,
+            17
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "CHANGED = \"changed\""
+          ],
+          "line_range": [
+            18,
+            18
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "UNCHANGED = \"unchanged\""
+          ],
+          "line_range": [
+            19,
+            19
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_DiffResult": {
+      "id": "class_DiffResult",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class DiffResult:"
+          ],
+          "line_range": [
+            22,
+            22
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_num: int"
+          ],
+          "line_range": [
+            23,
+            23
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "change_type: ChangeType"
+          ],
+          "line_range": [
+            24,
+            24
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "original_content: str"
+          ],
+          "line_range": [
+            25,
+            25
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "modified_content: str"
+          ],
+          "line_range": [
+            26,
+            26
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_OutputLineMapping": {
+      "id": "class_OutputLineMapping",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class OutputLineMapping:"
+          ],
+          "line_range": [
+            29,
+            29
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_number: int"
+          ],
+          "line_range": [
+            30,
+            30
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node_id: str"
+          ],
+          "line_range": [
+            31,
+            31
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node_type: str"
+          ],
+          "line_range": [
+            32,
+            32
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "signature: str"
+          ],
+          "line_range": [
+            33,
+            33
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "description: str"
+          ],
+          "line_range": [
+            34,
+            34
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_range: Optional[Tuple[int, int]]"
+          ],
+          "line_range": [
+            35,
+            35
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "content: str"
+          ],
+          "line_range": [
+            36,
+            36
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_ChangeAnalysis": {
+      "id": "class_ChangeAnalysis",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class ChangeAnalysis:"
+          ],
+          "line_range": [
+            39,
+            39
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node_id: str"
+          ],
+          "line_range": [
+            40,
+            40
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node_type: str"
+          ],
+          "line_range": [
+            41,
+            41
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "signature: str"
+          ],
+          "line_range": [
+            42,
+            42
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "description: str"
+          ],
+          "line_range": [
+            43,
+            43
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_range: Optional[Tuple[int, int]]"
+          ],
+          "line_range": [
+            44,
+            44
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "change_type: str"
+          ],
+          "line_range": [
+            45,
+            45
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "affected_output_lines: List[int]"
+          ],
+          "line_range": [
+            46,
+            46
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "original_content: str"
+          ],
+          "line_range": [
+            47,
+            47
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "modified_content: str"
+          ],
+          "line_range": [
+            48,
+            48
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "class_DiffAnalyzer": {
+      "id": "class_DiffAnalyzer",
+      "type": "class_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "class DiffAnalyzer:"
+          ],
+          "line_range": [
+            50,
+            50
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer___init__",
+          "line_range": [
+            51,
+            58
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer_load_files",
+          "line_range": [
+            60,
+            79
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer_get_detailed_diff",
+          "line_range": [
+            81,
+            131
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer_build_output_line_mappings",
+          "line_range": [
+            133,
+            212
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer_find_ast_node_for_output_line",
+          "line_range": [
+            214,
+            219
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer_analyze_changes",
+          "line_range": [
+            221,
+            258
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "DiffAnalyzer_to_json",
+          "line_range": [
+            260,
+            279
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "DiffAnalyzer___init__": {
+      "id": "DiffAnalyzer___init__",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def __init__(self, ast_json_file, file1_path, file2_path) -> None:"
+          ],
+          "line_range": [
+            51,
+            51
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.ast_json_file = ast_json_file"
+          ],
+          "line_range": [
+            52,
+            52
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.file1_path = file1_path"
+          ],
+          "line_range": [
+            53,
+            53
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.file2_path = file2_path"
+          ],
+          "line_range": [
+            54,
+            54
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.ast_data = None"
+          ],
+          "line_range": [
+            55,
+            55
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.output_line_mappings = []"
+          ],
+          "line_range": [
+            56,
+            56
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.file1_lines = []"
+          ],
+          "line_range": [
+            57,
+            57
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.file2_lines = []"
+          ],
+          "line_range": [
+            58,
+            58
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "DiffAnalyzer_load_files": {
+      "id": "DiffAnalyzer_load_files",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def load_files(self) -> ReturnType:"
+          ],
+          "line_range": [
+            60,
+            60
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Load both files and AST data.\"\"\""
+          ],
+          "line_range": [
+            61,
+            61
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try1_block",
+          "line_range": [
+            62,
+            79
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "try1_block": {
+      "id": "try1_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "DiffAnalyzer_load_files"
+    },
+    "with1_statement": {
+      "id": "with1_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try1_block"
+    },
+    "with2_statement": {
+      "id": "with2_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try1_block"
+    },
+    "with3_statement": {
+      "id": "with3_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try1_block"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "try1_block"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if \"phy_chunks\" not in self.ast_data or \"main\" not in self.ast_data[\"phy_chunks\"]:",
+            "raise ValueError(\"Invalid .pyh JSON: missing phy_chunks/main\")"
+          ],
+          "line_range": [
+            73,
+            74
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "DiffAnalyzer_get_detailed_diff": {
+      "id": "DiffAnalyzer_get_detailed_diff",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def get_detailed_diff(self) -> ReturnType:"
+          ],
+          "line_range": [
+            81,
+            81
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Get detailed differences between the two files.\"\"\""
+          ],
+          "line_range": [
+            82,
+            82
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2_block",
+          "line_range": [
+            83,
+            84
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "results = []"
+          ],
+          "line_range": [
+            86,
+            86
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "matcher = SequenceMatcher(None, self.file1_lines, self.file2_lines)"
+          ],
+          "line_range": [
+            87,
+            87
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for1_loop",
+          "line_range": [
+            89,
+            129
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return results"
+          ],
+          "line_range": [
+            131,
+            131
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_get_detailed_diff"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not self.file1_lines or not self.file2_lines:",
+            "return []"
+          ],
+          "line_range": [
+            83,
+            84
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (tag, i1, i2, j1, j2) in matcher.get_opcodes():"
+          ],
+          "line_range": [
+            89,
+            89
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3_block",
+          "line_range": [
+            90,
+            129
+          ]
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_get_detailed_diff"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif2"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif3"
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if tag == 'equal':",
+            "# Lines are the same",
+            "for idx in range(i2 - i1):",
+            "results.append(DiffResult(",
+            "line_num=i1 + idx + 1,",
+            "change_type=ChangeType.UNCHANGED,",
+            "original_content=self.file1_lines[i1 + idx].rstrip(),",
+            "modified_content=self.file2_lines[j1 + idx].rstrip()",
+            "))",
+            "elif tag == 'delete':",
+            "# Lines deleted from file1",
+            "for idx in range(i2 - i1):",
+            "results.append(DiffResult(",
+            "line_num=i1 + idx + 1,",
+            "change_type=ChangeType.REMOVED,",
+            "original_content=self.file1_lines[i1 + idx].rstrip(),",
+            "modified_content=\"\"",
+            "))",
+            "elif tag == 'insert':",
+            "# Lines added to file2",
+            "for idx in range(j2 - j1):",
+            "results.append(DiffResult(",
+            "line_num=j1 + idx + 1,",
+            "change_type=ChangeType.ADDED,",
+            "original_content=\"\",",
+            "modified_content=self.file2_lines[j1 + idx].rstrip()",
+            "))",
+            "elif tag == 'replace':",
+            "# Lines changed",
+            "max_len = max(i2 - i1, j2 - j1)",
+            "for idx in range(max_len):",
+            "orig_line = self.file1_lines[i1 + idx].rstrip() if i1 + idx < i2 else \"\"",
+            "mod_line = self.file2_lines[j1 + idx].rstrip() if j1 + idx < j2 else \"\"",
+            "",
+            "results.append(DiffResult(",
+            "line_num=i1 + idx + 1,",
+            "change_type=ChangeType.CHANGED,",
+            "original_content=orig_line,",
+            "modified_content=mod_line",
+            "))"
+          ],
+          "line_range": [
+            90,
+            98
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for idx in range(i2 - i1):"
+          ],
+          "line_range": [
+            92,
+            92
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "results.append(DiffResult(",
+            "line_num=i1 + idx + 1,",
+            "change_type=ChangeType.UNCHANGED,",
+            "original_content=self.file1_lines[i1 + idx].rstrip(),",
+            "modified_content=self.file2_lines[j1 + idx].rstrip()",
+            "))"
+          ],
+          "line_range": [
+            93,
+            98
+          ]
+        }
+      ],
+      "parent_scope": "if3"
+    },
+    "elif1": {
+      "id": "elif1",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if3_block"
+    },
+    "for3_loop": {
+      "id": "for3_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for idx in range(i2 - i1):"
+          ],
+          "line_range": [
+            101,
+            101
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "results.append(DiffResult(",
+            "line_num=i1 + idx + 1,",
+            "change_type=ChangeType.REMOVED,",
+            "original_content=self.file1_lines[i1 + idx].rstrip(),",
+            "modified_content=\"\"",
+            "))"
+          ],
+          "line_range": [
+            102,
+            107
+          ]
+        }
+      ],
+      "parent_scope": "elif1"
+    },
+    "elif2": {
+      "id": "elif2",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if3_block"
+    },
+    "for4_loop": {
+      "id": "for4_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for idx in range(j2 - j1):"
+          ],
+          "line_range": [
+            110,
+            110
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "results.append(DiffResult(",
+            "line_num=j1 + idx + 1,",
+            "change_type=ChangeType.ADDED,",
+            "original_content=\"\",",
+            "modified_content=self.file2_lines[j1 + idx].rstrip()",
+            "))"
+          ],
+          "line_range": [
+            111,
+            116
+          ]
+        }
+      ],
+      "parent_scope": "elif2"
+    },
+    "elif3": {
+      "id": "elif3",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if3_block"
+    },
+    "for5_loop": {
+      "id": "for5_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for idx in range(max_len):"
+          ],
+          "line_range": [
+            120,
+            120
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "orig_line = self.file1_lines[i1 + idx].rstrip() if i1 + idx < i2 else \"\""
+          ],
+          "line_range": [
+            121,
+            121
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "mod_line = self.file2_lines[j1 + idx].rstrip() if j1 + idx < j2 else \"\""
+          ],
+          "line_range": [
+            122,
+            122
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "results.append(DiffResult(",
+            "line_num=i1 + idx + 1,",
+            "change_type=ChangeType.CHANGED,",
+            "original_content=orig_line,",
+            "modified_content=mod_line",
+            "))"
+          ],
+          "line_range": [
+            124,
+            129
+          ]
+        }
+      ],
+      "parent_scope": "elif3"
+    },
+    "DiffAnalyzer_build_output_line_mappings": {
+      "id": "DiffAnalyzer_build_output_line_mappings",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def build_output_line_mappings(self) -> None:"
+          ],
+          "line_range": [
+            133,
+            133
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Build mappings from output lines to AST nodes by simulating the render process.\"\"\""
+          ],
+          "line_range": [
+            134,
+            134
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4_block",
+          "line_range": [
+            135,
+            136
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.output_line_mappings = []"
+          ],
+          "line_range": [
+            138,
+            138
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "root = self.ast_data[\"phy_chunks\"][\"main\"]"
+          ],
+          "line_range": [
+            139,
+            139
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_render_node_with_mapping",
+          "line_range": [
+            141,
+            209
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "render_node_with_mapping(root)"
+          ],
+          "line_range": [
+            212,
+            212
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_build_output_line_mappings"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not self.ast_data:",
+            "return"
+          ],
+          "line_range": [
+            135,
+            136
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "function_render_node_with_mapping": {
+      "id": "function_render_node_with_mapping",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def render_node_with_mapping(node, indent, line_counter) -> None:"
+          ],
+          "line_range": [
+            141,
+            141
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Render node and track line mappings.\"\"\""
+          ],
+          "line_range": [
+            142,
+            142
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "lines = []"
+          ],
+          "line_range": [
+            143,
+            143
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "pad = \"    \" * indent"
+          ],
+          "line_range": [
+            144,
+            144
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "sig = node.get(\"signature\")"
+          ],
+          "line_range": [
+            146,
+            146
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "desc = node.get(\"description\")"
+          ],
+          "line_range": [
+            147,
+            147
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_range = node.get(\"line_range\")"
+          ],
+          "line_range": [
+            148,
+            148
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node_id = node.get(\"id\", \"\")"
+          ],
+          "line_range": [
+            149,
+            149
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "node_type = node.get(\"type\", \"\")"
+          ],
+          "line_range": [
+            150,
+            150
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "line_info = \"\""
+          ],
+          "line_range": [
+            153,
+            153
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5_block",
+          "line_range": [
+            154,
+            155
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6_block",
+          "line_range": [
+            158,
+            203
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for6_loop",
+          "line_range": [
+            206,
+            207
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return lines"
+          ],
+          "line_range": [
+            209,
+            209
+          ]
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_build_output_line_mappings"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "function_render_node_with_mapping"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if line_range:",
+            "line_info = f\"  (lines {line_range[0]}\u2013{line_range[1]})\""
+          ],
+          "line_range": [
+            154,
+            155
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "elif1"
+        }
+      ],
+      "parent_scope": "function_render_node_with_mapping"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if sig:",
+            "line_counter[0] += 1",
+            "content = f\"{pad}{sig}{line_info}\"",
+            "lines.append(content)",
+            "",
+            "# Map this line to the AST node",
+            "self.output_line_mappings.append(OutputLineMapping(",
+            "line_number=line_counter[0],",
+            "node_id=node_id,",
+            "node_type=node_type,",
+            "signature=sig,",
+            "description=desc,",
+            "line_range=tuple(line_range) if line_range else None,",
+            "content=content",
+            "))",
+            "",
+            "if desc:",
+            "line_counter[0] += 1",
+            "content = f\"{pad}    {desc}\"",
+            "lines.append(content)",
+            "",
+            "# Map this line to the same AST node (it's the description)",
+            "self.output_line_mappings.append(OutputLineMapping(",
+            "line_number=line_counter[0],",
+            "node_id=node_id,",
+            "node_type=node_type,",
+            "signature=sig,",
+            "description=desc,",
+            "line_range=tuple(line_range) if line_range else None,",
+            "content=content",
+            "))",
+            "elif desc:",
+            "line_counter[0] += 1",
+            "content = f\"{pad}{desc}{line_info}\"",
+            "lines.append(content)",
+            "",
+            "# Map this line to the AST node",
+            "self.output_line_mappings.append(OutputLineMapping(",
+            "line_number=line_counter[0],",
+            "node_id=node_id,",
+            "node_type=node_type,",
+            "signature=sig,",
+            "description=desc,",
+            "line_range=tuple(line_range) if line_range else None,",
+            "content=content",
+            "))"
+          ],
+          "line_range": [
+            158,
+            188
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        }
+      ],
+      "parent_scope": "if6"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if desc:",
+            "line_counter[0] += 1",
+            "content = f\"{pad}    {desc}\"",
+            "lines.append(content)",
+            "",
+            "# Map this line to the same AST node (it's the description)",
+            "self.output_line_mappings.append(OutputLineMapping(",
+            "line_number=line_counter[0],",
+            "node_id=node_id,",
+            "node_type=node_type,",
+            "signature=sig,",
+            "description=desc,",
+            "line_range=tuple(line_range) if line_range else None,",
+            "content=content",
+            "))"
+          ],
+          "line_range": [
+            174,
+            188
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "elif4": {
+      "id": "elif4",
+      "type": "elif_statement",
+      "code_blocks": [],
+      "parent_scope": "if6_block"
+    },
+    "for6_loop": {
+      "id": "for6_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for child in node.get('children', []):"
+          ],
+          "line_range": [
+            206,
+            206
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "lines.extend(render_node_with_mapping(child, indent + 1, line_counter))"
+          ],
+          "line_range": [
+            207,
+            207
+          ]
+        }
+      ],
+      "parent_scope": "function_render_node_with_mapping"
+    },
+    "DiffAnalyzer_find_ast_node_for_output_line": {
+      "id": "DiffAnalyzer_find_ast_node_for_output_line",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def find_ast_node_for_output_line(self, output_line_num) -> ReturnType:"
+          ],
+          "line_range": [
+            214,
+            214
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Find the AST node that corresponds to a specific output line.\"\"\""
+          ],
+          "line_range": [
+            215,
+            215
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for7_loop",
+          "line_range": [
+            216,
+            218
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return None"
+          ],
+          "line_range": [
+            219,
+            219
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "for7_loop": {
+      "id": "for7_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for mapping in self.output_line_mappings:"
+          ],
+          "line_range": [
+            216,
+            216
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8_block",
+          "line_range": [
+            217,
+            218
+          ]
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_find_ast_node_for_output_line"
+    },
+    "if8_block": {
+      "id": "if8_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8"
+        }
+      ],
+      "parent_scope": "for7_loop"
+    },
+    "if8": {
+      "id": "if8",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if mapping.line_number == output_line_num:",
+            "return mapping"
+          ],
+          "line_range": [
+            217,
+            218
+          ]
+        }
+      ],
+      "parent_scope": "if8_block"
+    },
+    "DiffAnalyzer_analyze_changes": {
+      "id": "DiffAnalyzer_analyze_changes",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def analyze_changes(self) -> ReturnType:"
+          ],
+          "line_range": [
+            221,
+            221
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Analyze changes and map them to AST nodes.\"\"\""
+          ],
+          "line_range": [
+            222,
+            222
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9_block",
+          "line_range": [
+            223,
+            224
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "diff_results = self.get_detailed_diff()"
+          ],
+          "line_range": [
+            227,
+            227
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "self.build_output_line_mappings()"
+          ],
+          "line_range": [
+            230,
+            230
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes = []"
+          ],
+          "line_range": [
+            233,
+            233
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "processed_node_ids = set()"
+          ],
+          "line_range": [
+            234,
+            234
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for8_loop",
+          "line_range": [
+            236,
+            256
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return changes"
+          ],
+          "line_range": [
+            258,
+            258
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "if9_block": {
+      "id": "if9_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9"
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_analyze_changes"
+    },
+    "if9": {
+      "id": "if9",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not self.load_files():",
+            "return []"
+          ],
+          "line_range": [
+            223,
+            224
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "for8_loop": {
+      "id": "for8_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for diff_result in diff_results:"
+          ],
+          "line_range": [
+            236,
+            236
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10_block",
+          "line_range": [
+            237,
+            238
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "mapping = self.find_ast_node_for_output_line(diff_result.line_num)"
+          ],
+          "line_range": [
+            241,
+            241
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11_block",
+          "line_range": [
+            243,
+            256
+          ]
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_analyze_changes"
+    },
+    "if10_block": {
+      "id": "if10_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10"
+        }
+      ],
+      "parent_scope": "for8_loop"
+    },
+    "if10": {
+      "id": "if10",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if diff_result.change_type == ChangeType.UNCHANGED:",
+            "continue"
+          ],
+          "line_range": [
+            237,
+            238
+          ]
+        }
+      ],
+      "parent_scope": "if10_block"
+    },
+    "if11_block": {
+      "id": "if11_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11"
+        }
+      ],
+      "parent_scope": "for8_loop"
+    },
+    "if11": {
+      "id": "if11",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if mapping and mapping.node_id not in processed_node_ids:",
+            "change_analysis = ChangeAnalysis(",
+            "node_id=mapping.node_id,",
+            "node_type=mapping.node_type,",
+            "signature=mapping.signature,",
+            "description=mapping.description,",
+            "line_range=mapping.line_range,",
+            "change_type=diff_result.change_type.value,",
+            "affected_output_lines=[diff_result.line_num],",
+            "original_content=diff_result.original_content,",
+            "modified_content=diff_result.modified_content",
+            ")",
+            "changes.append(change_analysis)",
+            "processed_node_ids.add(mapping.node_id)"
+          ],
+          "line_range": [
+            243,
+            256
+          ]
+        }
+      ],
+      "parent_scope": "if11_block"
+    },
+    "DiffAnalyzer_to_json": {
+      "id": "DiffAnalyzer_to_json",
+      "type": "method_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def to_json(self, changes) -> ReturnType:"
+          ],
+          "line_range": [
+            260,
+            260
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Convert changes to JSON format.\"\"\""
+          ],
+          "line_range": [
+            261,
+            261
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes_dict = []"
+          ],
+          "line_range": [
+            263,
+            263
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for9_loop",
+          "line_range": [
+            264,
+            269
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "result = {",
+            "\"file1\": self.file1_path,",
+            "\"file2\": self.file2_path,",
+            "\"ast_file\": self.ast_json_file,",
+            "\"total_changes\": len(changes_dict),",
+            "\"changes\": changes_dict",
+            "}"
+          ],
+          "line_range": [
+            271,
+            277
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return json.dumps(result, indent=2)"
+          ],
+          "line_range": [
+            279,
+            279
+          ]
+        }
+      ],
+      "parent_scope": "class_DiffAnalyzer"
+    },
+    "for9_loop": {
+      "id": "for9_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for change in changes:"
+          ],
+          "line_range": [
+            264,
+            264
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "change_dict = asdict(change)"
+          ],
+          "line_range": [
+            265,
+            265
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12_block",
+          "line_range": [
+            267,
+            268
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes_dict.append(change_dict)"
+          ],
+          "line_range": [
+            269,
+            269
+          ]
+        }
+      ],
+      "parent_scope": "DiffAnalyzer_to_json"
+    },
+    "if12_block": {
+      "id": "if12_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12"
+        }
+      ],
+      "parent_scope": "for9_loop"
+    },
+    "if12": {
+      "id": "if12",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if change_dict['line_range']:",
+            "change_dict['line_range'] = list(change_dict['line_range'])"
+          ],
+          "line_range": [
+            267,
+            268
+          ]
+        }
+      ],
+      "parent_scope": "if12_block"
+    },
+    "function_main": {
+      "id": "function_main",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def main() -> None:"
+          ],
+          "line_range": [
+            281,
+            281
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "parser = argparse.ArgumentParser(description='Analyze file differences and map to AST nodes')"
+          ],
+          "line_range": [
+            282,
+            282
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "parser.add_argument('ast_json', help='AST JSON file (.json)')"
+          ],
+          "line_range": [
+            283,
+            283
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "parser.add_argument('file1', help='First file (original)')"
+          ],
+          "line_range": [
+            284,
+            284
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "parser.add_argument('file2', help='Second file (modified)')"
+          ],
+          "line_range": [
+            285,
+            285
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "parser.add_argument('--output', '-o', help='Output JSON file (optional)')"
+          ],
+          "line_range": [
+            286,
+            286
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "args = parser.parse_args()"
+          ],
+          "line_range": [
+            288,
+            288
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "analyzer = DiffAnalyzer(args.ast_json, args.file1, args.file2)"
+          ],
+          "line_range": [
+            291,
+            291
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "changes = analyzer.analyze_changes()"
+          ],
+          "line_range": [
+            292,
+            292
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "json_output = analyzer.to_json(changes)"
+          ],
+          "line_range": [
+            295,
+            295
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13_block",
+          "line_range": [
+            297,
+            302
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if13_block": {
+      "id": "if13_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else13"
+        }
+      ],
+      "parent_scope": "function_main"
+    },
+    "if13": {
+      "id": "if13",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if args.output:",
+            "with open(args.output, 'w', encoding='utf-8') as f:",
+            "f.write(json_output)",
+            "print(f\"Analysis written to {args.output}\")",
+            "else:",
+            "print(json_output)"
+          ],
+          "line_range": [
+            297,
+            300
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "with4_statement": {
+      "id": "with4_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "if13"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "print(json_output)"
+          ],
+          "line_range": [
+            302,
+            302
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "if14_block": {
+      "id": "if14_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if14": {
+      "id": "if14",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "main()"
+          ],
+          "line_range": [
+            304,
+            305
+          ]
+        }
+      ],
+      "parent_scope": "if14_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}

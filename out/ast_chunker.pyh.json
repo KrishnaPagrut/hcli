@@ -1,0 +1,426 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports",
+          "type": "imports",
+          "description": "import ast, json, typing utilities, and datetime",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "class_CodeChunker",
+          "type": "class_definition",
+          "signature": "class CodeChunker",
+          "children": [
+            {
+              "id": "CodeChunker___init__",
+              "type": "method_definition",
+              "signature": "method __init__(self)",
+              "description": "initialize instance variables for chunks, counters, source lines, and node mappings",
+              "line_range": [
+                8,
+                18
+              ]
+            },
+            {
+              "id": "CodeChunker_chunk_file",
+              "type": "method_definition",
+              "signature": "method chunk_file(self, file_path)",
+              "children": [
+                {
+                  "id": "file_reading_and_parsing",
+                  "type": "code_block",
+                  "description": "read source code from file, parse into AST, split into source lines",
+                  "line_range": [
+                    22,
+                    30
+                  ]
+                },
+                {
+                  "id": "two_pass_processing",
+                  "type": "code_block",
+                  "description": "first pass creates chunk IDs, second pass populates content, then create output structure",
+                  "line_range": [
+                    33,
+                    38
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__first_pass_create_ids",
+              "type": "method_definition",
+              "signature": "method _first_pass_create_ids(self, tree)",
+              "children": [
+                {
+                  "id": "main_chunk_setup",
+                  "type": "code_block",
+                  "description": "create main module chunk with basic structure",
+                  "line_range": [
+                    44,
+                    51
+                  ]
+                },
+                {
+                  "id": "recursive_id_creation",
+                  "type": "code_block",
+                  "description": "recursively create IDs for all AST nodes in the tree body",
+                  "line_range": [
+                    54,
+                    54
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__create_ids_recursive",
+              "type": "method_definition",
+              "signature": "method _create_ids_recursive(self, nodes, parent_scope)",
+              "children": [
+                {
+                  "id": "node_processing_loop",
+                  "type": "for_loop",
+                  "children": [
+                    {
+                      "id": "node_type_dispatch",
+                      "type": "if_else_block",
+                      "children": [
+                        {
+                          "id": "class_handling",
+                          "type": "if_statement",
+                          "description": "handle ClassDef nodes: create class chunk and process methods recursively",
+                          "line_range": [
+                            61,
+                            88
+                          ]
+                        },
+                        {
+                          "id": "function_handling",
+                          "type": "elif_statement",
+                          "description": "handle FunctionDef nodes: create function chunk and process body recursively",
+                          "line_range": [
+                            90,
+                            104
+                          ]
+                        },
+                        {
+                          "id": "if_statement_handling",
+                          "type": "elif_statement",
+                          "description": "handle If nodes: create container and individual chunks, process elif/else chains",
+                          "line_range": [
+                            106,
+                            179
+                          ]
+                        },
+                        {
+                          "id": "for_loop_handling",
+                          "type": "elif_statement",
+                          "description": "handle For nodes: create for loop chunk and process body recursively",
+                          "line_range": [
+                            181,
+                            193
+                          ]
+                        },
+                        {
+                          "id": "while_loop_handling",
+                          "type": "elif_statement",
+                          "description": "handle While nodes: create while loop chunk and process body recursively",
+                          "line_range": [
+                            195,
+                            207
+                          ]
+                        },
+                        {
+                          "id": "try_statement_handling",
+                          "type": "elif_statement",
+                          "description": "handle Try nodes: create try block chunk and process body, handlers, else, and finally",
+                          "line_range": [
+                            209,
+                            239
+                          ]
+                        },
+                        {
+                          "id": "with_statement_handling",
+                          "type": "elif_statement",
+                          "description": "handle With nodes: create with statement chunk and process body recursively",
+                          "line_range": [
+                            241,
+                            253
+                          ]
+                        },
+                        {
+                          "id": "other_nodes_handling",
+                          "type": "elif_statement",
+                          "description": "handle other nodes with body attributes by continuing recursion",
+                          "line_range": [
+                            255,
+                            256
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__second_pass_populate_content",
+              "type": "method_definition",
+              "signature": "method _second_pass_populate_content(self, tree)",
+              "children": [
+                {
+                  "id": "main_blocks_population",
+                  "type": "code_block",
+                  "description": "populate main chunk's code_blocks with references to top-level nodes or direct code",
+                  "line_range": [
+                    267,
+                    284
+                  ]
+                },
+                {
+                  "id": "chunk_content_population",
+                  "type": "code_block",
+                  "description": "populate content for all other chunks by finding their corresponding nodes",
+                  "line_range": [
+                    287,
+                    294
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__find_node_by_chunk_id",
+              "type": "method_definition",
+              "signature": "method _find_node_by_chunk_id(self, tree, chunk_id)",
+              "description": "find AST node corresponding to chunk ID by searching node mappings and handling special else case",
+              "line_range": [
+                296,
+                313
+              ]
+            },
+            {
+              "id": "CodeChunker__populate_chunk_content",
+              "type": "method_definition",
+              "signature": "method _populate_chunk_content(self, node, chunk_id)",
+              "children": [
+                {
+                  "id": "else_statements_handling",
+                  "type": "if_statement",
+                  "description": "special handling for else statements by processing their statement list",
+                  "line_range": [
+                    320,
+                    337
+                  ]
+                },
+                {
+                  "id": "node_type_content_dispatch",
+                  "type": "if_else_block",
+                  "children": [
+                    {
+                      "id": "class_content_population",
+                      "type": "if_statement",
+                      "description": "populate class chunks with declaration and member references",
+                      "line_range": [
+                        339,
+                        363
+                      ]
+                    },
+                    {
+                      "id": "function_content_population",
+                      "type": "elif_statement",
+                      "description": "delegate function content population to specialized method",
+                      "line_range": [
+                        365,
+                        366
+                      ]
+                    },
+                    {
+                      "id": "if_content_population",
+                      "type": "elif_statement",
+                      "description": "populate if-else blocks with references or direct source segments",
+                      "line_range": [
+                        368,
+                        402
+                      ]
+                    },
+                    {
+                      "id": "for_content_population",
+                      "type": "elif_statement",
+                      "description": "populate for loops with header and body statements, creating references for nested structures",
+                      "line_range": [
+                        404,
+                        434
+                      ]
+                    },
+                    {
+                      "id": "while_content_population",
+                      "type": "elif_statement",
+                      "description": "populate while loops with complete source segment including body",
+                      "line_range": [
+                        436,
+                        440
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "CodeChunker__populate_function_content",
+              "type": "method_definition",
+              "signature": "method _populate_function_content(self, node, chunk_id)",
+              "description": "populate function chunks with signature and body statements, creating references for nested structures",
+              "line_range": [
+                449,
+                478
+              ]
+            },
+            {
+              "id": "CodeChunker__get_body_end_line",
+              "type": "method_definition",
+              "signature": "method _get_body_end_line(self, body)",
+              "description": "get the end line number of a body of statements, handling empty bodies",
+              "line_range": [
+                480,
+                484
+              ]
+            },
+            {
+              "id": "CodeChunker__get_source_segment",
+              "type": "method_definition",
+              "signature": "method _get_source_segment(self, node, include_body, body_only_if)",
+              "description": "extract source code for AST node as list of statements, handling indentation and body inclusion",
+              "line_range": [
+                486,
+                519
+              ]
+            },
+            {
+              "id": "CodeChunker__extract_dependencies",
+              "type": "method_definition",
+              "signature": "method _extract_dependencies(self, node)",
+              "description": "extract variable dependencies from node by walking AST and finding loaded names",
+              "line_range": [
+                521,
+                527
+              ]
+            },
+            {
+              "id": "CodeChunker__extract_top_level_definitions",
+              "type": "method_definition",
+              "signature": "method _extract_top_level_definitions(self, tree)",
+              "description": "extract names of top-level class and function definitions from AST",
+              "line_range": [
+                529,
+                537
+              ]
+            },
+            {
+              "id": "CodeChunker__get_args_string",
+              "type": "method_definition",
+              "signature": "method _get_args_string(self, args)",
+              "description": "convert function arguments to comma-separated string",
+              "line_range": [
+                539,
+                542
+              ]
+            },
+            {
+              "id": "CodeChunker__get_returns_string",
+              "type": "method_definition",
+              "signature": "method _get_returns_string(self, node)",
+              "description": "get return type annotation as string, defaulting to None",
+              "line_range": [
+                544,
+                548
+              ]
+            },
+            {
+              "id": "CodeChunker__create_error_chunk",
+              "type": "method_definition",
+              "signature": "method _create_error_chunk(self, source_code, error_msg)",
+              "description": "create single error chunk when parsing fails, containing entire source as fallback",
+              "line_range": [
+                550,
+                572
+              ]
+            },
+            {
+              "id": "CodeChunker__create_output_structure",
+              "type": "method_definition",
+              "signature": "method _create_output_structure(self, file_path)",
+              "description": "create final JSON output structure with metadata, chunks, relationships, and context map",
+              "line_range": [
+                574,
+                586
+              ]
+            },
+            {
+              "id": "CodeChunker__build_relationships",
+              "type": "method_definition",
+              "signature": "method _build_relationships(self)",
+              "description": "build relationship mappings between chunks with execution flow and dependency graph",
+              "line_range": [
+                588,
+                599
+              ]
+            },
+            {
+              "id": "CodeChunker__build_context_map",
+              "type": "method_definition",
+              "signature": "method _build_context_map(self)",
+              "description": "build global context mapping with empty placeholders for imports, variables, functions, classes",
+              "line_range": [
+                601,
+                608
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_main",
+          "type": "function_definition",
+          "signature": "function main()",
+          "children": [
+            {
+              "id": "argument_validation",
+              "type": "if_statement",
+              "description": "check command line arguments and exit if incorrect usage",
+              "line_range": [
+                615,
+                617
+              ]
+            },
+            {
+              "id": "chunking_execution",
+              "type": "code_block",
+              "description": "create CodeChunker instance, process file, and output JSON result with error handling",
+              "line_range": [
+                619,
+                635
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_guard",
+          "type": "if_statement",
+          "description": "when run as main script, execute main function",
+          "line_range": [
+            638,
+            639
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/ast_chunker.py"
+  }
+}
