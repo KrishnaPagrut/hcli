@@ -39,7 +39,7 @@ def crawl_repo(repo_root: str, out_root: str = "out"):
 
                 # Output file paths
                 ast_json = out_dir / f"{py_file.stem}.ast.json"
-                pyh_json = out_dir / f"{py_file.stem}.pyh.json"
+                pyh_json = out_dir / f"{py_file.stem}.pyh.ast.json"
 
                 print(f"\n📄 Processing {py_file}")
 
@@ -75,3 +75,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     crawl_repo(args.repo_root, args.out)
+
