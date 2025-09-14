@@ -60,7 +60,7 @@ async def apply_changes_from_json(file_stem: str):
             else:
                 line_info = "(unspecified lines)"
             changes_summary += (
-                f"{i}. Lines {line_range[0]}-{line_range[1]}: {original} → {modified}\n"
+                f"{i}. Lines{line_info}: {original} → {modified}\n"
             )
 
         # Create the prompt in readable multi-line format
@@ -121,11 +121,23 @@ Return all the paths and changes made."""
 
         print(prompt)
         
+        modified_files = []
+
         async for message in query(prompt=prompt, options=config):
             if isinstance(message, AssistantMessage):
                 for block in message.content:
                     if isinstance(block, TextBlock):
-                        print(f"{block.text}")
+                        text = block.text.strip()
+                        print(text)
+                        if text.startswith("{") and "modified_files" in text:
+                            try:
+                                data = json.loads(text)
+                                modified_files = data.get("modified_files", [])
+                            except Exception:
+                                pass
+
+        return modified_files
+
                         
     except FileNotFoundError as e:
         print(f"❌ File not found: {e}")
@@ -254,6 +266,40 @@ Please provide the complete updated Task class code with a timeToComplete field 
 #     return True
 
 
+import ast_chunker
+import pyh_ast_generator
+
+def regenerate_ast_files(py_file: str, repo_root: str = "."):
+    py_path = Path(py_file).resolve()
+    repo_root = Path(repo_root).resolve()
+    out_root = repo_root / "out"
+
+    rel_path = py_path.relative_to(repo_root)
+    out_dir = out_root / rel_path.parent
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    ast_json = out_dir / f"{py_path.stem}.ast.json"
+    pyh_json = out_dir / f"{py_path.stem}.pyh.ast.json"
+
+    print(f"\n🔄 Regenerating AST for {py_path}")
+
+    try:
+        chunker = ast_chunker.CodeChunker()
+        result = chunker.chunk_file(str(py_path))
+        ast_json.write_text(json.dumps(result, indent=2), encoding="utf-8")
+        print(f"✅ Wrote {ast_json}")
+    except Exception as e:
+        print(f"❌ Chunker failed for {py_path}: {e}")
+        return
+
+    try:
+        pyh_ast_generator.generate_pyh_with_claude(str(ast_json), str(pyh_json), str(py_path))
+        print(f"✅ Wrote {pyh_json}")
+    except Exception as e:
+        print(f"❌ pyh generator failed for {py_path}: {e}")
+
+
+
 async def main():
     print("Claude Code SDK - Apply Changes Demo")
     print("=" * 50)
@@ -275,13 +321,23 @@ async def main():
         if not file_stem:
             raise ValueError("❌ Could not determine file stem from changes.json")
 
-        # Now call with the correct file
-        await apply_changes_from_json(file_stem)
+        # Call apply_changes and capture modified files
+        modified_files = await apply_changes_from_json(file_stem)
+
+        # If Claude actually modified files, regenerate AST/pyh
+        if modified_files:
+            print("\n🔄 Regenerating AST files for modified files...")
+            for f in modified_files:
+                regenerate_ast_files(f, repo_root=".")
+        else:
+            print("\n✅ No modified files returned, skipping AST regeneration")
 
         print("\n🎉 Demo completed successfully!")
 
     except Exception as e:
         print(f"\n❌ Demo failed with error: {e}")
 
+
 if __name__ == "__main__":
     asyncio.run(main())
+

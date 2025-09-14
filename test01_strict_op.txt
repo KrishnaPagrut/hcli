@@ -1,0 +1,6 @@
+    class MathUtils
+        method factorial(self, n) -> ReturnType
+            docstring explaining this is a recursive factorial implementation, inefficient for large n  (lines 3–3)
+            base case: if n is less than or equal to 1, return 1  (lines 4–5)
+            recursive case: return n multiplied by factorial of (n-1)  (lines 6–6)
+    when run as main: create MathUtils instance and print factorial of 5  (lines 9–11)

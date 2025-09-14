@@ -1,0 +1,12 @@
+    class MathUtils
+        method factorial(self, n: int) -> int
+            docstring: iterative factorial with input validation
+            if n is negative, raise ValueError
+            otherwise, loop from 2 to n and multiply into result
+        method fibonacci(self, n: int) -> int
+            docstring: compute nth fibonacci number iteratively
+            if n <= 1 return n
+            otherwise build fibonacci using loop
+    when run as main:
+        instead of always factorial(5), ask the user to enter a number
+        print both factorial and fibonacci of that number
