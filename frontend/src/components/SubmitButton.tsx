@@ -3,52 +3,29 @@ import { Send, Loader, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
 import { useStore } from '../hooks/useStore';
 
 const SubmitButton: React.FC = () => {
-  const { editor, repository, setLoading, setError, clearDiffs } = useStore();
+  const { repository, applyPhyChanges } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error' | 'warning'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
 
   const handleSubmit = async () => {
-    if (!repository.selectedFile || editor.diffs.length === 0) return;
+    if (!repository.selectedFile) return;
 
     setIsSubmitting(true);
     setSubmitStatus('idle');
     setSubmitMessage('Applying changes...');
 
     try {
-      // Call backend to apply changes
-      const response = await fetch('/api/apply-changes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pyh_content: editor.pyhContent,
-          original_py_path: repository.selectedFile,
-          diffs: editor.diffs,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to apply changes');
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setSubmitStatus('success');
-        setSubmitMessage('Changes applied successfully! All tests passed.');
-        clearDiffs();
-        
-        // Reload the file to show updated content
-        setTimeout(() => {
-          if (repository.selectedFile) {
-            // This will trigger a reload of the file content
-            window.location.reload();
-          }
-        }, 2000);
-      } else {
-        setSubmitStatus('error');
-        setSubmitMessage(result.error || 'Failed to apply changes');
-      }
+      // Use the new applyPhyChanges function from the store
+      await applyPhyChanges(repository.selectedFile);
+      
+      setSubmitStatus('success');
+      setSubmitMessage('PHY changes applied successfully!');
+      
+      // Reload the file to show updated content
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       setSubmitStatus('error');
       setSubmitMessage(error instanceof Error ? error.message : 'Unknown error occurred');
@@ -102,7 +79,7 @@ const SubmitButton: React.FC = () => {
     }
   };
 
-  const isDisabled = !repository.selectedFile || editor.diffs.length === 0 || isSubmitting;
+  const isDisabled = !repository.selectedFile || isSubmitting;
 
   return (
     <div className="bg-white border-t border-neutral-200 px-4 py-3">
@@ -117,9 +94,9 @@ const SubmitButton: React.FC = () => {
             <span>{getButtonText()}</span>
           </button>
           
-          {editor.diffs.length > 0 && (
+          {repository.selectedFile && (
             <span className="text-sm text-neutral-600">
-              {editor.diffs.length} change{editor.diffs.length !== 1 ? 's' : ''} pending
+              Ready to apply PHY changes
             </span>
           )}
         </div>

@@ -1,0 +1,159 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports",
+          "type": "import_statements",
+          "description": "import json, argparse, and Path from pathlib",
+          "line_range": [
+            1,
+            3
+          ]
+        },
+        {
+          "id": "function_render_node",
+          "type": "function_definition",
+          "signature": "function render_node(takes node and indent level)",
+          "children": [
+            {
+              "id": "initialization",
+              "type": "assignment_block",
+              "description": "initialize empty lines list, create padding string based on indent, and extract node properties (signature, description, line_range)",
+              "line_range": [
+                6,
+                11
+              ]
+            },
+            {
+              "id": "line_info_setup",
+              "type": "assignment",
+              "description": "initialize empty line_info string",
+              "line_range": [
+                14,
+                14
+              ]
+            },
+            {
+              "id": "if1_abstract",
+              "type": "if_statement",
+              "description": "if line_range exists, format it as a display string with em-dash",
+              "line_range": [
+                15,
+                16
+              ]
+            },
+            {
+              "id": "if2_block_abstract",
+              "type": "if_else_block",
+              "children": [
+                {
+                  "id": "if2_abstract",
+                  "type": "if_statement",
+                  "description": "if signature exists, append it with line info, then optionally append description indented; else if only description exists, append it with line info",
+                  "line_range": [
+                    19,
+                    24
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "for1_loop_abstract",
+              "type": "for_loop",
+              "description": "recursively render each child node with increased indentation and extend the lines list",
+              "line_range": [
+                27,
+                28
+              ]
+            },
+            {
+              "id": "return_stmt",
+              "type": "return_statement",
+              "description": "return the accumulated lines",
+              "line_range": [
+                30,
+                30
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_phy_ast_to_output",
+          "type": "function_definition",
+          "signature": "function phy_ast_to_output(takes pyh_file and output_file paths)",
+          "children": [
+            {
+              "id": "file_reading",
+              "type": "assignment",
+              "description": "read and strip text content from the pyh file",
+              "line_range": [
+                33,
+                33
+              ]
+            },
+            {
+              "id": "if4_abstract",
+              "type": "if_statement",
+              "description": "if text starts with triple backticks, remove all lines that start with triple backticks",
+              "line_range": [
+                36,
+                37
+              ]
+            },
+            {
+              "id": "json_parsing",
+              "type": "assignment",
+              "description": "parse the text as JSON data",
+              "line_range": [
+                39,
+                39
+              ]
+            },
+            {
+              "id": "if5_abstract",
+              "type": "if_statement",
+              "description": "validate that the JSON contains required phy_chunks/main structure, raise ValueError if missing",
+              "line_range": [
+                41,
+                42
+              ]
+            },
+            {
+              "id": "processing",
+              "type": "assignment_block",
+              "description": "extract the main root node and render it to a joined string result",
+              "line_range": [
+                44,
+                45
+              ]
+            },
+            {
+              "id": "if6_abstract",
+              "type": "if_else_block",
+              "description": "if output_file is specified, write result to file and print confirmation; otherwise print result to console",
+              "line_range": [
+                47,
+                51
+              ]
+            }
+          ]
+        },
+        {
+          "id": "if7_abstract",
+          "type": "if_statement",
+          "description": "when run as main: create argument parser for pyh_file and optional output file, parse arguments, and call phy_ast_to_output function",
+          "line_range": [
+            53,
+            59
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "pyh_ast_to_output.py"
+  }
+}

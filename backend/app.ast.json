@@ -1,0 +1,1515 @@
+{
+  "metadata": {
+    "original_file": "backend/app.py",
+    "total_chunks": 64,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T07:18:09.605198"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"",
+            "HCLI IDE Backend API",
+            "Provides REST API endpoints for the HCLI IDE frontend",
+            "\"\"\""
+          ],
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from flask import Flask, request, jsonify"
+          ],
+          "line_range": [
+            6,
+            6
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from flask_cors import CORS"
+          ],
+          "line_range": [
+            7,
+            7
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import os"
+          ],
+          "line_range": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import json"
+          ],
+          "line_range": [
+            9,
+            9
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import subprocess"
+          ],
+          "line_range": [
+            10,
+            10
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import tempfile"
+          ],
+          "line_range": [
+            11,
+            11
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import shutil"
+          ],
+          "line_range": [
+            12,
+            12
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            13,
+            13
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import re"
+          ],
+          "line_range": [
+            14,
+            14
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import sys"
+          ],
+          "line_range": [
+            17,
+            17
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "sys.path.append(str(Path(__file__).parent.parent))"
+          ],
+          "line_range": [
+            18,
+            18
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try1_block",
+          "line_range": [
+            20,
+            27
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "app = Flask(__name__)"
+          ],
+          "line_range": [
+            29,
+            29
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "CORS(app)  # Enable CORS for frontend communication"
+          ],
+          "line_range": [
+            30,
+            30
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "REPO_ROOT = Path(__file__).parent.parent  # Go up one level from backend to hcli root"
+          ],
+          "line_range": [
+            33,
+            33
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "OUT_DIR = REPO_ROOT / \"out\""
+          ],
+          "line_range": [
+            34,
+            34
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "OUT_DIR.mkdir(exist_ok=True)"
+          ],
+          "line_range": [
+            35,
+            35
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_health_check",
+          "line_range": [
+            38,
+            43
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_clone_repository",
+          "line_range": [
+            46,
+            89
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_get_files",
+          "line_range": [
+            92,
+            123
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_get_file_content",
+          "line_range": [
+            126,
+            146
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_get_pyh_output",
+          "line_range": [
+            149,
+            179
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_format_pyh_output",
+          "line_range": [
+            181,
+            196
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_extract_line_mappings",
+          "line_range": [
+            198,
+            218
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_apply_changes",
+          "line_range": [
+            221,
+            276
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_apply_changes_with_claude",
+          "line_range": [
+            278,
+            296
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if17_block",
+          "line_range": [
+            298,
+            299
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "try1_block": {
+      "id": "try1_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "main"
+    },
+    "function_health_check": {
+      "id": "function_health_check",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def health_check() -> None:"
+          ],
+          "line_range": [
+            38,
+            38
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Health check endpoint\"\"\""
+          ],
+          "line_range": [
+            39,
+            39
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return jsonify({",
+            "'status': 'healthy',",
+            "'message': 'HCLI IDE Backend API is running'",
+            "})"
+          ],
+          "line_range": [
+            40,
+            43
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "function_clone_repository": {
+      "id": "function_clone_repository",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def clone_repository() -> None:"
+          ],
+          "line_range": [
+            46,
+            46
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Clone a GitHub repository\"\"\""
+          ],
+          "line_range": [
+            47,
+            47
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try2_block",
+          "line_range": [
+            48,
+            89
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try2_block": {
+      "id": "try2_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_clone_repository"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "try2_block"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not repo_url:",
+            "return jsonify({'error': 'Repository URL is required'}), 400"
+          ],
+          "line_range": [
+            53,
+            54
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "with1_statement": {
+      "id": "with1_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try2_block"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "with1_statement"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if result.returncode != 0:",
+            "return jsonify({",
+            "'error': 'Failed to clone repository',",
+            "'details': result.stderr",
+            "}), 400"
+          ],
+          "line_range": [
+            65,
+            69
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for item in temp_path.iterdir():"
+          ],
+          "line_range": [
+            72,
+            72
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3_block",
+          "line_range": [
+            73,
+            80
+          ]
+        }
+      ],
+      "parent_scope": "with1_statement"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if item.name not in ['.git', '__pycache__', '.pytest_cache']:",
+            "dest = REPO_ROOT / item.name",
+            "if item.is_dir():",
+            "if dest.exists():",
+            "shutil.rmtree(dest)",
+            "shutil.copytree(item, dest)",
+            "else:",
+            "shutil.copy2(item, dest)"
+          ],
+          "line_range": [
+            73,
+            80
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else4"
+        }
+      ],
+      "parent_scope": "if3"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if item.is_dir():",
+            "if dest.exists():",
+            "shutil.rmtree(dest)",
+            "shutil.copytree(item, dest)",
+            "else:",
+            "shutil.copy2(item, dest)"
+          ],
+          "line_range": [
+            75,
+            78
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "if5_block": {
+      "id": "if5_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if5"
+        }
+      ],
+      "parent_scope": "if4"
+    },
+    "if5": {
+      "id": "if5",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if dest.exists():",
+            "shutil.rmtree(dest)"
+          ],
+          "line_range": [
+            76,
+            77
+          ]
+        }
+      ],
+      "parent_scope": "if5_block"
+    },
+    "else1": {
+      "id": "else1",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "shutil.copy2(item, dest)"
+          ],
+          "line_range": [
+            80,
+            80
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    },
+    "function_get_files": {
+      "id": "function_get_files",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def get_files() -> None:"
+          ],
+          "line_range": [
+            92,
+            92
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Get list of files in the repository\"\"\""
+          ],
+          "line_range": [
+            93,
+            93
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try3_block",
+          "line_range": [
+            94,
+            123
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try3_block": {
+      "id": "try3_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_get_files"
+    },
+    "function_scan_directory": {
+      "id": "function_scan_directory",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def scan_directory(path, relative_path) -> None:"
+          ],
+          "line_range": [
+            97,
+            97
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for2_loop",
+          "line_range": [
+            98,
+            117
+          ]
+        }
+      ],
+      "parent_scope": "try3_block"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for item in path.iterdir():"
+          ],
+          "line_range": [
+            98,
+            98
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6_block",
+          "line_range": [
+            99,
+            100
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "item_relative = f\"{relative_path}/{item.name}\" if relative_path else item.name"
+          ],
+          "line_range": [
+            102,
+            102
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7_block",
+          "line_range": [
+            104,
+            117
+          ]
+        }
+      ],
+      "parent_scope": "function_scan_directory"
+    },
+    "if6_block": {
+      "id": "if6_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if6"
+        }
+      ],
+      "parent_scope": "for2_loop"
+    },
+    "if6": {
+      "id": "if6",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if item.name.startswith('.') or item.name in ['__pycache__', 'node_modules', 'out']:",
+            "continue"
+          ],
+          "line_range": [
+            99,
+            100
+          ]
+        }
+      ],
+      "parent_scope": "if6_block"
+    },
+    "if7_block": {
+      "id": "if7_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if7"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else7"
+        }
+      ],
+      "parent_scope": "for2_loop"
+    },
+    "if7": {
+      "id": "if7",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if item.is_dir():",
+            "files.append({",
+            "'name': item.name,",
+            "'type': 'directory',",
+            "'path': item_relative,",
+            "'children': []",
+            "})",
+            "scan_directory(item, item_relative)",
+            "else:",
+            "files.append({",
+            "'name': item.name,",
+            "'type': 'file',",
+            "'path': item_relative",
+            "})"
+          ],
+          "line_range": [
+            104,
+            111
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "else2": {
+      "id": "else2",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "files.append({",
+            "'name': item.name,",
+            "'type': 'file',",
+            "'path': item_relative",
+            "})"
+          ],
+          "line_range": [
+            113,
+            117
+          ]
+        }
+      ],
+      "parent_scope": "if7_block"
+    },
+    "function_get_file_content": {
+      "id": "function_get_file_content",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def get_file_content(file_path) -> None:"
+          ],
+          "line_range": [
+            126,
+            126
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Get content of a specific file\"\"\""
+          ],
+          "line_range": [
+            127,
+            127
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try4_block",
+          "line_range": [
+            128,
+            146
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try4_block": {
+      "id": "try4_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_get_file_content"
+    },
+    "if8_block": {
+      "id": "if8_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if8"
+        }
+      ],
+      "parent_scope": "try4_block"
+    },
+    "if8": {
+      "id": "if8",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not full_path.exists():",
+            "return jsonify({'error': 'File not found'}), 404"
+          ],
+          "line_range": [
+            131,
+            132
+          ]
+        }
+      ],
+      "parent_scope": "if8_block"
+    },
+    "if9_block": {
+      "id": "if9_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if9"
+        }
+      ],
+      "parent_scope": "try4_block"
+    },
+    "if9": {
+      "id": "if9",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if full_path.is_dir():",
+            "return jsonify({'error': 'Path is a directory'}), 400"
+          ],
+          "line_range": [
+            134,
+            135
+          ]
+        }
+      ],
+      "parent_scope": "if9_block"
+    },
+    "function_get_pyh_output": {
+      "id": "function_get_pyh_output",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def get_pyh_output(pyh_file_path) -> None:"
+          ],
+          "line_range": [
+            149,
+            149
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Get the human-readable output of a .pyh.json file\"\"\""
+          ],
+          "line_range": [
+            150,
+            150
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try5_block",
+          "line_range": [
+            151,
+            179
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try5_block": {
+      "id": "try5_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_get_pyh_output"
+    },
+    "if10_block": {
+      "id": "if10_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if10"
+        }
+      ],
+      "parent_scope": "try5_block"
+    },
+    "if10": {
+      "id": "if10",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not pyh_path.exists():",
+            "return jsonify({'error': 'PHY file not found'}), 404"
+          ],
+          "line_range": [
+            154,
+            155
+          ]
+        }
+      ],
+      "parent_scope": "if10_block"
+    },
+    "if11_block": {
+      "id": "if11_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if11"
+        }
+      ],
+      "parent_scope": "try5_block"
+    },
+    "if11": {
+      "id": "if11",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if text.startswith(\"```\"):",
+            "text = \"\\n\".join(line for line in text.splitlines() if not line.strip().startswith(\"```\"))"
+          ],
+          "line_range": [
+            161,
+            162
+          ]
+        }
+      ],
+      "parent_scope": "if11_block"
+    },
+    "if12_block": {
+      "id": "if12_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if12"
+        }
+      ],
+      "parent_scope": "try5_block"
+    },
+    "if12": {
+      "id": "if12",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if \"phy_chunks\" not in data or \"main\" not in data[\"phy_chunks\"]:",
+            "return jsonify({'error': 'Invalid .pyh JSON: missing phy_chunks/main'}), 400"
+          ],
+          "line_range": [
+            166,
+            167
+          ]
+        }
+      ],
+      "parent_scope": "if12_block"
+    },
+    "function_format_pyh_output": {
+      "id": "function_format_pyh_output",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def format_pyh_output(lines) -> None:"
+          ],
+          "line_range": [
+            181,
+            181
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Format PHY output by removing line numbers and keeping proper spacing\"\"\""
+          ],
+          "line_range": [
+            182,
+            182
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "formatted_lines = []"
+          ],
+          "line_range": [
+            183,
+            183
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for3_loop",
+          "line_range": [
+            185,
+            194
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return \"\\n\".join(formatted_lines)"
+          ],
+          "line_range": [
+            196,
+            196
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "for3_loop": {
+      "id": "for3_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for line in lines:"
+          ],
+          "line_range": [
+            185,
+            185
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "cleaned_line = re.sub(r'\\s*\\(lines\\s+\\d+[\u2013-]\\d+\\)', '', line)"
+          ],
+          "line_range": [
+            187,
+            187
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13_block",
+          "line_range": [
+            190,
+            194
+          ]
+        }
+      ],
+      "parent_scope": "function_format_pyh_output"
+    },
+    "if13_block": {
+      "id": "if13_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if13"
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "else13"
+        }
+      ],
+      "parent_scope": "for3_loop"
+    },
+    "if13": {
+      "id": "if13",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if cleaned_line.strip():",
+            "formatted_lines.append(cleaned_line)",
+            "else:",
+            "# Keep empty lines as they are for proper alignment",
+            "formatted_lines.append(\"\")"
+          ],
+          "line_range": [
+            190,
+            191
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "else3": {
+      "id": "else3",
+      "type": "else_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "formatted_lines.append(\"\")"
+          ],
+          "line_range": [
+            194,
+            194
+          ]
+        }
+      ],
+      "parent_scope": "if13_block"
+    },
+    "function_extract_line_mappings": {
+      "id": "function_extract_line_mappings",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def extract_line_mappings(pyh_data) -> None:"
+          ],
+          "line_range": [
+            198,
+            198
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Extract line number mappings from PHY data\"\"\""
+          ],
+          "line_range": [
+            199,
+            199
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "mappings = []"
+          ],
+          "line_range": [
+            200,
+            200
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_extract_from_node",
+          "line_range": [
+            202,
+            213
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15_block",
+          "line_range": [
+            215,
+            216
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "return mappings"
+          ],
+          "line_range": [
+            218,
+            218
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "function_extract_from_node": {
+      "id": "function_extract_from_node",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def extract_from_node(node, path) -> None:"
+          ],
+          "line_range": [
+            202,
+            202
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14_block",
+          "line_range": [
+            203,
+            209
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for4_loop",
+          "line_range": [
+            211,
+            213
+          ]
+        }
+      ],
+      "parent_scope": "function_extract_line_mappings"
+    },
+    "if14_block": {
+      "id": "if14_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if14"
+        }
+      ],
+      "parent_scope": "function_extract_from_node"
+    },
+    "if14": {
+      "id": "if14",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if \"line_range\" in node and node[\"line_range\"]:",
+            "mappings.append({",
+            "'pyhLine': node[\"line_range\"][0],  # Start line",
+            "'pyLine': node[\"line_range\"][0],   # For now, map 1:1",
+            "'description': node.get('description', ''),",
+            "'signature': node.get('signature', '')",
+            "})"
+          ],
+          "line_range": [
+            203,
+            209
+          ]
+        }
+      ],
+      "parent_scope": "if14_block"
+    },
+    "for4_loop": {
+      "id": "for4_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for child in node.get('children', []):"
+          ],
+          "line_range": [
+            211,
+            211
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "child_path = f\"{path}.{node.get('id', '')}\" if path else node.get('id', '')"
+          ],
+          "line_range": [
+            212,
+            212
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "extract_from_node(child, child_path)"
+          ],
+          "line_range": [
+            213,
+            213
+          ]
+        }
+      ],
+      "parent_scope": "function_extract_from_node"
+    },
+    "if15_block": {
+      "id": "if15_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if15"
+        }
+      ],
+      "parent_scope": "function_extract_line_mappings"
+    },
+    "if15": {
+      "id": "if15",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if \"phy_chunks\" in pyh_data and \"main\" in pyh_data[\"phy_chunks\"]:",
+            "extract_from_node(pyh_data[\"phy_chunks\"][\"main\"])"
+          ],
+          "line_range": [
+            215,
+            216
+          ]
+        }
+      ],
+      "parent_scope": "if15_block"
+    },
+    "function_apply_changes": {
+      "id": "function_apply_changes",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def apply_changes() -> None:"
+          ],
+          "line_range": [
+            221,
+            221
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Apply changes from PHY file to Python code\"\"\""
+          ],
+          "line_range": [
+            222,
+            222
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try6_block",
+          "line_range": [
+            223,
+            276
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try6_block": {
+      "id": "try6_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_apply_changes"
+    },
+    "if16_block": {
+      "id": "if16_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if16"
+        }
+      ],
+      "parent_scope": "try6_block"
+    },
+    "if16": {
+      "id": "if16",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if not pyh_content or not original_py_path:",
+            "return jsonify({'error': 'PHY content and original Python path are required'}), 400"
+          ],
+          "line_range": [
+            229,
+            230
+          ]
+        }
+      ],
+      "parent_scope": "if16_block"
+    },
+    "with2_statement": {
+      "id": "with2_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try6_block"
+    },
+    "try7_block": {
+      "id": "try7_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "try6_block"
+    },
+    "function_apply_changes_with_claude": {
+      "id": "function_apply_changes_with_claude",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def apply_changes_with_claude(changes_file_path) -> None:"
+          ],
+          "line_range": [
+            278,
+            278
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "\"\"\"Apply changes using Claude (simplified version)\"\"\""
+          ],
+          "line_range": [
+            279,
+            279
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "try8_block",
+          "line_range": [
+            280,
+            296
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "try8_block": {
+      "id": "try8_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "function_apply_changes_with_claude"
+    },
+    "with3_statement": {
+      "id": "with3_statement",
+      "type": "with_statement",
+      "code_blocks": [],
+      "parent_scope": "try8_block"
+    },
+    "if17_block": {
+      "id": "if17_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if17"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if17": {
+      "id": "if17",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == '__main__':",
+            "app.run(debug=True, host='0.0.0.0', port=5001)"
+          ],
+          "line_range": [
+            298,
+            299
+          ]
+        }
+      ],
+      "parent_scope": "if17_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}

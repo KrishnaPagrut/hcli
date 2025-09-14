@@ -132,15 +132,40 @@ Return all the paths and changes made."""
                         print("RAW BLOCK:", repr(text))  # <-- NEW DEBUG
                         if "modified_files" in text:
                             try:
-                                # Extract JSON object from block using regex
-                                match = re.search(r"\{[\s\S]*\}", text)
-                                if match:
-                                    json_str = match.group(0)
+                                # Look for the JSON object containing modified_files
+                                # Find the last occurrence of { "modified_files": [...] }
+                                json_match = re.search(r'\{[^{}]*"modified_files"[^{}]*\[[^\]]*\][^{}]*\}', text)
+                                if json_match:
+                                    json_str = json_match.group(0)
                                     data = json.loads(json_str)
                                     modified_files = data.get("modified_files", [])
                                     print("PARSED JSON:", data)
+                                else:
+                                    # Fallback: look for any JSON with modified_files
+                                    json_match = re.search(r'\{[^{}]*"modified_files"[^{}]*\}', text)
+                                    if json_match:
+                                        json_str = json_match.group(0)
+                                        data = json.loads(json_str)
+                                        modified_files = data.get("modified_files", [])
+                                        print("PARSED JSON (fallback):", data)
+                                    else:
+                                        # Try to extract file paths manually
+                                        file_matches = re.findall(r'"/[^"]*\.py"', text)
+                                        if file_matches:
+                                            modified_files = [f.strip('"') for f in file_matches]
+                                            print("EXTRACTED FILES MANUALLY:", modified_files)
+                                        else:
+                                            # If we see "modified_files": [] in the text, it means no files were modified
+                                            if '"modified_files": []' in text:
+                                                modified_files = []
+                                                print("DETECTED: No files modified")
                             except json.JSONDecodeError as e:
-                                print("JSON decode failed:", e)  # <-- NEW DEBUG
+                                print("JSON decode failed:", e)
+                                # Try to extract just the file paths manually
+                                file_matches = re.findall(r'"/[^"]*\.py"', text)
+                                if file_matches:
+                                    modified_files = [f.strip('"') for f in file_matches]
+                                    print("EXTRACTED FILES MANUALLY:", modified_files)
 
 
         print("DEBUG: Final modified_files =", modified_files)

@@ -1,0 +1,122 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports",
+          "type": "imports",
+          "description": "import necessary modules: json, subprocess, pathlib.Path, and argparse",
+          "line_range": [
+            1,
+            3
+          ]
+        },
+        {
+          "id": "function_generate_pyh_with_claude",
+          "type": "function_definition",
+          "signature": "function generate_pyh_with_claude(takes json_file, pyh_file, py_file)",
+          "children": [
+            {
+              "id": "data_loading",
+              "type": "assignment",
+              "description": "read the content of the JSON file into data variable",
+              "line_range": [
+                6,
+                6
+              ]
+            },
+            {
+              "id": "prompt_creation",
+              "type": "assignment",
+              "description": "create a large multi-line prompt string that contains instructions for converting Python AST JSON into abstracted natural-language AST, including rules, examples, and the actual data to process",
+              "line_range": [
+                9,
+                242
+              ]
+            },
+            {
+              "id": "claude_subprocess",
+              "type": "subprocess_call",
+              "description": "run Claude CLI subprocess with the prompt and capture the output",
+              "line_range": [
+                243,
+                247
+              ]
+            },
+            {
+              "id": "output_cleanup",
+              "type": "assignment",
+              "description": "strip whitespace from the subprocess output",
+              "line_range": [
+                249,
+                249
+              ]
+            },
+            {
+              "id": "if1_block_abstract",
+              "type": "if_else_block",
+              "children": [
+                {
+                  "id": "if1_abstract",
+                  "type": "if_statement",
+                  "description": "clean up the output by removing markdown code block markers (```json or '''json) if present",
+                  "line_range": [
+                    251,
+                    252
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "if2_block_abstract",
+              "type": "if_else_block",
+              "children": [
+                {
+                  "id": "if2_abstract",
+                  "type": "if_statement",
+                  "description": "if subprocess failed, print error message",
+                  "line_range": [
+                    256,
+                    257
+                  ]
+                },
+                {
+                  "id": "else1_abstract",
+                  "type": "else_statement",
+                  "description": "if subprocess succeeded: parse JSON output, handle parsing errors, resolve source Python file path from AST path (handling /out directory structure), inject metadata with source file path, and write the final .pyh.json file",
+                  "line_range": [
+                    259,
+                    282
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "argparse_import",
+          "type": "import",
+          "description": "import argparse module",
+          "line_range": [
+            287,
+            287
+          ]
+        },
+        {
+          "id": "if4_abstract",
+          "type": "if_statement",
+          "description": "when run as main script: set up argument parser for input AST file, original Python file, and optional output file, parse arguments, generate default output filename if not provided, and call the main function",
+          "line_range": [
+            289,
+            304
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/pyh_ast_generator.py"
+  }
+}

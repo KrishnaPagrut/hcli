@@ -1,0 +1,635 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "module_docstring",
+          "type": "docstring",
+          "description": "HCLI IDE Backend API - Provides REST API endpoints for the HCLI IDE frontend",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "imports_block",
+          "type": "import_statements",
+          "description": "import Flask web framework, CORS, standard libraries (os, json, subprocess, tempfile, shutil, pathlib, re, sys), and add parent directory to Python path",
+          "line_range": [
+            6,
+            18
+          ]
+        },
+        {
+          "id": "try1_block_abstract",
+          "type": "try_statement",
+          "description": "attempt to import custom modules with error handling",
+          "line_range": [
+            20,
+            27
+          ]
+        },
+        {
+          "id": "app_initialization",
+          "type": "assignment_block",
+          "description": "create Flask app instance, enable CORS for frontend communication, set repository root path and output directory",
+          "line_range": [
+            29,
+            35
+          ]
+        },
+        {
+          "id": "function_health_check",
+          "type": "function_definition",
+          "signature": "function health_check() -> None",
+          "children": [
+            {
+              "id": "health_check_response",
+              "type": "return_statement",
+              "description": "return JSON response with healthy status and message",
+              "line_range": [
+                40,
+                43
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_clone_repository",
+          "type": "function_definition",
+          "signature": "function clone_repository() -> None",
+          "children": [
+            {
+              "id": "clone_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "get_repo_url",
+                  "type": "assignment",
+                  "description": "extract repository URL from request JSON",
+                  "line_range": [
+                    49,
+                    52
+                  ]
+                },
+                {
+                  "id": "validate_repo_url",
+                  "type": "if_statement",
+                  "description": "return error if repository URL is missing",
+                  "line_range": [
+                    53,
+                    54
+                  ]
+                },
+                {
+                  "id": "clone_with_temp_dir",
+                  "type": "with_statement",
+                  "children": [
+                    {
+                      "id": "git_clone_command",
+                      "type": "subprocess_call",
+                      "description": "execute git clone command into temporary directory",
+                      "line_range": [
+                        57,
+                        64
+                      ]
+                    },
+                    {
+                      "id": "check_clone_result",
+                      "type": "if_statement",
+                      "description": "return error if git clone failed",
+                      "line_range": [
+                        65,
+                        69
+                      ]
+                    },
+                    {
+                      "id": "copy_files_loop",
+                      "type": "for_loop",
+                      "description": "iterate through cloned files and copy them to repository root, excluding .git, __pycache__, and .pytest_cache directories",
+                      "line_range": [
+                        72,
+                        80
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "clone_success_response",
+                  "type": "return_statement",
+                  "description": "return success message after successful clone",
+                  "line_range": [
+                    82,
+                    85
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_crawl_repository",
+          "type": "function_definition",
+          "signature": "function crawl_repository() -> None",
+          "children": [
+            {
+              "id": "crawl_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "run_ast_chunker",
+                  "type": "subprocess_call",
+                  "description": "execute ast_chunker.py script to generate AST files for all Python files in repository",
+                  "line_range": [
+                    95,
+                    103
+                  ]
+                },
+                {
+                  "id": "check_crawl_result",
+                  "type": "if_statement",
+                  "description": "return error if crawling failed",
+                  "line_range": [
+                    104,
+                    108
+                  ]
+                },
+                {
+                  "id": "crawl_success_response",
+                  "type": "return_statement",
+                  "description": "return success message with details about generated AST files",
+                  "line_range": [
+                    110,
+                    113
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_generate_pyh",
+          "type": "function_definition",
+          "signature": "function generate_pyh() -> None",
+          "children": [
+            {
+              "id": "pyh_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "get_ast_file_path",
+                  "type": "assignment",
+                  "description": "extract AST file path from request JSON",
+                  "line_range": [
+                    123,
+                    125
+                  ]
+                },
+                {
+                  "id": "validate_ast_path",
+                  "type": "if_statement",
+                  "description": "return error if AST file path is missing",
+                  "line_range": [
+                    126,
+                    127
+                  ]
+                },
+                {
+                  "id": "check_ast_exists",
+                  "type": "if_statement",
+                  "description": "return error if AST file doesn't exist",
+                  "line_range": [
+                    131,
+                    132
+                  ]
+                },
+                {
+                  "id": "check_python_file",
+                  "type": "if_statement",
+                  "description": "return error if corresponding Python file doesn't exist",
+                  "line_range": [
+                    137,
+                    138
+                  ]
+                },
+                {
+                  "id": "run_pyh_generator",
+                  "type": "subprocess_call",
+                  "description": "execute pyh_ast_generator.py to convert AST to human-readable format",
+                  "line_range": [
+                    140,
+                    144
+                  ]
+                },
+                {
+                  "id": "check_pyh_result",
+                  "type": "if_statement",
+                  "description": "return error if PYH generation failed",
+                  "line_range": [
+                    145,
+                    149
+                  ]
+                },
+                {
+                  "id": "pyh_success_response",
+                  "type": "return_statement",
+                  "description": "return success message with generated PYH file path",
+                  "line_range": [
+                    151,
+                    157
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_analyze_diff",
+          "type": "function_definition",
+          "signature": "function analyze_diff() -> None",
+          "children": [
+            {
+              "id": "diff_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "get_pyh_paths",
+                  "type": "assignment_block",
+                  "description": "extract old and new PYH file paths from request JSON",
+                  "line_range": [
+                    167,
+                    170
+                  ]
+                },
+                {
+                  "id": "validate_pyh_paths",
+                  "type": "if_statement",
+                  "description": "return error if either PYH file path is missing",
+                  "line_range": [
+                    171,
+                    172
+                  ]
+                },
+                {
+                  "id": "check_pyh_files_exist",
+                  "type": "if_statement",
+                  "description": "return error if one or both PYH files don't exist",
+                  "line_range": [
+                    178,
+                    179
+                  ]
+                },
+                {
+                  "id": "run_diff_analyzer",
+                  "type": "subprocess_call",
+                  "description": "execute diff_analyzer.py to analyze differences between PYH files",
+                  "line_range": [
+                    181,
+                    187
+                  ]
+                },
+                {
+                  "id": "check_diff_result",
+                  "type": "if_statement",
+                  "description": "return error if diff analysis failed",
+                  "line_range": [
+                    188,
+                    192
+                  ]
+                },
+                {
+                  "id": "diff_success_response",
+                  "type": "return_statement",
+                  "description": "return success message with diff analysis results",
+                  "line_range": [
+                    194,
+                    197
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_apply_changes",
+          "type": "function_definition",
+          "signature": "function apply_changes() -> None",
+          "children": [
+            {
+              "id": "apply_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "get_python_file_path",
+                  "type": "assignment",
+                  "description": "extract Python file path from request JSON",
+                  "line_range": [
+                    207,
+                    209
+                  ]
+                },
+                {
+                  "id": "validate_python_path",
+                  "type": "if_statement",
+                  "description": "return error if Python file path is missing",
+                  "line_range": [
+                    210,
+                    211
+                  ]
+                },
+                {
+                  "id": "check_python_file_exists",
+                  "type": "if_statement",
+                  "description": "return error if Python file doesn't exist",
+                  "line_range": [
+                    214,
+                    215
+                  ]
+                },
+                {
+                  "id": "run_apply_changes",
+                  "type": "subprocess_call",
+                  "description": "execute apply_changes_demo.py to apply changes to Python file",
+                  "line_range": [
+                    217,
+                    221
+                  ]
+                },
+                {
+                  "id": "check_apply_result",
+                  "type": "if_statement",
+                  "description": "return error if applying changes failed",
+                  "line_range": [
+                    222,
+                    226
+                  ]
+                },
+                {
+                  "id": "apply_success_response",
+                  "type": "return_statement",
+                  "description": "return success message after applying changes",
+                  "line_range": [
+                    228,
+                    231
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_get_files",
+          "type": "function_definition",
+          "signature": "function get_files() -> None",
+          "children": [
+            {
+              "id": "files_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "init_files_list",
+                  "type": "assignment",
+                  "description": "initialize empty files list",
+                  "line_range": [
+                    241,
+                    242
+                  ]
+                },
+                {
+                  "id": "function_scan_directory",
+                  "type": "function_definition",
+                  "signature": "function scan_directory(path, relative_path) -> None",
+                  "children": [
+                    {
+                      "id": "scan_loop",
+                      "type": "for_loop",
+                      "description": "iterate through directory items, skip hidden files and common build directories, add directories and files to list with proper structure",
+                      "line_range": [
+                        244,
+                        263
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "start_scan",
+                  "type": "function_call",
+                  "description": "initiate directory scanning from repository root",
+                  "line_range": [
+                    265,
+                    265
+                  ]
+                },
+                {
+                  "id": "files_success_response",
+                  "type": "return_statement",
+                  "description": "return JSON response with files list",
+                  "line_range": [
+                    266,
+                    266
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_get_file_content",
+          "type": "function_definition",
+          "signature": "function get_file_content(file_path) -> None",
+          "children": [
+            {
+              "id": "content_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "build_file_path",
+                  "type": "assignment",
+                  "description": "construct full file path from repository root and relative path",
+                  "line_range": [
+                    275,
+                    276
+                  ]
+                },
+                {
+                  "id": "check_file_exists",
+                  "type": "if_statement",
+                  "description": "return error if file doesn't exist",
+                  "line_range": [
+                    277,
+                    278
+                  ]
+                },
+                {
+                  "id": "check_not_directory",
+                  "type": "if_statement",
+                  "description": "return error if path is a directory",
+                  "line_range": [
+                    280,
+                    281
+                  ]
+                },
+                {
+                  "id": "read_file_content",
+                  "type": "file_operation",
+                  "description": "read file content with UTF-8 encoding and return as JSON response",
+                  "line_range": [
+                    283,
+                    288
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_get_pyh_output",
+          "type": "function_definition",
+          "signature": "function get_pyh_output(py_file_path) -> None",
+          "children": [
+            {
+              "id": "pyh_output_try_block",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "build_pyh_path",
+                  "type": "assignment",
+                  "description": "construct path to corresponding .ast.pyh.json file",
+                  "line_range": [
+                    298,
+                    305
+                  ]
+                },
+                {
+                  "id": "validate_python_file",
+                  "type": "if_statement",
+                  "description": "return error if Python file doesn't exist",
+                  "line_range": [
+                    300,
+                    301
+                  ]
+                },
+                {
+                  "id": "validate_pyh_file",
+                  "type": "if_statement",
+                  "description": "return error if corresponding PYH file doesn't exist",
+                  "line_range": [
+                    306,
+                    307
+                  ]
+                },
+                {
+                  "id": "process_pyh_content",
+                  "type": "file_processing_block",
+                  "description": "read PYH file, clean markdown formatting, parse JSON, validate structure, extract and format output",
+                  "line_range": [
+                    309,
+                    327
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_format_pyh_output",
+          "type": "function_definition",
+          "signature": "function format_pyh_output(lines) -> None",
+          "children": [
+            {
+              "id": "format_loop",
+              "type": "for_loop",
+              "description": "iterate through lines, remove line number annotations, preserve spacing and empty lines for proper alignment",
+              "line_range": [
+                337,
+                346
+              ]
+            },
+            {
+              "id": "return_formatted",
+              "type": "return_statement",
+              "description": "return formatted lines joined with newlines",
+              "line_range": [
+                348,
+                348
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_extract_line_mappings",
+          "type": "function_definition",
+          "signature": "function extract_line_mappings(pyh_data) -> None",
+          "children": [
+            {
+              "id": "init_mappings",
+              "type": "assignment",
+              "description": "initialize empty mappings list",
+              "line_range": [
+                352,
+                352
+              ]
+            },
+            {
+              "id": "function_extract_from_node",
+              "type": "function_definition",
+              "signature": "function extract_from_node(node, path) -> None",
+              "children": [
+                {
+                  "id": "extract_line_range",
+                  "type": "if_statement",
+                  "description": "if node has line_range, add mapping with PYH line, Python line, description and signature",
+                  "line_range": [
+                    355,
+                    361
+                  ]
+                },
+                {
+                  "id": "recurse_children",
+                  "type": "for_loop",
+                  "description": "recursively process child nodes to extract their line mappings",
+                  "line_range": [
+                    363,
+                    365
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "start_extraction",
+              "type": "if_statement",
+              "description": "begin extraction from main PYH chunks if they exist",
+              "line_range": [
+                367,
+                368
+              ]
+            },
+            {
+              "id": "return_mappings",
+              "type": "return_statement",
+              "description": "return collected line mappings",
+              "line_range": [
+                370,
+                370
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution",
+          "type": "if_statement",
+          "description": "when run as main script, start Flask development server on all interfaces at port 5001",
+          "line_range": [
+            373,
+            374
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/backend/app.py"
+  }
+}

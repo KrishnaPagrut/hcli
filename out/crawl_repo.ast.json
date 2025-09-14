@@ -1,0 +1,394 @@
+{
+  "metadata": {
+    "original_file": "/Users/krishnapagrut/Developer/hcli/crawl_repo.py",
+    "total_chunks": 14,
+    "chunking_method": "ast_semantic",
+    "timestamp": "2025-09-14T08:07:20.454744"
+  },
+  "chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "import os"
+          ],
+          "line_range": [
+            2,
+            2
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "from pathlib import Path"
+          ],
+          "line_range": [
+            3,
+            3
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import ast_chunker"
+          ],
+          "line_range": [
+            4,
+            4
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "import pyh_ast_generator"
+          ],
+          "line_range": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "IGNORE_DIRS = {",
+            "\".git\", \".github\", \".gitlab\", \".idea\", \".vscode\",",
+            "\"venv\", \".venv\", \"env\", \".env\",",
+            "\"__pycache__\", \"build\", \"dist\"",
+            "}"
+          ],
+          "line_range": [
+            8,
+            12
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "IGNORE_SUFFIXES = {\".egg-info\", \".pyc\", \".pyo\"}"
+          ],
+          "line_range": [
+            13,
+            13
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "function_crawl_repo",
+          "line_range": [
+            15,
+            67
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4_block",
+          "line_range": [
+            70,
+            77
+          ]
+        }
+      ],
+      "parent_scope": null
+    },
+    "function_crawl_repo": {
+      "id": "function_crawl_repo",
+      "type": "function_definition",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "def crawl_repo(repo_root, out_root) -> None:"
+          ],
+          "line_range": [
+            15,
+            15
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "repo_root = Path(repo_root).resolve()"
+          ],
+          "line_range": [
+            16,
+            16
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "out_root = repo_root / \"out\""
+          ],
+          "line_range": [
+            17,
+            17
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for1_loop",
+          "line_range": [
+            19,
+            67
+          ]
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "for1_loop": {
+      "id": "for1_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for (dirpath, dirnames, filenames) in os.walk(repo_root):"
+          ],
+          "line_range": [
+            19,
+            19
+          ]
+        },
+        {
+          "type": "code",
+          "content": [
+            "dirnames[:] = [d for d in dirnames if d not in IGNORE_DIRS]"
+          ],
+          "line_range": [
+            21,
+            21
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "for2_loop",
+          "line_range": [
+            23,
+            67
+          ]
+        }
+      ],
+      "parent_scope": "function_crawl_repo"
+    },
+    "for2_loop": {
+      "id": "for2_loop",
+      "type": "for_loop",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "for filename in filenames:"
+          ],
+          "line_range": [
+            23,
+            23
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1_block",
+          "line_range": [
+            25,
+            26
+          ]
+        },
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2_block",
+          "line_range": [
+            28,
+            67
+          ]
+        }
+      ],
+      "parent_scope": "for1_loop"
+    },
+    "if1_block": {
+      "id": "if1_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if1"
+        }
+      ],
+      "parent_scope": "for2_loop"
+    },
+    "if1": {
+      "id": "if1",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if any(filename.endswith(suffix) for suffix in IGNORE_SUFFIXES):",
+            "continue"
+          ],
+          "line_range": [
+            25,
+            26
+          ]
+        }
+      ],
+      "parent_scope": "if1_block"
+    },
+    "if2_block": {
+      "id": "if2_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if2"
+        }
+      ],
+      "parent_scope": "for2_loop"
+    },
+    "if2": {
+      "id": "if2",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if filename.endswith(\".py\"):",
+            "py_file = Path(dirpath) / filename",
+            "",
+            "# Skip files inside the out directory itself",
+            "if out_root in py_file.parents:",
+            "continue",
+            "",
+            "# Mirror the folder structure into out/",
+            "rel_path = py_file.relative_to(repo_root)",
+            "out_dir = out_root / rel_path.parent",
+            "out_dir.mkdir(parents=True, exist_ok=True)",
+            "",
+            "# Output file paths",
+            "ast_json = out_dir / f\"{py_file.stem}.ast.json\"",
+            "pyh_json = out_dir / f\"{py_file.stem}.pyh.ast.json\"",
+            "",
+            "print(f\"\\n\ud83d\udcc4 Processing {py_file}\")",
+            "",
+            "# 1. Run AST chunker (imported directly)",
+            "try:",
+            "chunker = ast_chunker.CodeChunker()",
+            "result = chunker.chunk_file(str(py_file))",
+            "ast_json.write_text(",
+            "__import__(\"json\").dumps(result, indent=2),",
+            "encoding=\"utf-8\"",
+            ")",
+            "print(f\"\u2705 Chunked \u2192 {ast_json}\")",
+            "except Exception as e:",
+            "print(f\"\u274c Chunker failed for {py_file}: {e}\")",
+            "continue",
+            "",
+            "# 2. Run pyh AST generator (imported directly)",
+            "try:",
+            "pyh_ast_generator.generate_pyh_with_claude(",
+            "str(ast_json), str(pyh_json), str(py_file)",
+            ")",
+            "print(f\"\u2705 Generated \u2192 {pyh_json}\")",
+            "except Exception as e:",
+            "print(f\"\u274c Generator failed for {py_file}: {e}\")",
+            "continue"
+          ],
+          "line_range": [
+            28,
+            67
+          ]
+        }
+      ],
+      "parent_scope": "if2_block"
+    },
+    "if3_block": {
+      "id": "if3_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if3"
+        }
+      ],
+      "parent_scope": "if2"
+    },
+    "if3": {
+      "id": "if3",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if out_root in py_file.parents:",
+            "continue"
+          ],
+          "line_range": [
+            32,
+            33
+          ]
+        }
+      ],
+      "parent_scope": "if3_block"
+    },
+    "try1_block": {
+      "id": "try1_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "if2"
+    },
+    "try2_block": {
+      "id": "try2_block",
+      "type": "try_statement",
+      "code_blocks": [],
+      "parent_scope": "if2"
+    },
+    "if4_block": {
+      "id": "if4_block",
+      "type": "if_else_block",
+      "code_blocks": [
+        {
+          "type": "chunk_ref",
+          "chunk_id": "if4"
+        }
+      ],
+      "parent_scope": "main"
+    },
+    "if4": {
+      "id": "if4",
+      "type": "if_statement",
+      "code_blocks": [
+        {
+          "type": "code",
+          "content": [
+            "if __name__ == \"__main__\":",
+            "import argparse",
+            "parser = argparse.ArgumentParser()",
+            "parser.add_argument(\"repo_root\", help=\"Path to the root of the repo to crawl\")",
+            "parser.add_argument(\"-o\", \"--out\", default=\"out\", help=\"Output root directory (default: out)\")",
+            "args = parser.parse_args()",
+            "",
+            "crawl_repo(args.repo_root, args.out)"
+          ],
+          "line_range": [
+            70,
+            77
+          ]
+        }
+      ],
+      "parent_scope": "if4_block"
+    }
+  },
+  "relationships": {
+    "execution_flow": [
+      "main"
+    ],
+    "dependency_graph": {}
+  },
+  "context_map": {
+    "global_imports": [],
+    "global_variables": [],
+    "functions": [],
+    "classes": []
+  }
+}

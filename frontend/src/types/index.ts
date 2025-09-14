@@ -37,6 +37,7 @@ export interface RepositoryState {
   branch: string;
   files: FileNode[];
   selectedFile: string | null;
+  currentDirectory: string;
 }
 
 export interface EditorState {

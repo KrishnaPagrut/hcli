@@ -7,6 +7,7 @@ const initialRepositoryState: RepositoryState = {
   branch: 'main',
   files: [],
   selectedFile: null,
+  currentDirectory: '/Users/krishnapagrut/Developer/hcli_test',
 };
 
 const initialEditorState: EditorState = {
@@ -21,6 +22,8 @@ const initialEditorState: EditorState = {
 interface AppStore extends AppState {
   // Repository actions
   setRepository: (repo: Partial<RepositoryState>) => void;
+  setCurrentDirectory: (directory: string) => void;
+  loadFiles: (directory?: string) => Promise<void>;
   cloneRepository: (url: string, branch: string) => Promise<void>;
   selectFile: (filePath: string) => Promise<void>;
   
@@ -29,6 +32,13 @@ interface AppStore extends AppState {
   updatePyhContent: (content: string) => void;
   addDiff: (diff: any) => void;
   clearDiffs: () => void;
+  
+  // Workflow actions
+  crawlRepository: (repoPath?: string) => Promise<void>;
+  generatePyhForFile: (astFilePath: string) => Promise<void>;
+  applyChanges: (pyFilePath: string) => Promise<void>;
+  saveUserPhy: (pyFilePath: string, phyContent: string) => Promise<void>;
+  applyPhyChanges: (pyFilePath: string) => Promise<void>;
   
   // App actions
   setLoading: (loading: boolean) => void;
@@ -48,6 +58,38 @@ export const useStore = create<AppStore>((set, get) => ({
       repository: { ...state.repository, ...repo },
     })),
 
+  setCurrentDirectory: (directory) =>
+    set((state) => ({
+      repository: { ...state.repository, currentDirectory: directory },
+    })),
+
+  loadFiles: async (directory?: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const targetDirectory = directory || get().repository.currentDirectory;
+      const response = await fetch(`/api/files?directory=${encodeURIComponent(targetDirectory)}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to load files');
+      }
+      
+      const data = await response.json();
+      
+      set({
+        repository: {
+          ...get().repository,
+          files: data.files || [],
+        },
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to load files',
+        isLoading: false,
+      });
+    }
+  },
+
   cloneRepository: async (url: string, branch: string) => {
     set({ isLoading: true, error: null });
     try {
@@ -62,7 +104,7 @@ export const useStore = create<AppStore>((set, get) => ({
       }
       
       // Fetch files after cloning
-      const filesResponse = await fetch('/api/files');
+      const filesResponse = await fetch(`/api/files?directory=${encodeURIComponent(get().repository.currentDirectory)}`);
       const filesData = await filesResponse.json();
       
       set({
@@ -72,6 +114,7 @@ export const useStore = create<AppStore>((set, get) => ({
           branch,
           files: filesData.files,
           selectedFile: null,
+          currentDirectory: get().repository.currentDirectory,
         },
         isLoading: false,
       });
@@ -87,11 +130,11 @@ export const useStore = create<AppStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Load Python file content
-      const pyResponse = await fetch(`/api/file/${filePath}`);
+      const pyResponse = await fetch(`/api/file/${filePath}?directory=${encodeURIComponent(get().repository.currentDirectory)}`);
       const pyData = await pyResponse.json();
       
       // Load PHY output (human-readable format)
-      const pyhResponse = await fetch(`/api/pyh-output/${filePath}`);
+      const pyhResponse = await fetch(`/api/pyh-output/${filePath}?directory=${encodeURIComponent(get().repository.currentDirectory)}`);
       const pyhData = pyhResponse.ok ? await pyhResponse.json() : null;
       
       set((state) => ({
@@ -143,6 +186,158 @@ export const useStore = create<AppStore>((set, get) => ({
         diffs: [],
       },
     })),
+
+  // Workflow actions
+  crawlRepository: async (repoPath?: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const targetPath = repoPath || get().repository.currentDirectory;
+      const response = await fetch('/api/crawl-repo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo_path: targetPath }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to crawl repository');
+      }
+      
+      const data = await response.json();
+      console.log('Repository crawled:', data);
+      
+      // Load files after crawling
+      await get().loadFiles(targetPath);
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to crawl repository',
+        isLoading: false,
+      });
+    }
+  },
+
+  generatePyhForFile: async (astFilePath) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch('/api/generate-pyh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ast_file_path: astFilePath }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate PYH file');
+      }
+      
+      const data = await response.json();
+      console.log('PYH file generated:', data);
+      
+      set({ isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to generate PYH file',
+        isLoading: false,
+      });
+    }
+  },
+
+  applyChanges: async (pyFilePath) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch('/api/apply-changes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ py_file_path: pyFilePath }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to apply changes');
+      }
+      
+      const data = await response.json();
+      console.log('Changes applied:', data);
+      
+      // Clear unsaved changes after successful apply
+      set((state) => ({
+        editor: {
+          ...state.editor,
+          hasUnsavedChanges: false,
+          diffs: [],
+        },
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to apply changes',
+        isLoading: false,
+      });
+    }
+  },
+
+  saveUserPhy: async (pyFilePath: string, phyContent: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`/api/save-user-phy?directory=${encodeURIComponent(get().repository.currentDirectory)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          py_file_path: pyFilePath, 
+          phy_content: phyContent 
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save user PHY content');
+      }
+      
+      const data = await response.json();
+      console.log('User PHY content saved:', data);
+      
+      set({ isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to save user PHY content',
+        isLoading: false,
+      });
+    }
+  },
+
+  applyPhyChanges: async (pyFilePath: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`/api/apply-phy-changes?directory=${encodeURIComponent(get().repository.currentDirectory)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ py_file_path: pyFilePath }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to apply PHY changes');
+      }
+      
+      const data = await response.json();
+      console.log('PHY changes applied:', data);
+      
+      // Clear unsaved changes after successful apply
+      set((state) => ({
+        editor: {
+          ...state.editor,
+          hasUnsavedChanges: false,
+          diffs: [],
+        },
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to apply PHY changes',
+        isLoading: false,
+      });
+    }
+  },
 
   // App actions
   setLoading: (loading) => set({ isLoading: loading }),
