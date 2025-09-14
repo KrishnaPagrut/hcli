@@ -273,7 +273,10 @@ class DiffAnalyzer:
             "file2": self.file2_path,
             "ast_file": self.ast_json_file,
             "total_changes": len(changes_dict),
-            "changes": changes_dict
+            "changes": changes_dict,
+            "metadata": {
+                "source_file": "/Users/krishnapagrut/Developer/hcli/test.ast.json"
+            }
         }
         
         return json.dumps(result, indent=2)
