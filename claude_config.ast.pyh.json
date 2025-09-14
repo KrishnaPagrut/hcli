@@ -1,0 +1,248 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "module_docstring",
+          "type": "docstring",
+          "description": "module docstring describing Claude Code SDK Configuration for different use cases",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "imports",
+          "type": "imports",
+          "description": "import ClaudeCodeOptions from claude_code_sdk, Path from pathlib, and os module",
+          "line_range": [
+            6,
+            8
+          ]
+        },
+        {
+          "id": "class_ClaudeConfig",
+          "type": "class_definition",
+          "signature": "class ClaudeConfig",
+          "description": "pre-configured Claude Code options for different scenarios",
+          "children": [
+            {
+              "id": "basic_config",
+              "type": "method_definition",
+              "signature": "method basic_config()",
+              "description": "returns basic configuration with simple system prompt for general queries",
+              "line_range": [
+                15,
+                19
+              ]
+            },
+            {
+              "id": "development_config",
+              "type": "method_definition",
+              "signature": "method development_config()",
+              "description": "returns development configuration with Python expert system prompt, acceptEdits permission mode, current working directory, and comprehensive tool set for coding tasks",
+              "line_range": [
+                22,
+                32
+              ]
+            },
+            {
+              "id": "analysis_config",
+              "type": "method_definition",
+              "signature": "method analysis_config()",
+              "description": "returns analysis configuration with code analysis expert system prompt, plan permission mode (no execution), and read-only tools for code examination",
+              "line_range": [
+                35,
+                43
+              ]
+            },
+            {
+              "id": "project_management_config",
+              "type": "method_definition",
+              "signature": "method project_management_config()",
+              "description": "returns project management configuration with task organization system prompt, acceptEdits permission mode, and tools for file management and web research",
+              "line_range": [
+                46,
+                54
+              ]
+            },
+            {
+              "id": "research_config",
+              "type": "method_definition",
+              "signature": "method research_config()",
+              "description": "returns research configuration with research assistant system prompt, plan permission mode, and web search tools for information gathering",
+              "line_range": [
+                57,
+                65
+              ]
+            },
+            {
+              "id": "custom_config",
+              "type": "method_definition",
+              "signature": "method custom_config(system_prompt, permission_mode, allowed_tools, cwd, **kwargs)",
+              "description": "creates custom configuration by setting provided parameters on a new ClaudeCodeOptions instance",
+              "children": [
+                {
+                  "id": "config_initialization",
+                  "type": "assignment",
+                  "description": "create new ClaudeCodeOptions instance",
+                  "line_range": [
+                    76,
+                    76
+                  ]
+                },
+                {
+                  "id": "parameter_setting",
+                  "type": "conditional_assignments",
+                  "description": "conditionally set system_prompt, permission_mode, allowed_tools, and cwd if provided",
+                  "line_range": [
+                    78,
+                    85
+                  ]
+                },
+                {
+                  "id": "kwargs_processing",
+                  "type": "for_loop",
+                  "description": "iterate through kwargs and set attributes on config object if they exist",
+                  "line_range": [
+                    88,
+                    90
+                  ]
+                },
+                {
+                  "id": "return_config",
+                  "type": "return_statement",
+                  "description": "return the configured ClaudeCodeOptions instance",
+                  "line_range": [
+                    92,
+                    92
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tool_sets_definition",
+          "type": "constant_definition",
+          "description": "define TOOL_SETS dictionary mapping tool set names to lists of available tools for different use cases",
+          "line_range": [
+            96,
+            107
+          ]
+        },
+        {
+          "id": "function_get_config_for_use_case",
+          "type": "function_definition",
+          "signature": "function get_config_for_use_case(use_case, **overrides)",
+          "description": "get pre-configured setup for common use cases with optional parameter overrides",
+          "children": [
+            {
+              "id": "configs_mapping",
+              "type": "assignment",
+              "description": "create dictionary mapping use case names to ClaudeConfig methods",
+              "line_range": [
+                121,
+                127
+              ]
+            },
+            {
+              "id": "use_case_validation",
+              "type": "if_statement",
+              "description": "validate use_case parameter exists in configs, raise ValueError with available options if not",
+              "line_range": [
+                129,
+                130
+              ]
+            },
+            {
+              "id": "config_retrieval",
+              "type": "assignment",
+              "description": "call appropriate config method to get base configuration",
+              "line_range": [
+                132,
+                132
+              ]
+            },
+            {
+              "id": "overrides_application",
+              "type": "for_loop",
+              "description": "iterate through override parameters and set them on config object if attributes exist",
+              "line_range": [
+                135,
+                137
+              ]
+            },
+            {
+              "id": "return_config",
+              "type": "return_statement",
+              "description": "return the final configured ClaudeCodeOptions instance",
+              "line_range": [
+                139,
+                139
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_add_tools_to_config",
+          "type": "function_definition",
+          "signature": "function add_tools_to_config(config, tool_set_name)",
+          "description": "add predefined set of tools to existing configuration",
+          "children": [
+            {
+              "id": "tool_set_validation",
+              "type": "if_statement",
+              "description": "validate tool_set_name exists in TOOL_SETS, raise ValueError with available options if not",
+              "line_range": [
+                153,
+                154
+              ]
+            },
+            {
+              "id": "tools_retrieval",
+              "type": "assignment",
+              "description": "get tools list from TOOL_SETS using tool_set_name",
+              "line_range": [
+                156,
+                156
+              ]
+            },
+            {
+              "id": "tools_addition",
+              "type": "if_else_statement",
+              "description": "if config already has allowed_tools extend the list, otherwise set allowed_tools to the new tools list",
+              "line_range": [
+                157,
+                160
+              ]
+            },
+            {
+              "id": "return_config",
+              "type": "return_statement",
+              "description": "return the updated configuration",
+              "line_range": [
+                162,
+                162
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution_examples",
+          "type": "if_statement",
+          "description": "when run as main script: demonstrate three examples - getting development config, creating custom config with overrides, and adding tools to basic config",
+          "line_range": [
+            166,
+            183
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "claude_config.py"
+  }
+}

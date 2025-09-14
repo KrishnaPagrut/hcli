@@ -1,0 +1,65 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports",
+          "type": "import_statements",
+          "description": "import necessary modules: uvicorn for server, sys for system operations, os for environment, and Path for file operations",
+          "line_range": [
+            5,
+            8
+          ]
+        },
+        {
+          "id": "function_main",
+          "type": "function_definition",
+          "signature": "function main() -> None",
+          "children": [
+            {
+              "id": "startup_messages",
+              "type": "print_statements",
+              "description": "print startup banner and separator line for the HCLI Backend API Server",
+              "line_range": [
+                12,
+                13
+              ]
+            },
+            {
+              "id": "if1_abstract",
+              "type": "if_statement",
+              "description": "check if api_server.py exists in current directory, if not found print error message and exit with status 1",
+              "line_range": [
+                16,
+                19
+              ]
+            },
+            {
+              "id": "server_info_messages",
+              "type": "print_statements",
+              "description": "print server startup information including URL endpoints for main server, API docs, and health check, plus instructions to stop server",
+              "line_range": [
+                32,
+                36
+              ]
+            }
+          ]
+        },
+        {
+          "id": "if2_abstract",
+          "type": "if_statement",
+          "description": "when run as main script, call the main function to start the server",
+          "line_range": [
+            53,
+            54
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/start_server.py"
+  }
+}

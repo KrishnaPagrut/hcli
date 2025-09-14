@@ -1,0 +1,88 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "imports_and_constants",
+          "type": "imports_and_constants",
+          "description": "import os, pathlib, ast_chunker, pyh_ast_generator modules and define IGNORE_DIRS set containing common directories to skip (.git, venv, __pycache__, etc.) and IGNORE_SUFFIXES set for file extensions to skip",
+          "line_range": [
+            2,
+            13
+          ]
+        },
+        {
+          "id": "function_crawl_repo",
+          "type": "function_definition",
+          "signature": "function crawl_repo(takes repo_root and out_root parameters)",
+          "children": [
+            {
+              "id": "path_setup",
+              "type": "assignment",
+              "description": "resolve repo_root to absolute path and set out_root to repo_root/out directory",
+              "line_range": [
+                16,
+                17
+              ]
+            },
+            {
+              "id": "for1_loop_abstract",
+              "type": "for_loop",
+              "description": "walk through repository directory structure using os.walk",
+              "children": [
+                {
+                  "id": "filter_directories",
+                  "type": "assignment",
+                  "description": "filter out ignored directories from the directory traversal",
+                  "line_range": [
+                    21,
+                    21
+                  ]
+                },
+                {
+                  "id": "for2_loop_abstract",
+                  "type": "for_loop",
+                  "description": "process each file in the current directory",
+                  "children": [
+                    {
+                      "id": "if1_abstract",
+                      "type": "if_statement",
+                      "description": "skip files with ignored suffixes (.pyc, .pyo, .egg-info)",
+                      "line_range": [
+                        25,
+                        26
+                      ]
+                    },
+                    {
+                      "id": "if2_abstract",
+                      "type": "if_statement",
+                      "description": "process Python files: create output directory structure, skip files in output directory, then run AST chunker and pyh generator with error handling for each step",
+                      "line_range": [
+                        28,
+                        67
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "if4_abstract",
+          "type": "if_statement",
+          "description": "when run as main: setup argparse with repo_root argument and optional output directory, then call crawl_repo with parsed arguments",
+          "line_range": [
+            70,
+            77
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/crawl_repo.py"
+  }
+}

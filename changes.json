@@ -2,8 +2,24 @@
   "file1": "test01_strict_op.txt",
   "file2": "test01_user_op.txt",
   "ast_file": "/Users/krishnapagrut/Developer/hcli_test/out/test01.pyh.ast.json",
-  "total_changes": 5,
+  "total_changes": 10,
   "changes": [
+    {
+      "node_id": "import_datetime",
+      "node_type": "import_statement",
+      "signature": null,
+      "description": "import datetime module",
+      "line_range": [
+        1,
+        1
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        1
+      ],
+      "original_content": "    import datetime module  (lines 1\u20131)",
+      "modified_content": "import datetime"
+    },
     {
       "node_id": "class_TextUtils",
       "node_type": "class_definition",
@@ -15,26 +31,58 @@
       ],
       "change_type": "changed",
       "affected_output_lines": [
-        1
+        2
       ],
       "original_content": "    class TextUtils",
-      "modified_content": "import datetime"
+      "modified_content": ""
     },
     {
       "node_id": "TextUtils_word_count",
       "node_type": "method_definition",
-      "signature": "method word_count(takes self and text)",
-      "description": "returns the number of words in a string by splitting and counting",
+      "signature": "method word_count(self, text)",
+      "description": null,
       "line_range": [
-        2,
-        4
+        0,
+        0
       ],
       "change_type": "changed",
       "affected_output_lines": [
-        2
+        3
       ],
-      "original_content": "        method word_count(takes self and text)  (lines 2\u20134)",
-      "modified_content": ""
+      "original_content": "        method word_count(self, text)",
+      "modified_content": "class TextUtils"
+    },
+    {
+      "node_id": "word_count_docstring",
+      "node_type": "docstring",
+      "signature": null,
+      "description": "docstring explaining method returns number of words in a string",
+      "line_range": [
+        6,
+        6
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        4
+      ],
+      "original_content": "            docstring explaining method returns number of words in a string  (lines 6\u20136)",
+      "modified_content": "    method word_count(self, text)"
+    },
+    {
+      "node_id": "word_count_logic",
+      "node_type": "assignment_and_processing",
+      "signature": null,
+      "description": "import re module, normalize text by removing punctuation and converting to lowercase, split into words and return count",
+      "line_range": [
+        8,
+        10
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        5
+      ],
+      "original_content": "            import re module, normalize text by removing punctuation and converting to lowercase, split into words and return count  (lines 8\u201310)",
+      "modified_content": "        instead of just splitting, normalize to lowercase and ignore punctuation"
     },
     {
       "node_id": "class_MathUtils",
@@ -47,42 +95,74 @@
       ],
       "change_type": "changed",
       "affected_output_lines": [
-        4
+        6
       ],
       "original_content": "    class MathUtils",
-      "modified_content": "    method word_count(self, text)"
+      "modified_content": "        loop through characters, build words manually, then count them"
     },
     {
       "node_id": "MathUtils_add",
       "node_type": "method_definition",
-      "signature": "method add(takes self, a, and b)",
-      "description": "returns the sum of two numbers",
+      "signature": "method add(self, a, b)",
+      "description": null,
       "line_range": [
-        8,
-        10
-      ],
-      "change_type": "changed",
-      "affected_output_lines": [
-        5
-      ],
-      "original_content": "        method add(takes self, a, and b)  (lines 8\u201310)",
-      "modified_content": "        instead of just splitting, normalize to lowercase and ignore punctuation"
-    },
-    {
-      "node_id": "if1_abstract",
-      "node_type": "if_statement",
-      "signature": null,
-      "description": "when run as main: create instances of TextUtils and MathUtils, then print word count of 'hello world' and sum of 2 and 3",
-      "line_range": [
-        13,
-        17
+        0,
+        0
       ],
       "change_type": "changed",
       "affected_output_lines": [
         7
       ],
-      "original_content": "    when run as main: create instances of TextUtils and MathUtils, then print word count of 'hello world' and sum of 2 and 3  (lines 13\u201317)",
+      "original_content": "        method add(self, a, b)",
       "modified_content": ""
+    },
+    {
+      "node_id": "add_docstring",
+      "node_type": "docstring",
+      "signature": null,
+      "description": "docstring explaining method returns sum of two numbers",
+      "line_range": [
+        15,
+        15
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        8
+      ],
+      "original_content": "            docstring explaining method returns sum of two numbers  (lines 15\u201315)",
+      "modified_content": "    method is_anagram(self, s1, s2)"
+    },
+    {
+      "node_id": "add_return",
+      "node_type": "return_statement",
+      "signature": null,
+      "description": "return the sum of parameters a and b",
+      "line_range": [
+        16,
+        16
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        9
+      ],
+      "original_content": "            return the sum of parameters a and b  (lines 16\u201316)",
+      "modified_content": "        helper normalize() that strips spaces, lowercases, and sorts"
+    },
+    {
+      "node_id": "if1_abstract",
+      "node_type": "if_statement",
+      "signature": null,
+      "description": "when run as main: create instances of TextUtils and MathUtils, test word_count method with 'hello world' and add method with 2 and 3, printing both results",
+      "line_range": [
+        19,
+        23
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        10
+      ],
+      "original_content": "    when run as main: create instances of TextUtils and MathUtils, test word_count method with 'hello world' and add method with 2 and 3, printing both results  (lines 19\u201323)",
+      "modified_content": "        return True if normalize(s1) equals normalize(s2)"
     }
   ],
   "metadata": {

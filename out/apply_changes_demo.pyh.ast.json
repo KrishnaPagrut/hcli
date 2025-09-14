@@ -1,0 +1,405 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "module_docstring",
+          "type": "docstring",
+          "description": "module docstring describing apply changes demo using Claude to apply changes from changes.json to test.py",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "imports_block",
+          "type": "import_statements",
+          "description": "import standard libraries (asyncio, json, os, sys, re, pathlib) and third-party modules (claude_code_sdk, claude_config, ast_chunker, pyh_ast_generator)",
+          "line_range": [
+            6,
+            13
+          ]
+        },
+        {
+          "id": "additional_imports",
+          "type": "import_statements",
+          "description": "import ast_chunker and pyh_ast_generator modules",
+          "line_range": [
+            277,
+            278
+          ]
+        },
+        {
+          "id": "function_apply_changes_from_json",
+          "type": "function_definition",
+          "signature": "async function apply_changes_from_json(takes file_stem string)",
+          "children": [
+            {
+              "id": "try_apply_changes",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "load_changes_json",
+                  "type": "with_statement",
+                  "description": "load changes.json file and parse JSON data",
+                  "line_range": [
+                    20,
+                    21
+                  ]
+                },
+                {
+                  "id": "resolve_ast_path",
+                  "type": "assignment",
+                  "description": "get ast_file path from changes data",
+                  "line_range": [
+                    23,
+                    24
+                  ]
+                },
+                {
+                  "id": "check_ast_path",
+                  "type": "if_statement",
+                  "description": "if ast_path is missing, raise ValueError with error message",
+                  "line_range": [
+                    25,
+                    26
+                  ]
+                },
+                {
+                  "id": "load_ast_data",
+                  "type": "with_statement",
+                  "description": "load AST file and parse JSON data",
+                  "line_range": [
+                    28,
+                    29
+                  ]
+                },
+                {
+                  "id": "resolve_source_file",
+                  "type": "assignment_block",
+                  "description": "extract metadata from AST data, resolve source_file from metadata supporting both source_file and source_py keys with fallback",
+                  "line_range": [
+                    31,
+                    40
+                  ]
+                },
+                {
+                  "id": "normalize_file_extension",
+                  "type": "if_statement",
+                  "description": "if source_file ends with .ast.pyh.json, replace extension with .py",
+                  "line_range": [
+                    43,
+                    44
+                  ]
+                },
+                {
+                  "id": "setup_config_and_summary",
+                  "type": "assignment_block",
+                  "description": "load Claude config for development use case and initialize changes summary string",
+                  "line_range": [
+                    46,
+                    51
+                  ]
+                },
+                {
+                  "id": "build_changes_summary",
+                  "type": "for_loop",
+                  "description": "for each change in changes data, extract line range, original and modified content, format line info based on range length, and append to changes summary",
+                  "line_range": [
+                    53,
+                    65
+                  ]
+                },
+                {
+                  "id": "create_prompt_template",
+                  "type": "assignment",
+                  "description": "create detailed multi-line prompt template with context, rules, and format instructions for Claude to apply abstracted diffs",
+                  "line_range": [
+                    67,
+                    113
+                  ]
+                },
+                {
+                  "id": "convert_prompt_format",
+                  "type": "assignment",
+                  "description": "convert multi-line prompt to single line for CLI compatibility by replacing newlines and extra spaces",
+                  "line_range": [
+                    115,
+                    115
+                  ]
+                },
+                {
+                  "id": "print_request_info",
+                  "type": "print_statements",
+                  "description": "print request information and iterate through changes to display node_id and content changes",
+                  "line_range": [
+                    117,
+                    124
+                  ]
+                },
+                {
+                  "id": "initialize_modified_files",
+                  "type": "assignment",
+                  "description": "initialize empty list for modified files",
+                  "line_range": [
+                    126,
+                    126
+                  ]
+                },
+                {
+                  "id": "process_claude_response",
+                  "type": "async_for_loop",
+                  "description": "iterate through Claude query responses, process AssistantMessage content blocks, extract and parse JSON for modified_files list with regex matching and error handling",
+                  "line_range": [
+                    128,
+                    143
+                  ]
+                },
+                {
+                  "id": "return_modified_files",
+                  "type": "return_statement",
+                  "description": "print debug info and return list of modified files",
+                  "line_range": [
+                    145,
+                    147
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "exception_handling",
+              "type": "except_blocks",
+              "description": "handle various exceptions: FileNotFoundError, JSONDecodeError, CLINotFoundError, ProcessError, and general Exception with appropriate error messages",
+              "line_range": [
+                149,
+                164
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_analyze_changes_structure",
+          "type": "function_definition",
+          "signature": "async function analyze_changes_structure()",
+          "children": [
+            {
+              "id": "try_analyze_changes",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "load_and_analyze_changes",
+                  "type": "with_statement",
+                  "description": "load changes.json and print analysis including total changes, files involved, AST file",
+                  "line_range": [
+                    171,
+                    176
+                  ]
+                },
+                {
+                  "id": "print_detailed_changes",
+                  "type": "for_loop",
+                  "description": "iterate through changes and print detailed information for each change including node_id, type, signature, description, line range, change type, original and modified content",
+                  "line_range": [
+                    178,
+                    188
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "analyze_exception_handling",
+              "type": "except_blocks",
+              "description": "handle FileNotFoundError, JSONDecodeError, and general exceptions with error messages",
+              "line_range": [
+                190,
+                195
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_create_updated_test_file",
+          "type": "function_definition",
+          "signature": "async function create_updated_test_file()",
+          "children": [
+            {
+              "id": "try_create_updated_file",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "read_current_file",
+                  "type": "with_statement",
+                  "description": "read current test.py file content",
+                  "line_range": [
+                    203,
+                    204
+                  ]
+                },
+                {
+                  "id": "setup_config_and_prompt",
+                  "type": "assignment_block",
+                  "description": "get config for development and create prompt for updating Task class with timeToComplete parameter",
+                  "line_range": [
+                    206,
+                    218
+                  ]
+                },
+                {
+                  "id": "try_claude_query",
+                  "type": "try_statement",
+                  "description": "attempt to query Claude with main prompt and print responses, with fallback to simpler prompt if main attempt fails",
+                  "line_range": [
+                    222,
+                    244
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "create_file_exception_handling",
+              "type": "except_blocks",
+              "description": "handle FileNotFoundError and general exceptions",
+              "line_range": [
+                246,
+                249
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_regenerate_ast_files",
+          "type": "function_definition",
+          "signature": "function regenerate_ast_files(takes py_file and repo_root)",
+          "children": [
+            {
+              "id": "setup_paths",
+              "type": "assignment_block",
+              "description": "resolve py_file and repo_root paths, calculate relative path from repo root",
+              "line_range": [
+                281,
+                289
+              ]
+            },
+            {
+              "id": "create_output_structure",
+              "type": "assignment_block",
+              "description": "create output directory structure and define AST and pyh JSON file paths",
+              "line_range": [
+                291,
+                296
+              ]
+            },
+            {
+              "id": "print_regeneration_info",
+              "type": "print_statement",
+              "description": "print regeneration status message",
+              "line_range": [
+                298,
+                298
+              ]
+            },
+            {
+              "id": "generate_ast_json",
+              "type": "try_statement",
+              "description": "attempt to generate AST JSON using ast_chunker with error handling",
+              "line_range": [
+                300,
+                307
+              ]
+            },
+            {
+              "id": "generate_pyh_json",
+              "type": "try_statement",
+              "description": "attempt to generate pyh JSON using pyh_ast_generator with error handling",
+              "line_range": [
+                309,
+                313
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_main",
+          "type": "function_definition",
+          "signature": "async function main()",
+          "children": [
+            {
+              "id": "try_main_execution",
+              "type": "try_statement",
+              "children": [
+                {
+                  "id": "print_header",
+                  "type": "print_statements",
+                  "description": "print demo header with title and separator",
+                  "line_range": [
+                    318,
+                    320
+                  ]
+                },
+                {
+                  "id": "load_changes_and_determine_stem",
+                  "type": "with_statement",
+                  "description": "load changes.json and determine file stem from ast_file or metadata.source_file",
+                  "line_range": [
+                    322,
+                    332
+                  ]
+                },
+                {
+                  "id": "validate_file_stem",
+                  "type": "if_statement",
+                  "description": "if file_stem cannot be determined, raise ValueError",
+                  "line_range": [
+                    334,
+                    335
+                  ]
+                },
+                {
+                  "id": "apply_changes_and_regenerate",
+                  "type": "assignment_and_conditional",
+                  "description": "call apply_changes_from_json and if modified files are returned, regenerate AST files for each modified file, otherwise print no files message",
+                  "line_range": [
+                    337,
+                    346
+                  ]
+                },
+                {
+                  "id": "print_success",
+                  "type": "print_statement",
+                  "description": "print demo completion success message",
+                  "line_range": [
+                    348,
+                    348
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "main_exception_handling",
+              "type": "except_block",
+              "description": "handle any exception and print failure message with error details",
+              "line_range": [
+                350,
+                351
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution_guard",
+          "type": "if_statement",
+          "description": "if running as main module, execute main() function with asyncio.run()",
+          "line_range": [
+            354,
+            355
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/apply_changes_demo.py"
+  }
+}

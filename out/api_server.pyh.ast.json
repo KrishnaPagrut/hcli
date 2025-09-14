@@ -1,0 +1,510 @@
+{
+  "phy_chunks": {
+    "main": {
+      "id": "main",
+      "type": "module",
+      "children": [
+        {
+          "id": "module_docstring",
+          "type": "docstring",
+          "description": "FastAPI Server for HCLI Backend - provides endpoints for crawling repositories, displaying pyh files, and converting pyh to py",
+          "line_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": "imports",
+          "type": "import_group",
+          "description": "import standard libraries (asyncio, json, os, subprocess, tempfile, pathlib, typing, uuid) and third-party libraries (fastapi, uvicorn, pydantic)",
+          "line_range": [
+            6,
+            19
+          ]
+        },
+        {
+          "id": "local_imports",
+          "type": "import_group",
+          "description": "import local modules (crawl_repo, pyh_ast_to_output, diff_analyzer, apply_changes_demo)",
+          "line_range": [
+            22,
+            25
+          ]
+        },
+        {
+          "id": "app_initialization",
+          "type": "assignment",
+          "description": "create FastAPI application instance with title 'HCLI Backend API' and version '1.0.0'",
+          "line_range": [
+            28,
+            32
+          ]
+        },
+        {
+          "id": "cors_middleware",
+          "type": "middleware_setup",
+          "description": "add CORS middleware allowing requests from localhost:3000 with full permissions",
+          "line_range": [
+            35,
+            41
+          ]
+        },
+        {
+          "id": "class_CrawlRequest",
+          "type": "class_definition",
+          "signature": "class CrawlRequest",
+          "children": [
+            {
+              "id": "crawl_request_fields",
+              "type": "field_definitions",
+              "description": "define repo_path as string and optional output_dir defaulting to 'out'",
+              "line_range": [
+                46,
+                47
+              ]
+            }
+          ]
+        },
+        {
+          "id": "class_CrawlResponse",
+          "type": "class_definition",
+          "signature": "class CrawlResponse",
+          "children": [
+            {
+              "id": "crawl_response_fields",
+              "type": "field_definitions",
+              "description": "define response fields: success (bool), message (str), output_dir (str), processed_files (List[str])",
+              "line_range": [
+                51,
+                54
+              ]
+            }
+          ]
+        },
+        {
+          "id": "class_DisplayPyhRequest",
+          "type": "class_definition",
+          "signature": "class DisplayPyhRequest",
+          "children": [
+            {
+              "id": "display_pyh_request_fields",
+              "type": "field_definitions",
+              "description": "define pyh_file_path as string",
+              "line_range": [
+                58,
+                58
+              ]
+            }
+          ]
+        },
+        {
+          "id": "class_DisplayPyhResponse",
+          "type": "class_definition",
+          "signature": "class DisplayPyhResponse",
+          "children": [
+            {
+              "id": "display_pyh_response_fields",
+              "type": "field_definitions",
+              "description": "define response fields: success (bool), content (str), file_path (str)",
+              "line_range": [
+                62,
+                64
+              ]
+            }
+          ]
+        },
+        {
+          "id": "class_PyhToPyRequest",
+          "type": "class_definition",
+          "signature": "class PyhToPyRequest",
+          "children": [
+            {
+              "id": "pyh_to_py_request_fields",
+              "type": "field_definitions",
+              "description": "define fields: pyh_file_path (str), original_pyh_content (str), modified_pyh_content (str), optional source_py_file",
+              "line_range": [
+                68,
+                71
+              ]
+            }
+          ]
+        },
+        {
+          "id": "class_PyhToPyResponse",
+          "type": "class_definition",
+          "signature": "class PyhToPyResponse",
+          "children": [
+            {
+              "id": "pyh_to_py_response_fields",
+              "type": "field_definitions",
+              "description": "define response fields: success (bool), message (str), changes_applied (bool), modified_files (List[str]), optional changes_json",
+              "line_range": [
+                75,
+                79
+              ]
+            }
+          ]
+        },
+        {
+          "id": "temp_files_storage",
+          "type": "global_variable",
+          "description": "initialize global dictionary to track temporary files by session ID",
+          "line_range": [
+            83,
+            83
+          ]
+        },
+        {
+          "id": "function_root",
+          "type": "function_definition",
+          "signature": "async function root()",
+          "children": [
+            {
+              "id": "root_response",
+              "type": "return_statement",
+              "description": "return API information including message, version, and endpoint descriptions",
+              "line_range": [
+                89,
+                97
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_crawl_repository",
+          "type": "function_definition",
+          "signature": "async function crawl_repository(request: CrawlRequest)",
+          "children": [
+            {
+              "id": "crawl_validation",
+              "type": "validation_block",
+              "description": "validate repository path exists, set default output directory",
+              "line_range": [
+                112,
+                116
+              ]
+            },
+            {
+              "id": "crawl_execution",
+              "type": "execution_block",
+              "description": "run crawl_repo function, find generated pyh files, and prepare response with processed files list",
+              "line_range": [
+                118,
+                131
+              ]
+            },
+            {
+              "id": "crawl_error_handling",
+              "type": "exception_handling",
+              "description": "catch any exceptions and raise HTTPException with 500 status code",
+              "line_range": [
+                133,
+                134
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_display_pyh_file",
+          "type": "function_definition",
+          "signature": "async function display_pyh_file(request: DisplayPyhRequest)",
+          "children": [
+            {
+              "id": "display_validation",
+              "type": "validation_block",
+              "description": "validate pyh file path exists",
+              "line_range": [
+                149,
+                151
+              ]
+            },
+            {
+              "id": "display_processing",
+              "type": "processing_block",
+              "description": "use pyh_ast_to_output to format content and return DisplayPyhResponse",
+              "line_range": [
+                153,
+                160
+              ]
+            },
+            {
+              "id": "display_error_handling",
+              "type": "exception_handling",
+              "description": "catch exceptions and raise HTTPException with 500 status code",
+              "line_range": [
+                162,
+                163
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_convert_pyh_to_py",
+          "type": "function_definition",
+          "signature": "async function convert_pyh_to_py(request: PyhToPyRequest)",
+          "children": [
+            {
+              "id": "session_setup",
+              "type": "initialization_block",
+              "description": "generate unique session ID and create temporary directory for processing",
+              "line_range": [
+                182,
+                190
+              ]
+            },
+            {
+              "id": "source_file_determination",
+              "type": "conditional_logic",
+              "description": "determine source Python file from request or extract from pyh metadata, validate file exists",
+              "line_range": [
+                195,
+                222
+              ]
+            },
+            {
+              "id": "diff_analysis",
+              "type": "processing_block",
+              "description": "create DiffAnalyzer instance, analyze changes, generate and write changes.json with correct source file path",
+              "line_range": [
+                224,
+                239
+              ]
+            },
+            {
+              "id": "changes_application",
+              "type": "execution_block",
+              "description": "change to temp directory, copy source file, run apply_changes_demo, restore directory, copy modified file back",
+              "line_range": [
+                241,
+                263
+              ]
+            },
+            {
+              "id": "success_response",
+              "type": "return_statement",
+              "description": "return successful PyhToPyResponse with applied changes information",
+              "line_range": [
+                265,
+                273
+              ]
+            },
+            {
+              "id": "apply_error_response",
+              "type": "exception_handling",
+              "description": "handle apply_changes_demo failures and return partial success response",
+              "line_range": [
+                275,
+                283
+              ]
+            },
+            {
+              "id": "general_error_handling",
+              "type": "exception_handling",
+              "description": "catch general exceptions and raise HTTPException with 500 status",
+              "line_range": [
+                285,
+                286
+              ]
+            },
+            {
+              "id": "cleanup",
+              "type": "cleanup_block",
+              "description": "clean up temporary files and directories, remove session from tracking",
+              "line_range": [
+                287,
+                292
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_health_check",
+          "type": "function_definition",
+          "signature": "async function health_check()",
+          "children": [
+            {
+              "id": "health_response",
+              "type": "return_statement",
+              "description": "return healthy status message",
+              "line_range": [
+                298,
+                298
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_get_files",
+          "type": "function_definition",
+          "signature": "async function get_files(directory: str = 'test')",
+          "children": [
+            {
+              "id": "directory_validation",
+              "type": "validation_block",
+              "description": "validate directory exists and is actually a directory",
+              "line_range": [
+                305,
+                313
+              ]
+            },
+            {
+              "id": "function_build_file_tree",
+              "type": "function_definition",
+              "signature": "function build_file_tree(path: Path, relative_path: str = '')",
+              "children": [
+                {
+                  "id": "file_tree_processing",
+                  "type": "recursive_processing",
+                  "description": "recursively iterate through directory items, build tree structure for folders (excluding hidden/cache dirs) and files (.py, .json, .pyh, .txt), handle permission errors gracefully",
+                  "line_range": [
+                    319,
+                    344
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "file_tree_execution",
+              "type": "execution_block",
+              "description": "call build_file_tree and return file tree with directory information",
+              "line_range": [
+                346,
+                347
+              ]
+            },
+            {
+              "id": "file_error_handling",
+              "type": "exception_handling",
+              "description": "catch exceptions and raise HTTPException with 500 status",
+              "line_range": [
+                349,
+                350
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_get_file_content",
+          "type": "function_definition",
+          "signature": "async function get_file_content(file_path: str)",
+          "children": [
+            {
+              "id": "file_validation",
+              "type": "validation_block",
+              "description": "validate file exists and is actually a file",
+              "line_range": [
+                360,
+                365
+              ]
+            },
+            {
+              "id": "content_reading",
+              "type": "file_processing",
+              "description": "read file content as UTF-8 text, handle binary files with fallback message, return content with file info",
+              "line_range": [
+                367,
+                378
+              ]
+            },
+            {
+              "id": "content_error_handling",
+              "type": "exception_handling",
+              "description": "catch exceptions and raise HTTPException with 500 status",
+              "line_range": [
+                380,
+                381
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_get_pyh_output",
+          "type": "function_definition",
+          "signature": "async function get_pyh_output(file_path: str)",
+          "children": [
+            {
+              "id": "pyh_file_validation",
+              "type": "validation_block",
+              "description": "validate file exists, is a file, and is a Python file",
+              "line_range": [
+                390,
+                400
+              ]
+            },
+            {
+              "id": "ast_file_location",
+              "type": "file_resolution",
+              "description": "locate corresponding .ast.json file, try current directory first then out/ directory",
+              "line_range": [
+                402,
+                410
+              ]
+            },
+            {
+              "id": "ast_processing",
+              "type": "file_processing",
+              "description": "read AST JSON file, process nodes using pyh_ast_to_output.render_node, combine into output string",
+              "line_range": [
+                412,
+                427
+              ]
+            },
+            {
+              "id": "pyh_error_handling",
+              "type": "exception_handling",
+              "description": "catch processing and general exceptions, raise appropriate HTTPExceptions",
+              "line_range": [
+                429,
+                434
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_list_temp_files",
+          "type": "function_definition",
+          "signature": "async function list_temp_files()",
+          "children": [
+            {
+              "id": "list_sessions",
+              "type": "return_statement",
+              "description": "return list of active temporary file session IDs",
+              "line_range": [
+                440,
+                440
+              ]
+            }
+          ]
+        },
+        {
+          "id": "function_cleanup_temp_files",
+          "type": "function_definition",
+          "signature": "async function cleanup_temp_files(session_id: str)",
+          "children": [
+            {
+              "id": "cleanup_validation",
+              "type": "validation_block",
+              "description": "validate session exists, remove temp directory and session tracking",
+              "line_range": [
+                446,
+                455
+              ]
+            }
+          ]
+        },
+        {
+          "id": "main_execution",
+          "type": "if_statement",
+          "description": "when run as main script: start uvicorn server on host 0.0.0.0:8000 with reload and info logging",
+          "line_range": [
+            458,
+            465
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "source_py": "/Users/krishnapagrut/Developer/hcli/api_server.py"
+  }
+}
