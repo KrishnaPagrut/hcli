@@ -1,0 +1,91 @@
+{
+  "file1": "test01_strict_op.txt",
+  "file2": "test01_user_op.txt",
+  "ast_file": "/Users/krishnapagrut/Developer/hcli_test/out/test01.pyh.ast.json",
+  "total_changes": 5,
+  "changes": [
+    {
+      "node_id": "class_TextUtils",
+      "node_type": "class_definition",
+      "signature": "class TextUtils",
+      "description": null,
+      "line_range": [
+        0,
+        0
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        1
+      ],
+      "original_content": "    class TextUtils",
+      "modified_content": "import datetime"
+    },
+    {
+      "node_id": "TextUtils_word_count",
+      "node_type": "method_definition",
+      "signature": "method word_count(takes self and text)",
+      "description": "returns the number of words in a string by splitting and counting",
+      "line_range": [
+        2,
+        4
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        2
+      ],
+      "original_content": "        method word_count(takes self and text)  (lines 2\u20134)",
+      "modified_content": ""
+    },
+    {
+      "node_id": "class_MathUtils",
+      "node_type": "class_definition",
+      "signature": "class MathUtils",
+      "description": null,
+      "line_range": [
+        0,
+        0
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        4
+      ],
+      "original_content": "    class MathUtils",
+      "modified_content": "    method word_count(self, text)"
+    },
+    {
+      "node_id": "MathUtils_add",
+      "node_type": "method_definition",
+      "signature": "method add(takes self, a, and b)",
+      "description": "returns the sum of two numbers",
+      "line_range": [
+        8,
+        10
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        5
+      ],
+      "original_content": "        method add(takes self, a, and b)  (lines 8\u201310)",
+      "modified_content": "        instead of just splitting, normalize to lowercase and ignore punctuation"
+    },
+    {
+      "node_id": "if1_abstract",
+      "node_type": "if_statement",
+      "signature": null,
+      "description": "when run as main: create instances of TextUtils and MathUtils, then print word count of 'hello world' and sum of 2 and 3",
+      "line_range": [
+        13,
+        17
+      ],
+      "change_type": "changed",
+      "affected_output_lines": [
+        7
+      ],
+      "original_content": "    when run as main: create instances of TextUtils and MathUtils, then print word count of 'hello world' and sum of 2 and 3  (lines 13\u201317)",
+      "modified_content": ""
+    }
+  ],
+  "metadata": {
+    "source_file": "/Users/krishnapagrut/Developer/hcli_test/out/test01.pyh.ast.json"
+  }
+}

@@ -1,0 +1,40 @@
+import datetime
+
+class TextUtils
+    method word_count(self, text) 
+        instead of just splitting, normalize to lowercase and ignore punctuation
+        loop through characters, build words manually, then count them
+
+    method is_anagram(self, s1, s2)
+        helper normalize() that strips spaces, lowercases, and sorts
+        return True if normalize(s1) equals normalize(s2)
+
+    method word_frequency(self, text)
+        return a dictionary of word → count
+        use a for loop to build counts
+
+class MathUtils
+    method factorial(self, n)
+        if n < 0 raise ValueError
+        iterative factorial with a for loop
+
+    method fibonacci(self, n)
+        iterative fibonacci with while loop
+        build a list and return it
+
+class DateUtils
+    method today(self)
+        return today’s date in YYYY-MM-DD format
+
+    method days_between(self, d1, d2)
+        return absolute number of days between two dates
+
+when run as main:
+    replace simple prints with a text menu:
+        1 → word frequency
+        2 → anagram check
+        3 → factorial
+        4 → fibonacci
+        5 → days between two dates
+    ask user for input, branch accordingly
+    print results
