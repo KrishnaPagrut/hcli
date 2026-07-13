@@ -5,9 +5,19 @@
 [![React 18](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.116.1-green.svg)](https://fastapi.tiangolo.com/)
 
+## 🏆 Winner — Warp Best Developer Tool Challenge at HackMIT 2025
+
+HCLI won the **Warp Best Developer Tool Challenge at HackMIT 2025**.
+
 Video Demo: https://www.youtube.com/watch?v=SaYtTa2IvbA 
 
 A sophisticated web-based IDE that transforms Python code into human-readable format, enabling natural language code editing and collaboration. HCLI bridges the gap between traditional code and human understanding through advanced AST (Abstract Syntax Tree) processing and intelligent code transformation.
+
+## 👥 Contributors
+
+- **Ruhan Malli**
+- **Krishna Pragut**
+- **Veer Shah**
 
 ## 🚀 Features
 
